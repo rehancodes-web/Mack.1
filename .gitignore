@@ -1,2 +1,4 @@
 node_modules/
 a6/cache/
+a6/outputs/classify_log.txt
+a6/outputs/classify_err.txt
