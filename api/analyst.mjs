@@ -48,10 +48,14 @@ export default async function handler(req, res) {
   const r = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
-    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 700, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content }] }),
+    // reasoning models can spend the whole budget thinking: turn thinking off for these short, grounded answers
+    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 2048, chat_template_kwargs: { enable_thinking: false, thinking: false },
+      messages: [{ role: 'system', content: '/no_think\n' + SYSTEM }, { role: 'user', content }] }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) return res.status(502).json({ error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}`, model });
-  const text = String(j.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-  return res.status(200).json({ answer: text || '(no answer)', model });
+  const ch = j.choices?.[0] || {};
+  const text = String(ch.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^[\s\S]*<\/think>/, '').trim();
+  if (!text) return res.status(502).json({ error: `Nemotron returned no answer (finish: ${ch.finish_reason || 'unknown'}, reasoning only: ${Boolean(ch.message?.reasoning_content)})`, model });
+  return res.status(200).json({ answer: text, model });
 }
