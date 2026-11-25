@@ -135,6 +135,7 @@ const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).
  // all airports merged into ONE mesh (4,000+ separate meshes made the globe stutter); clicks find the nearest airport instead
  .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(true).pointResolution(5)
  .onGlobeClick(c=>pickAirport(c)).onPointClick((p,e,c)=>pickAirport(c)).onPolygonClick((p,e,c)=>pickAirport(c))
+ .onLabelClick((p,e,c)=>pickAirport(c)).onPathClick((p,e,c)=>pickAirport(c)) // the Jewar label and orbit lines sit in front of airports
  .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
  .polygonLabel(d=>'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
  .labelsData(aps.filter(a=>a.jewar)).labelLat('lat').labelLng('lng').labelText(()=>'Jewar').labelSize(1.1).labelDotRadius(.4).labelColor(()=>'#FFD24A').labelAltitude(.065).labelResolution(2)
