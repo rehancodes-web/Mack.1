@@ -58,9 +58,9 @@ const chart = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="chartTit
 <desc id="chartDesc">Land cleared all year (NDVI baseline)${ai.length ? ' and Larper built or paved share' : ''}, with the reported 80% claim in January 2025.</desc>
 ${grid}${gaps}
 <path class="ln base" d="${line(base, 'fp_cleared_12m')}"/>
-${ai.length ? `<path class="ln larper" d="${line(ai, 'built_paved_frac')}"/>` : ''}
+${ai.length ? `<path class="ln larper" d="${line(ai, 'built_or_bare_frac')}"/>` : ''}
 ${endLabel(base, 'fp_cleared_12m', 'base', 'Cleared land')}
-${ai.length ? endLabel(ai, 'built_paved_frac', 'larper', 'Larper: built') : ''}
+${ai.length ? endLabel(ai, 'built_or_bare_frac', 'larper', 'Larper: converted') : ''}
 <line class="gapline" x1="${claimX}" x2="${claimX}" y1="${claimY}" y2="${obsY}"/>
 <circle class="claim" cx="${claimX}" cy="${claimY}" r="6"/><text class="el claimt" x="${claimX - 10}" y="${claimY - 12}" text-anchor="end">Reported: 80% complete</text>
 <circle class="obs" cx="${claimX}" cy="${obsY}" r="5"/><text class="el base" x="${claimX + 10}" y="${obsY + 18}">Seen from orbit: ${dec.satellite_observed_pct}%</text>
@@ -68,7 +68,7 @@ ${ai.length ? endLabel(ai, 'built_paved_frac', 'larper', 'Larper: built') : ''}
 
 // ---------- app pieces ----------
 const lastShot = SHOTS[SHOTS.length - 1], firstShot = SHOTS[0];
-const larperBuilt = jan25 ? pct(jan25.built_paved_frac) : null;
+const larperBuilt = jan25 ? pct(jan25.built_or_bare_frac) : null;
 const scen = dec.scenarios.map(s => `<tr${s.name.startsWith('Satellite') ? ' class="hi"' : ''}><td>${esc(s.name)}</td><td>${s.p.toFixed(2)}</td><td>$${Math.round(s.release).toLocaleString('en-US')}</td><td>$${Math.round(s.inspect).toLocaleString('en-US')}</td><td><b>${s.action === 'inspect' ? 'Inspect' : 'Release'}</b></td></tr>`).join('');
 const classRows = met ? met.per_class.map(c => `<tr><td><i class="dot ${c.class}"></i>${c.class.replace('_', ' / ')}</td><td>${pct(c.recall)}</td><td>${pct(c.precision)}</td></tr>`).join('') : '';
 const reviewItems = rev ? [
@@ -202,7 +202,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="tiles" aria-label="Key figures for January 2025">
   <div class="tile claim"><div class="k">Builder's claim, Jan 2025 <span class="ev rep">reported</span></div><div class="v">80%</div><div class="s">"work complete" (Business Standard)</div></div>
   <div class="tile orbit"><div class="k">Seen from orbit, Jan 2025 <span class="ev der">derived</span></div><div class="v">${dec.satellite_observed_pct}%</div><div class="s">land converted, Sentinel-2</div></div>
-  <div class="tile larp"><div class="k">Larper: built or paved <span class="ev ai">AI</span></div><div class="v">${larperBuilt ?? '…'}</div><div class="s">${larperBuilt ? 'of the site, Jan 2025' : 'model run in progress'}</div></div>
+  <div class="tile larp"><div class="k">Larper: converted land <span class="ev ai">AI</span></div><div class="v">${larperBuilt ?? '…'}</div><div class="s">${larperBuilt ? 'of the site, Jan 2025' : 'model run in progress'}</div></div>
   <div class="tile"><div class="k">Larper accuracy <span class="ev ai">AI</span></div><div class="v">${met ? Math.round(met.overall_accuracy * 100) + '%' : '…'}</div><div class="s">${met ? 'agreement with ESA WorldCover on unseen land' : 'model run in progress'}</div></div>
  </section>
 
@@ -226,7 +226,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="panel" aria-labelledby="h-prog">
   <h2 id="h-prog">Progress over time <span class="ev der">derived</span></h2>
   ${chart}
-  <p class="note">Green: land free of vegetation all year (crop cycles never count). ${ai.length ? 'Blue: Larper built or paved share.' : 'Larper\'s built/paved line is added when its run finishes.'} Grey: too cloudy to measure. After 2025 the green line dips as grass regrows on unpaved ground; Larper is built to separate that from real change.</p>
+  <p class="note">Green: land free of vegetation all year (crop cycles never count). ${ai.length ? 'Blue: Larper converted land (built or paved plus bare earth). The built-only share is noisy (it reads some dry 2020 fields as paved), so we do not quote it alone.' : 'Larper\'s built/paved line is added when its run finishes.'} Grey: too cloudy to measure. After 2025 the green line dips as grass regrows on unpaved ground; Larper is built to separate that from real change.</p>
  </section>
 
  <div class="two">
