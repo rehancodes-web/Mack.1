@@ -16,6 +16,16 @@ Rules:
 - When images are supplied (a Sentinel-2 true-colour photo and the class map from Larper, our Random Forest land-cover model: red built/paved, sand bare, green vegetation, blue water, dark = outside footprint), compare them: say where the class map looks right and list specific areas where it seems wrong. You are a visual cross-check of Larper, not a replacement for its numbers; label your observations "AI visual check".
 - Be concise: at most 150 words unless asked for a memo. Memos: max 250 words, headings Evidence / Decision / Caveats.`;
 
+// Earth Viewer mode: describe change at any location from two Sentinel-2 cloudless yearly mosaics.
+const SYSTEM_EARTH = `You compare two satellite images of the same place for NavContinuity's Earth Viewer.
+Images: Sentinel-2 cloudless yearly mosaics (EOX), about 10 m per pixel, same area, labelled with their years.
+Rules:
+- Describe only what is visible: new or removed buildings, roads, runways, clearing, farmland, water, mining, flooding.
+- Give rough sizes using the scale in CONTEXT when helpful. Say "unclear" rather than guess.
+- Do not identify or track people, vehicles or individual private properties. No military targeting.
+- These are composites of many dates: seasonal colour differences are not change.
+- Reply in at most 4 short bullets, then one line "Change level: none / minor / major".`;
+
 export const config = { api: { bodyParser: { sizeLimit: '4mb' } } };
 
 export default async function handler(req, res) {
@@ -50,7 +60,7 @@ export default async function handler(req, res) {
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
     // reasoning models can spend the whole budget thinking: turn thinking off for these short, grounded answers
     body: JSON.stringify({ model, temperature: 0.2, max_tokens: 2048, chat_template_kwargs: { enable_thinking: false, thinking: false },
-      messages: [{ role: 'system', content: '/no_think\n' + SYSTEM }, { role: 'user', content }] }),
+      messages: [{ role: 'system', content: '/no_think\n' + (body.mode === 'earth' ? SYSTEM_EARTH : SYSTEM) }, { role: 'user', content }] }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) return res.status(502).json({ error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}`, model });
