@@ -28,7 +28,8 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors(origin) });
     if (req.method !== 'POST') return json({ error: 'POST only' }, 405, origin);
     if (!ALLOWED_ORIGINS.includes(origin)) return json({ error: 'origin not allowed' }, 403, origin);
-    if (!env.GEMINI_API_KEY) return json({ error: 'backend has no GEMINI_API_KEY secret' }, 500, origin);
+    const KEY = String(env.GEMINI_API_KEY || '').trim().replace(/^["']|["']$/g, '').replace(/^GEMINI_API_KEY=/, '');
+    if (!KEY) return json({ error: 'backend has no GEMINI_API_KEY secret' }, 500, origin);
 
     let body; try { body = await req.json(); } catch { return json({ error: 'bad JSON' }, 400, origin); }
     const question = String(body.question || '').slice(0, MAX_Q).trim();
@@ -43,7 +44,7 @@ export default {
     const model = env.GEMINI_MODEL || MODEL_DEFAULT;
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM }] },
         contents: [{ role: 'user', parts: [...images, { text: `CONTEXT:\n${context}\n\nQUESTION:\n${question}` }] }],

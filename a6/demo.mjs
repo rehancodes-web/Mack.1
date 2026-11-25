@@ -12,7 +12,7 @@ const ai = rd('progress_ai.json').results;
 const met = rd('classifier_metrics.json');
 const dec = rd('decision.json');
 const rdy = fs.existsSync(path.join(OUT, 'readiness.json')) ? rd('readiness.json') : null;
-const AI_ENDPOINT = process.env.AI_ENDPOINT || '';
+const AI_ENDPOINT = process.env.AI_ENDPOINT ?? '/api/analyst'; // same Vercel project serves page + API
 // compact, labelled context the AI analyst may use (nothing else)
 const CTX = {
   asset: 'Noida International Airport (Jewar), footprint ~1333 ha, Sentinel-2 2020-2026',
@@ -103,11 +103,11 @@ ${rdy ? `<h2>5 · Hand-off to NavContinuity: recovery capacity</h2>
 <tr><td>Usable as diversion / rebooking airport</td><td>${rdy.recovery_capacity.usable_for_navcontinuity}</td></tr>
 <tr><td>Region passed to Track C</td><td>${rdy.region.radius_km} km around ${rdy.region.centre.lat}°N, ${rdy.region.centre.lon}°E <span class="lab">assumed</span></td></tr>
 </table><p class="note">Track C then asks whether GNSS is degraded inside this region; no coverage reads "unknown", never "safe".</p></div>` : ''}
-<h2>6 · Ask the analyst <span class="lab">AI · Gemini</span></h2>
+<h2>6 · Ask the analyst <span class="lab">AI · NVIDIA Nemotron</span></h2>
 <div class="card"><p class="note">Answers come only from this page's data, with reported / derived / assumed labels kept. AI text can be wrong: check it against the charts above.</p>
 <p style="display:flex;gap:8px;flex-wrap:wrap"><input id="q" maxlength="600" placeholder="e.g. Why does the baseline fall after 2025?" style="flex:1;min-width:220px;padding:8px;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--fg)">
 <button id="ask">Ask</button><button id="memo">Write lender memo</button></p>
-<p style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><b>Model + Gemini cross-check:</b>
+<p style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><b>Model + Nemotron vision cross-check:</b>
 <select id="vm">${['2026-03', '2024-03', '2020-03'].filter(m => fs.existsSync(path.join(OUT, `classmap_${m}.png`))).map(m => `<option>${m}</option>`).join('')}</select>
 <button id="vis">Check RF map against the satellite photo</button></p>
 <div id="ans" style="white-space:pre-wrap"></div></div>

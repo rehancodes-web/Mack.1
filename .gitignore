@@ -5,3 +5,4 @@ a6/outputs/classify_err.txt
 backend/.wrangler/
 backend/.dev.vars
 .env
+.vercel
