@@ -138,7 +138,7 @@ button{cursor:pointer;font-weight:650}button.primary{background:var(--larper);bo
 .scrub{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;font-size:13px;color:var(--mut)}
 .legend i,.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .dot.built_paved,.legend .b{background:#dc3c3c}.dot.bare,.legend .a{background:#e6c878}.dot.vegetation,.legend .g{background:#3c8c3c}.dot.water,.legend .w{background:#3c78dc}
-.legend{display:flex;gap:12px;flex-wrap:wrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap}.legend[hidden]{display:none}
 .two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
 svg{width:100%;height:auto;display:block}
 .g{stroke:var(--rule)}.ax{fill:var(--mut);font-size:12px}.gap{fill:var(--rule);opacity:.55}
