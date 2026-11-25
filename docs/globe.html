@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NavContinuity Globe</title>
+<meta name="description" content="3D globe: GPS, Galileo and NavIC satellites, the proposed LEO augmentation layer (Track B3), GPS interference zones (Track C) and airports with before/after satellite imagery.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{--rail:#0B1216;--railfg:#AEBBC1;--panel:rgba(16,26,32,.86);--ink:#E4EBEA;--mut:#93A2A9;--rule:#2A3840;--acc:#86A3FF;--focus:#86A3FF;
+ --gps:#F2C14E;--gal:#5FD3F3;--navic:#FF8A3D;--leo:#B98CFF;--high:#E05A43;--med:#E8B33A;--ap:#E8EEF0;--apin:#7CE38B}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#000;color:var(--ink);font:14px/1.5 Archivo,system-ui,sans-serif;overflow:hidden}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.top{position:fixed;top:0;left:0;right:0;height:54px;display:flex;align-items:center;gap:22px;padding:0 18px;background:var(--rail);color:var(--railfg);z-index:20}
+.brand{font-weight:800;font-variation-settings:"wdth" 118;color:#fff;font-size:17px;display:flex;align-items:center;gap:9px}.brand svg{width:22px;height:22px}
+.mods{display:flex;gap:4px;height:100%}.mods a{display:flex;align-items:center;gap:7px;padding:0 12px;color:var(--railfg);text-decoration:none;border-bottom:2px solid transparent;font-weight:600}
+.mods a[aria-current]{color:#fff;border-bottom-color:#86A3FF}.mods small{font-size:11px;border:1px solid currentColor;border-radius:4px;padding:0 5px}
+#globe{position:fixed;inset:54px 0 0 0}
+.side{position:fixed;top:66px;left:12px;width:300px;max-height:calc(100vh - 78px);overflow:auto;background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;z-index:10}
+.side h1{font-size:17px;margin:0 0 2px;font-weight:800;font-variation-settings:"wdth" 110}.side p{margin:0 0 10px;color:var(--mut);font-size:12.5px}
+.layer{display:flex;align-items:center;gap:9px;padding:6px 0;border-top:1px solid var(--rule);cursor:pointer}
+.layer input{accent-color:var(--acc);width:16px;height:16px}
+.layer i{width:10px;height:10px;border-radius:50%;flex:none}
+.layer span{flex:1}.layer b{font-weight:700}.layer small{display:block;color:var(--mut);font-size:11.5px}
+.layer em{font-style:normal;color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums}
+.search{display:flex;gap:6px;margin:10px 0 4px}
+input[type=text],button,select{font:inherit;color:var(--ink);background:#14212A;border:1px solid var(--rule);border-radius:6px;padding:6px 9px}
+input[type=text]{flex:1;min-width:0}button{cursor:pointer;font-weight:650}
+#hits{list-style:none;margin:0;padding:0}#hits li button{width:100%;text-align:left;border:0;background:transparent;padding:4px 2px;font-weight:500}#hits li button:hover{background:#1c2b34}
+.clock{font-size:12px;color:var(--mut);margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.note{font-size:11.5px;color:var(--mut);margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:grid;place-items:center;padding:16px}
+.modal[hidden]{display:none}
+.card{width:min(1100px,100%);height:min(720px,100%);background:#0F171C;border:1px solid var(--rule);border-radius:10px;display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+.card header{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--rule)}
+.card h2{margin:0;font-size:16px;font-weight:800;font-variation-settings:"wdth" 108}.card header p{margin:0;color:var(--mut);font-size:12.5px}
+.card header .sp{flex:1}.card header a{color:var(--acc);font-weight:650;font-size:13px}
+.card iframe{width:100%;height:100%;border:0;background:#0b1216}
+.tip{background:rgba(10,18,23,.92);border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font:12.5px/1.4 Archivo,system-ui,sans-serif;color:#E4EBEA}
+@media (max-width:820px){.top{flex-wrap:wrap;height:auto;padding:8px 12px}.mods{flex-wrap:wrap}.mods a{padding:6px 8px}#globe{inset:88px 0 0 0}.side{top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:42vh}}
+</style></head><body>
+<header class="top">
+ <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
+ <nav class="mods" aria-label="Modules">
+  <a href="globe.html" aria-current="page">Globe <small>all tracks</small></a>
+  <a href="index.html">Site Monitor <small>Track A6</small></a>
+  <a href="earth.html">Earth Viewer <small>any place</small></a>
+  <a href="c.html">GNSS Watch <small>Track C</small></a>
+  <a href="b3.html">Nav Integrity <small>Track B3</small></a>
+ </nav>
+</header>
+<div id="globe" role="application" aria-label="3D globe with satellites and airports; click an airport to compare satellite images"></div>
+<aside class="side" aria-labelledby="sh">
+ <h1 id="sh">Navigation from orbit</h1>
+ <p>Live positions of navigation satellites, the proposed low-orbit (LEO) augmentation layer, GPS interference seen by aircraft, and airports. Click any airport dot to compare its satellite images between years.</p>
+ <label class="layer"><input type="checkbox" data-l="GPS" checked><i style="background:var(--gps)"></i><span><b>GPS</b> (USA)<small>~20,200 km orbit</small></span><em id="nGPS"></em></label>
+ <label class="layer"><input type="checkbox" data-l="Galileo" checked><i style="background:var(--gal)"></i><span><b>Galileo</b> (EU)<small>~23,200 km orbit</small></span><em id="nGalileo"></em></label>
+ <label class="layer"><input type="checkbox" data-l="NavIC" checked><i style="background:var(--navic)"></i><span><b>NavIC</b> (India)<small>~36,000 km, over India</small></span><em id="nNavIC"></em></label>
+ <label class="layer"><input type="checkbox" data-l="LEO" checked><i style="background:var(--leo)"></i><span><b>LEO augmentation</b> (proposed, Track B3)<small>simulated: 114 sats, 1,000 km, 6 planes</small></span><em id="nLEO"></em></label>
+ <label class="layer"><input type="checkbox" data-l="orbits" checked><i style="background:linear-gradient(90deg,var(--gps),var(--leo))"></i><span><b>Orbit paths</b><small>one track per satellite (one plane for LEO)</small></span></label>
+ <label class="layer"><input type="checkbox" data-l="gnss" checked><i style="background:var(--high)"></i><span><b>GPS interference</b> (Track C)<small>aircraft reports, 1 Nov 2026; red high, amber medium</small></span><em id="nGnss"></em></label>
+ <label class="layer"><input type="checkbox" data-l="airports" checked><i style="background:var(--ap)"></i><span><b>Airports</b><small>large airports worldwide, India in green</small></span><em id="nAp"></em></label>
+ <form class="search" id="sf"><input type="text" id="sq" placeholder="Find an airport (name or code)" aria-label="Find an airport" autocomplete="off"><button type="submit">Find</button></form>
+ <ul id="hits" aria-live="polite"></ul>
+ <div class="clock"><span id="clk"></span><label>Speed <select id="spd"><option value="1">real time</option><option value="60" selected>60×</option><option value="600">600×</option></select></label></div>
+ <div class="note">Orbits: CelesTrak elements, propagated in your browser (SGP4). LEO layer is the Track B3 design, not real satellites. Airports: OurAirports. Globe imagery: NASA Blue Marble.</div>
+</aside>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mt">
+ <div class="card"><header><div><h2 id="mt"></h2><p id="ms"></p></div><span class="sp"></span><a id="mfull" href="#" target="_blank" rel="noopener">Open in Earth Viewer</a><button id="mclose" type="button">Close</button></header>
+ <iframe id="mframe" title="Before and after satellite imagery of the airport" loading="lazy"></iframe></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"></script>
+<script>
+(async function(){
+const IMG='https://cdn.jsdelivr.net/npm/three-globe@2.45.6/example/img/';
+const RE=6371, COL={GPS:'#F2C14E',Galileo:'#5FD3F3',NavIC:'#FF8A3D',LEO:'#B98CFF'};
+const D=await (await fetch('globe-data.json')).json();
+const show={GPS:true,Galileo:true,NavIC:true,LEO:true,orbits:true,gnss:true,airports:true};
+
+// ---- satellites: real (SGP4) + proposed LEO Walker constellation (circular, analytic) ----
+const real=[];for(const [sys,list] of Object.entries(D.sats))for(const [name,l1,l2] of list){try{real.push({sys,name,rec:satellite.twoline2satrec(l1,l2)});}catch(e){}}
+const LEO={planes:6,per:19,inc:50*Math.PI/180,alt:1000};const MU=398600.4418,a=RE+LEO.alt,nLeo=Math.sqrt(MU/a**3); // rad/s
+const leo=[];for(let p=0;p<LEO.planes;p++)for(let k=0;k<LEO.per;k++)leo.push({sys:'LEO',name:'LEO-B3 '+(p+1)+'-'+(k+1),raan:2*Math.PI*p/LEO.planes,m0:2*Math.PI*k/LEO.per+p*2*Math.PI/(LEO.planes*LEO.per)});
+const T0=Date.now();
+function leoPos(s,date){const t=(date-T0)/1000,u=s.m0+nLeo*t,gm=satellite.gstime(date);
+ const x=Math.cos(u),y=Math.sin(u),cr=Math.cos(s.raan),sr=Math.sin(s.raan),ci=Math.cos(LEO.inc),si=Math.sin(LEO.inc);
+ const X=cr*x-sr*ci*y,Y=sr*x+cr*ci*y,Z=si*y;let lng=Math.atan2(Y,X)-gm;lng=((lng+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+ return {lat:Math.asin(Z)*180/Math.PI,lng:lng*180/Math.PI,alt:LEO.alt/RE};}
+function realPos(s,date){const pv=satellite.propagate(s.rec,date);if(!pv||!pv.position)return null;const g=satellite.eciToGeodetic(pv.position,satellite.gstime(date));
+ return {lat:satellite.degreesLat(g.latitude),lng:satellite.degreesLong(g.longitude),alt:g.height/RE};}
+function orbitPath(s,date){const pts=[];if(s.sys==='LEO'){const per=2*Math.PI/nLeo*1000;for(let i=0;i<=72;i++){const p=leoPos(s,new Date(+date+per*i/72));pts.push([p.lat,p.lng,p.alt]);}}
+ else{const per=2*Math.PI/s.rec.no*60000;for(let i=0;i<=72;i++){const p=realPos(s,new Date(+date+per*i/72));if(p)pts.push([p.lat,p.lng,p.alt]);}}return {sys:s.sys,pts};}
+
+// ---- airports and interference cells ----
+const aps=D.airports.map(([name,code,lat,lng,cc,large])=>({name,code,lat,lng,cc,large,jewar:code==='DXN'||/Noida International/i.test(name)}));
+const cell=(la,lo)=>({type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[lo,la],[lo+1,la],[lo+1,la+1],[lo,la+1],[lo,la]]]}});
+const gnss=D.gnss.map(([la,lo,lvl,share,n])=>({...cell(la,lo),lvl,share,n,la,lo}));
+
+const el=document.getElementById('globe');
+const G=Globe()(el).globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
+ .atmosphereColor('#86A3FF').atmosphereAltitude(.18)
+ .pointsData(aps).pointLat('lat').pointLng('lng').pointAltitude(d=>d.jewar?.06:.006).pointRadius(d=>d.jewar?.45:d.cc==='IN'?.22:.16)
+ .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(false)
+ .pointLabel(d=>'<div class="tip"><b>'+d.name.replace(/</g,'&lt;')+'</b>'+(d.code?' · '+d.code:'')+'<br>Click to compare satellite images</div>')
+ .onPointClick(openAirport)
+ .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
+ .polygonLabel(d=>'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
+ .labelsData(aps.filter(a=>a.jewar)).labelLat('lat').labelLng('lng').labelText(()=>'Jewar').labelSize(1.1).labelDotRadius(.4).labelColor(()=>'#FFD24A').labelAltitude(.065).labelResolution(2)
+ .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>COL[d.sys]+'55').pathStroke(.6).pathTransitionDuration(0)
+ .particlesData([]).particleLat('lat').particleLng('lng').particleAltitude('alt').particlesSize(d=>d.length&&d[0].sys==='LEO'?2.2:3.2).particlesColor(d=>d.length?COL[d[0].sys]:'#fff').particlesSizeAttenuation(false);
+G.controls().autoRotate=true;G.controls().autoRotateSpeed=.35;
+G.pointOfView({lat:22,lng:79,altitude:4.2},0);
+const resize=()=>G.width(el.clientWidth).height(el.clientHeight);addEventListener('resize',resize);resize();
+el.addEventListener('pointerdown',()=>{G.controls().autoRotate=false;},{once:true});
+
+// ---- animation clock ----
+let simT=Date.now(),last=performance.now();const spd=document.getElementById('spd'),clk=document.getElementById('clk');
+function paths(){if(!show.orbits){G.pathsData([]);return;}const d=new Date(simT),list=[];
+ for(const s of real)if(show[s.sys])list.push(orbitPath(s,d));
+ if(show.LEO)for(let p=0;p<LEO.planes;p++)list.push(orbitPath(leo[p*LEO.per],d));G.pathsData(list);}
+function tick(){const now=performance.now();simT+= (now-last)*(+spd.value);last=now;const d=new Date(simT);
+ const groups=[];for(const sys of ['GPS','Galileo','NavIC']){if(!show[sys]){groups.push([]);continue;}groups.push(real.filter(s=>s.sys===sys).map(s=>{const p=realPos(s,d);return p&&{...p,sys};}).filter(Boolean));}
+ groups.push(show.LEO?leo.map(s=>({...leoPos(s,d),sys:'LEO'})):[]);
+ G.particlesData(groups.map(g=>g.length?g:[{lat:0,lng:0,alt:-1,sys:'GPS'}].slice(0,0)));
+ clk.textContent=d.toISOString().slice(0,16).replace('T',' ')+' UTC';}
+setInterval(tick,120);tick();paths();setInterval(paths,30000);spd.onchange=paths;
+
+// ---- counts and toggles ----
+for(const k of ['GPS','Galileo','NavIC'])document.getElementById('n'+k).textContent=D.sats[k].length;
+document.getElementById('nLEO').textContent=leo.length;document.getElementById('nGnss').textContent=gnss.length;document.getElementById('nAp').textContent=aps.length.toLocaleString('en-US');
+document.querySelectorAll('[data-l]').forEach(cb=>cb.onchange=()=>{show[cb.dataset.l]=cb.checked;
+ G.pointsData(show.airports?aps:[]);G.labelsData(show.airports?aps.filter(a=>a.jewar):[]);G.polygonsData(show.gnss?gnss:[]);paths();tick();});
+
+// ---- airport search ----
+const hits=document.getElementById('hits');
+document.getElementById('sf').onsubmit=e=>{e.preventDefault();const q=document.getElementById('sq').value.trim().toLowerCase();hits.textContent='';if(!q)return;
+ const res=aps.filter(a=>a.code.toLowerCase()===q||a.name.toLowerCase().includes(q)).slice(0,8);
+ if(!res.length){const li=document.createElement('li');li.textContent='No airport matches "'+q+'".';hits.appendChild(li);return;}
+ for(const a of res){const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.textContent=a.name+(a.code?' ('+a.code+')':'');
+  b.onclick=()=>{G.controls().autoRotate=false;G.pointOfView({lat:a.lat,lng:a.lng,altitude:.6},1200);setTimeout(()=>openAirport(a),1300);};li.appendChild(b);hits.appendChild(li);}};
+
+// ---- airport pop-up with the before/after viewer ----
+const modal=document.getElementById('modal'),frame=document.getElementById('mframe');
+function openAirport(a){G.controls().autoRotate=false;
+ const z=a.large?13:14,h=[a.lat.toFixed(4),a.lng.toFixed(4),z,2018,2025].join(',');
+ document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · Sentinel-2 cloudless, drag to compare';
+ frame.src='earth.html?embed=1#'+h;document.getElementById('mfull').href='earth.html#'+h;modal.hidden=false;document.getElementById('mclose').focus();}
+const close=()=>{modal.hidden=true;frame.src='about:blank';};
+document.getElementById('mclose').onclick=close;modal.addEventListener('click',e=>{if(e.target===modal)close();});addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close();});
+})();
+</script>
+</body></html>
