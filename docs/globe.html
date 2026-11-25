@@ -108,6 +108,9 @@ const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el) 
  .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>COL[d.sys]+'55').pathStroke(.6).pathTransitionDuration(0)
  .particlesData([]).particleLat('lat').particleLng('lng').particleAltitude('alt').particlesSize(d=>d.length&&d[0].sys==='LEO'?2.2:3.2).particlesColor(d=>d.length?COL[d[0].sys]:'#fff').particlesSizeAttenuation(false);
 window.NC_GLOBE=G; // handle for debugging in the console
+// globe.gl 2.46 drops the image URLs set during start-up; set them again once it has initialised
+const setImgs=()=>{if(!G.globeMaterial().map)G.globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png');};
+G.onGlobeReady(setImgs);setTimeout(setImgs,300);setTimeout(setImgs,2000);
 G.controls().autoRotate=true;G.controls().autoRotateSpeed=.35;
 G.pointOfView({lat:22,lng:79,altitude:4.2},0);
 const resize=()=>G.width(el.clientWidth).height(el.clientHeight);addEventListener('resize',resize);resize();
