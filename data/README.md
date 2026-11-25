@@ -52,6 +52,12 @@ Collections: `sentinel-2-c1-l2a` (Earth Search Collection 1: reprocessed to one 
 | `build_manifest.js` | Rebuilds the manifest: `node build_manifest.js 2020-01-01 2026-11-25 40` |
 | `s2_monthly_manifest.csv` | **79 monthly scenes, Jan 2020 to Nov 2026**, the lowest-cloud scene per month (≤ 40% tile cloud), with direct COG URLs for B02, B03, B04, B08, B11, B12 and SCL. 68 from C1, 11 gap-filled from the older collection (marked by collection column). Missing months are monsoon gaps (e.g. 2021-07, 2025-07/08): show them as gaps |
 
+## Dashboard imagery
+
+The five [Sentinel-2 quick-looks](../a6/outputs/imagery_index.json) share a 10 m grid in EPSG:32643. The index records each PNG, scene ID, UTC acquisition time, dimensions, and projected bounds for alignment on a map. The yellow footprint outline comes from OpenStreetMap. The [January 2025 crop](../a6/outputs/quicklook_2025-01.png) uses the acquisition on 28 January 2025 and pairs with the January funding scenario. Source band URLs and scene classification layers are in the monthly manifest.
+
+Sentinel-2 and the OSM footprint cover the site-scale historical replay. ESA WorldCover 2021 is an input to the optional classifier, not a dated airport milestone map. Work-package boundaries, dated milestone plans, and inspection records would need to come from the project owner for milestone-level verification.
+
 ## Python starter (*untested here: Python is not installed on this machine*)
 
 ```bash
