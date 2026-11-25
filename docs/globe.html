@@ -98,6 +98,8 @@ input[type=text]{flex:1;min-width:0}button{cursor:pointer;font-weight:650}
 (async function(){
 const IMG='https://cdn.jsdelivr.net/npm/three-globe@2.45.6/example/img/';
 const RE=6371, COL={GPS:'#F2C14E',Galileo:'#5FD3F3',NavIC:'#FF8A3D',LEO:'#B98CFF'};
+// thin orbit lines need rgba() colours (8-digit hex is drawn as white)
+const ORB={GPS:'rgba(242,193,78,.45)',Galileo:'rgba(95,211,243,.45)',NavIC:'rgba(255,138,61,.6)',LEO:'rgba(185,140,255,.30)',PUL:'rgba(255,255,255,.8)'};
 const D=await (await fetch('globe-data.json')).json();
 const CX={paths:[],parts:()=>[],tips:()=>{}}; // collision view hooks, filled in below
 const show={GPS:true,Galileo:true,NavIC:true,LEO:true,orbits:true,gnss:true,airports:true};
@@ -132,7 +134,7 @@ const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).
  .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
  .polygonLabel(d=>'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
  .labelsData(aps.filter(a=>a.jewar)).labelLat('lat').labelLng('lng').labelText(()=>'Jewar').labelSize(1.1).labelDotRadius(.4).labelColor(()=>'#FFD24A').labelAltitude(.065).labelResolution(2)
- .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>d.col||(d.pul?'#FFFFFFAA':COL[d.sys]+(d.sys==='LEO'?'40':'66'))).pathDashLength(d=>d.dash?.015:1).pathDashGap(d=>d.dash?.012:0).pathDashAnimateTime(0).pathStroke(d=>d.orbit?null:.6).pathTransitionDuration(0)
+ .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>d.col||(d.pul?ORB.PUL:ORB[d.sys])).pathDashLength(d=>d.dash?.015:1).pathDashGap(d=>d.dash?.012:0).pathDashAnimateTime(0).pathStroke(d=>d.orbit?null:.6).pathTransitionDuration(0)
  .particlesData([]).particleLat('lat').particleLng('lng').particleAltitude('alt').particlesSize(d=>d.length&&d[0].big?9:d.length&&d[0].pul?7:d.length&&d[0].sys==='LEO'?2.6:3.6).particlesColor(d=>d.length?(d[0].col||(d[0].pul?'#FFFFFF':COL[d[0].sys])):'#fff').particlesSizeAttenuation(false);
 window.NC_GLOBE=G; // handle for debugging in the console
 // globe.gl 2.46 drops the image URLs set during start-up; set them again once it has initialised
