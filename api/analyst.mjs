@@ -66,17 +66,26 @@ export default async function handler(req, res) {
   const content = vision
     ? [...imgs.flatMap(im => [{ type: 'text', text: `IMAGE: ${String(im.label || '').slice(0, 120)}` }, { type: 'image_url', image_url: { url: `data:${im.mime};base64,${im.data}` } }]), { type: 'text', text: userText }]
     : userText;
-  const r = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
-    // reasoning models can spend the whole budget thinking: turn thinking off for these short, grounded answers
-    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 2048, chat_template_kwargs: { enable_thinking: false, thinking: false },
-      messages: [{ role: 'system', content: '/no_think\n' + (body.mode === 'earth' ? SYSTEM_EARTH : body.mode === 'collision' ? SYSTEM_COLLISION : SYSTEM) }, { role: 'user', content }] }),
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) return res.status(502).json({ error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}`, model });
-  const ch = j.choices?.[0] || {};
-  const text = String(ch.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^[\s\S]*<\/think>/, '').trim();
-  if (!text) return res.status(502).json({ error: `Nemotron returned no answer (finish: ${ch.finish_reason || 'unknown'}, reasoning only: ${Boolean(ch.message?.reasoning_content)})`, model });
-  return res.status(200).json({ answer: text, model });
+  const sys = body.mode === 'earth' ? SYSTEM_EARTH : body.mode === 'collision' ? SYSTEM_COLLISION : SYSTEM;
+  // collision mode shows Nemotron's reasoning on screen, so thinking is on there (with a bigger budget); elsewhere it is off
+  const think = body.mode === 'collision' && body.think !== false;
+  const call = async thinking => {
+    const r = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
+      body: JSON.stringify({ model, temperature: thinking ? 0.6 : 0.2, max_tokens: thinking ? 4096 : 2048, chat_template_kwargs: { enable_thinking: thinking, thinking },
+        messages: [{ role: 'system', content: (thinking ? '' : '/no_think\n') + sys }, { role: 'user', content }] }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return { error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}` };
+    const m = j.choices?.[0]?.message || {}, raw = String(m.content || '');
+    const inline = (raw.match(/<think>([\s\S]*?)<\/think>/) || [])[1] || '';
+    const text = raw.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^[\s\S]*<\/think>/, '').trim();
+    return { text, reasoning: String(m.reasoning_content || m.reasoning || inline || '').trim(), finish: j.choices?.[0]?.finish_reason };
+  };
+  let out = await call(think);
+  if (!out.error && !out.text && think) out = { ...(await call(false)), reasoning: out.reasoning }; // thinking used the whole budget: answer without it
+  if (out.error) return res.status(502).json({ error: out.error, model });
+  if (!out.text) return res.status(502).json({ error: `Nemotron returned no answer (finish: ${out.finish || 'unknown'})`, model });
+  return res.status(200).json({ answer: out.text, reasoning: think ? out.reasoning.slice(0, 6000) : undefined, model });
 }
