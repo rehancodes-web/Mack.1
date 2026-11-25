@@ -82,7 +82,11 @@ Maritime awareness (dark vessels, illegal fishing, smuggling) · borders & remot
 
 ---
 
-## 5. Our chosen structure (NavContinuity brief v1.1)
+## 5. Our chosen structure
+
+> **Superseded by v2.0 ([TRACKS.md](TRACKS.md)):** the project is now navigation failure + passenger experience, with A6, B3 and C each mapped to it. The v1.1 table below is kept for history.
+
+### v1.1 (NavContinuity brief)
 
 Decided after the 9:36 pm update. Version 1.0 of the brief put GNSS receiver data under Track A, but GNSS isn't one of the six Track A objectives, so the plan was restructured:
 

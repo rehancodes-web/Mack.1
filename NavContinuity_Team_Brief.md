@@ -4,7 +4,9 @@
 
 Prepared for the Mach A Thon Aeromania 26 team. Version 1.1. Research reference date 25 November 2026. Working product name NavContinuity. This document is a project specification and research handoff, not an operational navigation procedure.
 
-**Version 1.1 change (read first).** The organisers' 9:36 pm update requires every team to complete at least one objective from Track A's six listed bullets as its compulsory primary problem, plus optionally one of Track B or Track C, with a flow linking them. GNSS degradation is not one of the six Track A bullets, so version 1.0 risked failing the compulsory requirement. The project is now structured as:
+**Version 2.0 change (read before 1.1).** The project is now aviation navigation failure and passenger experience, with Track A6, Track B3 and Track C each mapped to it. [TRACKS.md](TRACKS.md) is authoritative where it conflicts with this brief. The PDF copy has not been regenerated.
+
+**Version 1.1 change.** The organisers' 9:36 pm update requires every team to complete at least one objective from Track A's six listed bullets as its compulsory primary problem, plus optionally one of Track B or Track C, with a flow linking them. GNSS degradation is not one of the six Track A bullets, so version 1.0 risked failing the compulsory requirement. The project is now structured as:
 
 - **Primary problem: Track A, objective 6, Infrastructure.** Monitor construction progress of a critical aviation asset (an airport or runway under construction) from Sentinel-2 imagery and turn it into a lender's or owner's inspection-and-disbursement decision. Specified in the new section "Primary problem: Track A6 infrastructure monitoring" below. This must be finished and demonstrated on real data.
 - **Optional track: Track C, GNSS resilience and critical infrastructure.** The original NavContinuity work (navigation degradation evidence and a preparation decision) now runs for the same asset's region. Everything from "Event requirements and project fit" onward that describes GNSS evidence, airline preparation and its economics now describes this Track C module.

@@ -1,5 +1,7 @@
 # Plan of action: Mach-A-Thon, 26 Nov 2026
 
+> **Project change (v2.0):** our project is now **aviation navigation failure + passenger experience**, fitted to every track. See [TRACKS.md](TRACKS.md). A6 below stays the compulsory real-data demo, reframed as recovery-capacity input. New work: Track C risk map, B3 architecture (only if organisers allow both B and C), and the passenger-recovery flow.
+
 **Now:** 00:30 · **Judging:** 08:00, 5 minutes per team, Boeing judges · **Time left:** about 7.5 h
 **Rules recap:** Track A objective compulsory with a real-data demo (ours is **A6**, done at baseline). Optional track: one of B or C, and **all its objectives must be met if shown**. Every team answers "who pays, how much is it worth?" and brings a small PPT. See [RULES.md](RULES.md).
 
