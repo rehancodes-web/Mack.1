@@ -331,8 +331,8 @@ cbtn.onclick=async()=>{if(found){cp.hidden=false;return;}cbtn.disabled=true;G.co
 // ---- airport pop-up with the before/after viewer ----
 const modal=document.getElementById('modal'),frame=document.getElementById('mframe');
 function openAirport(a){G.controls().autoRotate=false;
- const z=a.large?13:14,h=[a.lat.toFixed(4),a.lng.toFixed(4),z,2014,2025].join(',');
- document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · 2014 (Esri archive) vs 2025 (Sentinel-2), drag to compare';
+ const z=a.large?13:14,h=[a.lat.toFixed(4),a.lng.toFixed(4),z,1990,2025].join(',');
+ document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · 1990 (Landsat) vs 2025 (Sentinel-2); pick any year 1975–2025, drag to compare';
  frame.src='earth.html?embed=1#'+h;document.getElementById('mfull').href='earth.html#'+h;modal.hidden=false;document.getElementById('mclose').focus();}
 const close=()=>{modal.hidden=true;frame.src='about:blank';tourStop();};
 // ---- tour: every airport in turn, starting with Jewar, then India, then the world from west to east ----
@@ -343,8 +343,8 @@ function tourGo(i){tourI=(i+tourList.length)%tourList.length;const a=tourList[to
  G.pointOfView({lat:a.lat,lng:a.lng,altitude:.5},1600);
  if(!modal.hidden&&frame.contentWindow&&/earth.html/.test(frame.src)){ // glide the open viewer instead of reloading it
   frame.contentWindow.postMessage({fly:[a.lat,a.lng,a.large?13:14]},location.origin);
-  document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · 2014 (Esri archive) vs 2025 (Sentinel-2), drag to compare';
-  document.getElementById('mfull').href='earth.html#'+[a.lat.toFixed(4),a.lng.toFixed(4),a.large?13:14,2014,2025].join(',');}
+  document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · 1990 (Landsat) vs 2025 (Sentinel-2); pick any year 1975–2025, drag to compare';
+  document.getElementById('mfull').href='earth.html#'+[a.lat.toFixed(4),a.lng.toFixed(4),a.large?13:14,1990,2025].join(',');}
  else openAirport(a);tourEl.classList.add('on');
  tcount.textContent=(tourI+1).toLocaleString('en-US')+' / '+tourList.length.toLocaleString('en-US');}
 function tourPlay(){tourOn=true;tplay.textContent='Pause';clearInterval(tourTimer);tourTimer=setInterval(()=>tourGo(tourI+1),TOUR_MS);}

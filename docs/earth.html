@@ -67,7 +67,7 @@ input{flex:1;min-width:0}button{cursor:pointer;font-weight:650}button.primary{ba
   <div class="row"><label>Left <select id="sa"></select></label><label>Right <select id="sb"></select></label><button id="share" type="button">Copy link</button></div>
   <button id="ask" class="primary" type="button">What changed here? (Nemotron)</button>
   <div id="ans" aria-live="polite"></div>
-  <div class="small">Imagery: 2014 from <a href="https://livingatlas.arcgis.com/wayback/" target="_blank" rel="noopener">Esri World Imagery Wayback</a> (Esri, Maxar, Earthstar Geographics); 2016 onward <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless by EOX IT Services GmbH</a> (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, later years CC BY-NC-SA 4.0, non-commercial use. Search: OpenStreetMap Nominatim. AI answers can be wrong.</div>
+  <div class="small">Imagery: 1975–2010 <a href="https://www.usgs.gov/landsat-missions/global-land-survey-gls" target="_blank" rel="noopener">Landsat Global Land Survey</a> (USGS/NASA, via Esri); 2014 from <a href="https://livingatlas.arcgis.com/wayback/" target="_blank" rel="noopener">Esri World Imagery Wayback</a> (Esri, Maxar, Earthstar Geographics); 2016 onward <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless by EOX IT Services GmbH</a> (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, later years CC BY-NC-SA 4.0, non-commercial use. Search: OpenStreetMap Nominatim. AI answers can be wrong.</div>
  </section>
 </div>
 </div>
@@ -75,18 +75,25 @@ input{flex:1;min-width:0}button{cursor:pointer;font-weight:650}button.primary{ba
 <script>
 (function(){
 if(new URLSearchParams(location.search).has('embed'))document.body.classList.add('embed');
-const YEARS=[2014,2016,2018,2019,2020,2021,2022,2023,2024,2025];
+const YEARS=[1975,1990,2000,2005,2010,2014,2016,2018,2019,2020,2021,2022,2023,2024,2025];
+// 1975-2010: NASA/USGS Landsat Global Land Survey (GLS) epochs, served by Esri. 30 m (1975: 60 m), so softer than later years.
+// Each epoch is a mosaic of scenes from a few years around the nominal year.
+const GLS={1975:[1972,1983],1990:[1987,1997],2000:[1999,2003],2005:[2003,2008],2010:[2008,2012]};
+const GLS_URL='https://landsat2.arcgis.com/arcgis/rest/services/LandsatGLS/MS/ImageServer/exportImage';
+const GLSLayer=L.TileLayer.extend({getTileUrl(c){const W=20037508.342789244,size=2*W/Math.pow(2,c.z),x0=-W+c.x*size,y1=W-c.y*size,[a,b]=GLS[this.options.year];
+ return GLS_URL+'?bbox='+[x0,y1-size,x0+size,y1].map(v=>v.toFixed(1)).join(',')+'&bboxSR=3857&imageSR=3857&size=256,256&format=jpg&f=image'+
+  '&renderingRule='+encodeURIComponent('{"rasterFunction":"Natural Color with DRA"}')+'&time='+Date.UTC(a,0,1)+','+Date.UTC(b+1,0,1);}});
 // 2014 = Esri World Imagery Wayback, release of 20 Feb 2014 (high resolution; images in it were captured on or before that date)
 const WAYBACK_2014='https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/10/{z}/{y}/{x}';
 const layerId=y=>y===2016?'s2cloudless_3857':'s2cloudless-'+y+'_3857';
 const url=y=>y===2014?WAYBACK_2014:'https://tiles.maps.eox.at/wmts/1.0.0/'+layerId(y)+'/default/g/{z}/{y}/{x}.jpg';
-const attr=y=>y===2014?'Esri World Imagery Wayback, 20 Feb 2014 (captured on or before) &copy; Esri, Maxar, Earthstar Geographics':'Sentinel-2 cloudless '+y+' &copy; <a href="https://s2maps.eu">EOX</a>, Copernicus Sentinel data';
+const attr=y=>GLS[y]?'Landsat Global Land Survey '+y+' (scenes '+GLS[y][0]+'–'+GLS[y][1]+', 30 m) &copy; USGS/NASA, served by Esri':y===2014?'Esri World Imagery Wayback, 20 Feb 2014 (captured on or before) &copy; Esri, Maxar, Earthstar Geographics':'Sentinel-2 cloudless '+y+' &copy; <a href="https://s2maps.eu">EOX</a>, Copernicus Sentinel data';
 // state from the link (#lat,lon,zoom,yearLeft,yearRight)
 const h=location.hash.slice(1).split(',').map(Number);
 let st={lat:h[0]||28.1709,lon:h[1]||77.6082,z:h[2]||13,a:YEARS.includes(h[3])?h[3]:2014,b:YEARS.includes(h[4])?h[4]:2025};
 const map=L.map('map',{zoomControl:true,maxZoom:17,minZoom:3,worldCopyJump:true}).setView([st.lat,st.lon],st.z);
 map.createPane('right');map.getPane('right').style.zIndex=250;
-const mk=(y,pane)=>L.tileLayer(url(y),{maxNativeZoom:y===2014?17:15,maxZoom:17,attribution:attr(y),pane:pane||'tilePane',crossOrigin:true});
+const mk=(y,pane)=>GLS[y]?new GLSLayer('',{year:y,maxNativeZoom:13,maxZoom:17,attribution:attr(y),pane:pane||'tilePane',crossOrigin:true}):L.tileLayer(url(y),{maxNativeZoom:y===2014?17:15,maxZoom:17,attribution:attr(y),pane:pane||'tilePane',crossOrigin:true});
 let left=mk(st.a).addTo(map),right=mk(st.b,'right').addTo(map);
 const sa=document.getElementById('sa'),sb=document.getElementById('sb');
 for(const s of [sa,sb])YEARS.forEach(y=>s.add(new Option(y,y)));sa.value=st.a;sb.value=st.b;
