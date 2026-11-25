@@ -19,9 +19,13 @@ const rdy = opt('readiness.json');
 const gnFile = path.join(HERE, '..', 'c', 'outputs', 'gnss_summary.json');
 const gn = fs.existsSync(gnFile) ? JSON.parse(fs.readFileSync(gnFile, 'utf8')) : null; // Track C result for the Jewar region
 const aiJ = opt('progress_ai.json'), ai = aiJ ? aiJ.results : [];
-// 3-month rolling median of Larper converted land: drops one-off bad scenes (e.g. Jan 2021 haze read as 94% built)
-ai.forEach((r, i) => { const w = ai.slice(Math.max(0, i - 1), i + 2).map(x => x.built_or_bare_frac).filter(v => v != null).sort((a, b) => a - b);
-  r.converted_smooth = r.built_or_bare_frac == null || !w.length ? null : w[Math.floor(w.length / 2)]; });
+// Trailing 12-month median of Larper converted land (same window idea as the baseline): removes one-off bad scenes
+// (e.g. hazy Jan 2021 read as 95% converted) and the harvest-season swing where bare fields look like earthworks.
+const mIdx = m => { const [y, mo] = m.split('-').map(Number); return y * 12 + mo; };
+ai.forEach(r => { const w = ai.filter(x => x.built_or_bare_frac != null && mIdx(r.month) - mIdx(x.month) >= 0 && mIdx(r.month) - mIdx(x.month) < 12)
+  .map(x => x.built_or_bare_frac).sort((a, b) => a - b);
+  r.converted_smooth = w.length >= 6 ? w[Math.floor(w.length / 2)] : null; });
+const preFloor = (() => { const w = ai.filter(r => r.month < '2023-01' && r.converted_smooth != null).map(r => r.converted_smooth).sort((a, b) => a - b); return w.length ? w[Math.floor(w.length / 2)] : null; })();
 const met = opt('classifier_metrics.json');
 const rev = opt('nemotron_review.json');
 const AI_ENDPOINT = process.env.AI_ENDPOINT ?? '/api/analyst';
@@ -73,7 +77,7 @@ ${ai.length ? endLabel(ai, 'converted_smooth', 'larper', 'Larper: converted') : 
 
 // ---------- app pieces ----------
 const lastShot = SHOTS[SHOTS.length - 1], firstShot = SHOTS[0];
-const larperBuilt = jan25 ? pct(jan25.built_or_bare_frac) : null;
+const larperBuilt = jan25 ? pct(jan25.converted_smooth) : null;
 const scen = dec.scenarios.map(s => `<tr${s.name.startsWith('Satellite') ? ' class="hi"' : ''}><td>${esc(s.name)}</td><td>${s.p.toFixed(2)}</td><td>$${Math.round(s.release).toLocaleString('en-US')}</td><td>$${Math.round(s.inspect).toLocaleString('en-US')}</td><td><b>${s.action === 'inspect' ? 'Inspect' : 'Release'}</b></td></tr>`).join('');
 const classRows = met ? met.per_class.map(c => `<tr><td><i class="dot ${c.class}"></i>${c.class.replace('_', ' / ')}</td><td>${pct(c.recall)}</td><td>${pct(c.precision)}</td></tr>`).join('') : '';
 const reviewItems = rev ? [
@@ -209,7 +213,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="tiles" aria-label="Key figures for January 2025">
   <div class="tile claim"><div class="k">Builder's claim, Jan 2025 <span class="ev rep">reported</span></div><div class="v">80%</div><div class="s">"work complete" (Business Standard)</div></div>
   <div class="tile orbit"><div class="k">Seen from orbit, Jan 2025 <span class="ev der">derived</span></div><div class="v">${dec.satellite_observed_pct}%</div><div class="s">land converted, Sentinel-2</div></div>
-  <div class="tile larp"><div class="k">Larper: converted land <span class="ev ai">AI</span></div><div class="v">${larperBuilt ?? '…'}</div><div class="s">${larperBuilt ? 'of the site, Jan 2025' : 'model run in progress'}</div></div>
+  <div class="tile larp"><div class="k">Larper: converted land <span class="ev ai">AI</span></div><div class="v">${larperBuilt ?? '…'}</div><div class="s">${larperBuilt ? `Jan 2025, 12-month median (farmland reads ${pct(preFloor)})` : 'model run in progress'}</div></div>
   <div class="tile"><div class="k">Larper accuracy <span class="ev ai">AI</span></div><div class="v">${met ? Math.round(met.overall_accuracy * 100) + '%' : '…'}</div><div class="s">${met ? 'agreement with ESA WorldCover on unseen land' : 'model run in progress'}</div></div>
  </section>
 
@@ -233,7 +237,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="panel" aria-labelledby="h-prog">
   <h2 id="h-prog">Progress over time <span class="ev der">derived</span></h2>
   ${chart}
-  <p class="note">Green: land free of vegetation all year (crop cycles never count). ${ai.length ? 'Blue: Larper converted land (built or paved plus bare earth), 3-month median so single bad scenes such as hazy Jan 2021 drop out. The built-only share is noisy (it reads some dry 2020 fields as paved), so we do not quote it alone.' : 'Larper\'s built/paved line is added when its run finishes.'} Grey: too cloudy to measure. After 2025 the green line dips as grass regrows on unpaved ground; Larper is built to separate that from real change.</p>
+  <p class="note">Green: land free of vegetation all year (crop cycles never count). ${ai.length ? `Blue: Larper converted land (built or paved plus bare earth), as a 12-month median like the green line, so hazy scenes and harvest-season bare fields drop out. Before construction it sits near ${pct(preFloor)}, which is Larper's false-alarm floor on farmland. Unlike the green line, it does not dip after 2025.` : 'Larper\'s line is added when its run finishes.'} Grey: too cloudy to measure. The green line dips after 2025 because grass regrows on finished, unpaved ground.</p>
  </section>
 
  <div class="two">
@@ -311,13 +315,14 @@ c.oninput=p.oninput=upd;upd();
 const EP=${JSON.stringify(AI_ENDPOINT)},CTX=${JSON.stringify(CTX).replace(/</g, '\\u003c')};
 const feed=document.getElementById('feed');let visualCheck=null;
 const btns=()=>document.querySelectorAll('.chips button,.composer button');
-function add(cls,title,text){const d=document.createElement('div');d.className='msg '+cls;if(title){const b=document.createElement('b');b.textContent=title;d.appendChild(b);}d.appendChild(document.createTextNode(text));feed.appendChild(d);feed.scrollTop=feed.scrollHeight;return d;}
+function fmtInto(el,text){el.textContent='';String(text).split(/**/).forEach((part,i)=>{if(!part)return;if(i%2){const s=document.createElement('strong');s.textContent=part;el.appendChild(s);}else el.appendChild(document.createTextNode(part));});}
+function add(cls,title,text){const d=document.createElement('div');d.className='msg '+cls;if(title){const b=document.createElement('b');b.textContent=title;d.appendChild(b);}const body=document.createElement('span');fmtInto(body,text);d.appendChild(body);feed.appendChild(d);feed.scrollTop=feed.scrollHeight;return d;}
 async function b64(url){const b=await (await fetch(url)).blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(b);});}
 async function ask(shown,question,images){
  add('me','',shown);const w=add('bot','Nemotron','Working on it…');btns().forEach(b=>b.disabled=true);
  const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},nemotron_live_visual_check:visualCheck};
  try{const res=await fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,context:ctx,images:images||[]})});const j=await res.json();
-  if(j.answer){w.lastChild.textContent=j.answer;return j.answer;}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
+  if(j.answer){fmtInto(w.lastChild,j.answer);return j.answer;}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
  catch(err){w.className='msg err';w.lastChild.textContent='The analyst is unreachable ('+err.message+'). The panels on the left are unaffected.';return null;}
  finally{btns().forEach(b=>b.disabled=false);feed.scrollTop=feed.scrollHeight;}}
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=async()=>{const q=b.dataset.q;
