@@ -1,0 +1,82 @@
+{
+  "crs": "EPSG:32643",
+  "bounds_order": [
+    "min_easting",
+    "min_northing",
+    "max_easting",
+    "max_northing"
+  ],
+  "pixel_size_m": 10,
+  "images": [
+    {
+      "month": "2020-03",
+      "scene_id": "S2B_T43RGM_20200310T053327_L2A",
+      "datetime_utc": "2020-03-10T05:41:01.473000Z",
+      "file": "quicklook_2020-03.png",
+      "bounds": [
+        751990,
+        3116550,
+        760150,
+        3121280
+      ],
+      "width": 816,
+      "height": 473
+    },
+    {
+      "month": "2022-05",
+      "scene_id": "S2B_43RGM_20220519_0_L2A",
+      "datetime_utc": "2022-05-19T05:41:03.250000Z",
+      "file": "quicklook_2022-05.png",
+      "bounds": [
+        751990,
+        3116550,
+        760150,
+        3121280
+      ],
+      "width": 816,
+      "height": 473
+    },
+    {
+      "month": "2024-03",
+      "scene_id": "S2A_T43RGM_20240314T053947_L2A",
+      "datetime_utc": "2024-03-14T05:41:03.266000Z",
+      "file": "quicklook_2024-03.png",
+      "bounds": [
+        751990,
+        3116550,
+        760150,
+        3121280
+      ],
+      "width": 816,
+      "height": 473
+    },
+    {
+      "month": "2025-01",
+      "scene_id": "S2C_T43RGM_20250128T054026_L2A",
+      "datetime_utc": "2025-01-28T05:41:31.272000Z",
+      "file": "quicklook_2025-01.png",
+      "bounds": [
+        751990,
+        3116550,
+        760150,
+        3121280
+      ],
+      "width": 816,
+      "height": 473
+    },
+    {
+      "month": "2026-03",
+      "scene_id": "S2A_T43RGM_20260306T053952_L2A",
+      "datetime_utc": "2026-03-06T05:41:22.395000Z",
+      "file": "quicklook_2026-03.png",
+      "bounds": [
+        751990,
+        3116550,
+        760150,
+        3121280
+      ],
+      "width": 816,
+      "height": 473
+    }
+  ]
+}

@@ -17,7 +17,7 @@ const P = {
   label_source: 'ESA WorldCover 10m 2021 v200 (tile N27E075)',
   label_url: 'https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N27E075_Map.tif',
   train_months: ['2021-02', '2021-04', '2021-11'], // same year as the labels, three seasons
-  train_pad_m: 6000, footprint_gap_m: 300,
+  train_pad_m: 4000, footprint_gap_m: 300,
   per_class_per_scene: 2500, seed: 42,
   rf: { nEstimators: 60, maxFeatures: 0.7, replacement: true, seed: 42, treeOptions: { maxDepth: 14 } },
   invalid_scl: [0, 1, 3, 8, 9, 10], min_clear_frac: 0.6,
@@ -42,11 +42,12 @@ const scenes = lines.slice(1).map(l => Object.fromEntries(l.split(',').map((v, i
 async function readBand(url, res, bb) {
   for (let a = 1; ; a++) {
     try {
-      const img = await (await fromUrl(url)).getImage();
+      const img = await (await fromUrl(url, { blockSize: 1 << 20 })).getImage();
       const [ox, oy] = img.getOrigin();
       const c0 = Math.floor((bb.minx - ox) / res), c1 = Math.ceil((bb.maxx - ox) / res);
       const r0 = Math.floor((oy - bb.maxy) / res), r1 = Math.ceil((oy - bb.miny) / res);
-      const [band] = await img.readRasters({ window: [c0, r0, c1, r1] });
+      const [band] = await Promise.race([img.readRasters({ window: [c0, r0, c1, r1] }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout 120s')), 120000))]);
       return { band, ox, oy, c0, r0, w: c1 - c0, h: r1 - r0 };
     } catch (e) { if (a >= 6) throw e; console.warn(`  retry ${a} ${url.split('/').pop()}: ${e.message}`); await new Promise(r => setTimeout(r, 2000 * a)); }
   }
@@ -77,7 +78,7 @@ async function loadScene(s, bb) {
 async function loadWorldCover(bb) {
   const corners = [[bb.minx, bb.miny], [bb.maxx, bb.maxy], [bb.minx, bb.maxy], [bb.maxx, bb.miny]].map(p => proj4(utm, 'WGS84', p));
   const lons = corners.map(p => p[0]), lats = corners.map(p => p[1]);
-  const img = await (await fromUrl(P.label_url)).getImage();
+  const img = await (await fromUrl(P.label_url, { blockSize: 1 << 20 })).getImage();
   const [ox, oy] = img.getOrigin(); const [rx, ry] = img.getResolution();
   const c0 = Math.floor((Math.min(...lons) - ox) / rx) - 2, c1 = Math.ceil((Math.max(...lons) - ox) / rx) + 2;
   const r0 = Math.floor((Math.max(...lats) - oy) / ry) - 2, r1 = Math.ceil((Math.min(...lats) - oy) / ry) + 2;
@@ -89,9 +90,12 @@ async function loadWorldCover(bb) {
 // ---------- training ----------
 const tb = { minx: fb.minx - P.train_pad_m, maxx: fb.maxx + P.train_pad_m, miny: fb.miny - P.train_pad_m, maxy: fb.maxy + P.train_pad_m };
 const splitX = (fb.minx + fb.maxx) / 2; // spatial block split: west of the footprint centre = train, east = test
+const trainCache = path.join(CACHE, `train_samples_${P.version}_${P.train_pad_m}.json`);
+let X = [], Y = [], isTest = [];
+if (fs.existsSync(trainCache)) { ({ X, Y, isTest } = JSON.parse(fs.readFileSync(trainCache, 'utf8'))); console.log(`training samples from cache: ${X.length}`); }
+else {
 console.log('loading WorldCover labels...');
 const wc = await loadWorldCover(tb);
-const X = [], Y = [], isTest = [];
 for (const m of P.train_months) {
   const s = scenes.find(x => x.month === m);
   console.log(`training scene ${m} ${s.scene_id}`);
@@ -111,6 +115,8 @@ for (const m of P.train_months) {
     }
   });
   console.log('  available per class:', pools.map((p, k) => `${CLASSES[k]}=${p.length}`).join(' '));
+}
+fs.writeFileSync(trainCache, JSON.stringify({ X, Y, isTest }));
 }
 const idxTr = [...Y.keys()].filter(i => !isTest[i]), idxTe = [...Y.keys()].filter(i => isTest[i]);
 const rf = new RandomForestClassifier(P.rf);
@@ -136,9 +142,10 @@ const base = JSON.parse(fs.readFileSync(path.join(OUT, 'progress_baseline.json')
 const results = [];
 let mask = null;
 const mapMonths = new Set(['2020-03', '2022-05', '2024-03', '2026-03']);
-for (const s of scenes) {
+const CONCURRENCY = 6; // footprint windows are small, so parallel fetches are safe here
+async function predictScene(s) {
   const cf = path.join(CACHE, `ai_${P.version}_${s.month}_${s.scene_id}.json`);
-  if (fs.existsSync(cf) && !mapMonths.has(s.month)) { results.push(JSON.parse(fs.readFileSync(cf, 'utf8'))); process.stdout.write(`${s.month}c `); continue; }
+  if (fs.existsSync(cf) && !mapMonths.has(s.month)) { results.push(JSON.parse(fs.readFileSync(cf, 'utf8'))); process.stdout.write(`${s.month}c `); return; }
   const { g, feat } = await loadScene(s, fb);
   if (!mask) { mask = new Uint8Array(g.w * g.h); for (let r = 0; r < g.h; r++) for (let c = 0; c < g.w; c++) mask[r * g.w + c] = inPoly(g.ox + (g.c0 + c + 0.5) * 10, g.oy - (g.r0 + r + 0.5) * 10) ? 1 : 0; }
   const F = [], pos = []; let tot = 0;
@@ -159,6 +166,9 @@ for (const s of scenes) {
   }
   process.stdout.write(`${s.month} `);
 }
+const queue = [...scenes];
+await Promise.all(Array.from({ length: CONCURRENCY }, async () => { while (queue.length) await predictScene(queue.shift()); }));
+results.sort((a, b) => a.month.localeCompare(b.month));
 console.log();
 // join with baseline for the comparison
 for (const r of results) { const b = base.find(x => x.month === r.month); r.baseline_cleared_12m = b?.fp_cleared_12m ?? null; }

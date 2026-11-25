@@ -11,6 +11,20 @@ const base = rd('progress_baseline.json').results;
 const ai = rd('progress_ai.json').results;
 const met = rd('classifier_metrics.json');
 const dec = rd('decision.json');
+const rdy = fs.existsSync(path.join(OUT, 'readiness.json')) ? rd('readiness.json') : null;
+const AI_ENDPOINT = process.env.AI_ENDPOINT || '';
+// compact, labelled context the AI analyst may use (nothing else)
+const CTX = {
+  asset: 'Noida International Airport (Jewar), footprint ~1333 ha, Sentinel-2 2020-2026',
+  reported: [['2021-11-25', 'Foundation stone'], ['2025-01-28', '"80% work complete"'], ['2026-03-28', 'Phase 1 inaugurated']],
+  derived_baseline_cleared_12m: base.filter(r => r.fp_cleared_12m != null && /-(01|04|07|10)$/.test(r.month)).map(r => [r.month, r.fp_cleared_12m]),
+  derived_ai_built_paved: ai.filter(r => r.built_paved_frac != null && /-(01|04|07|10)$/.test(r.month)).map(r => [r.month, r.built_paved_frac, r.bare_frac]),
+  derived_ai_all: ai.filter(r => r.built_paved_frac != null).map(r => [r.month, r.built_paved_frac, r.bare_frac, r.vegetation_frac]),
+  ai_metrics: { overall_agreement_with_worldcover: met.overall_accuracy, per_class: met.per_class, caveat: met.label_caveat },
+  decision: { report_pct: dec.report.reported_pct, satellite_pct: dec.satellite_observed_pct, gap_pts: dec.gap_pts, scenarios: dec.scenarios, assumed_parameters: dec.parameters, caveat: dec.caveat },
+  readiness: rdy,
+  product: 'NavContinuity: navigation failure -> passenger recovery. A6 output = recovery capacity + region for Track C GNSS check.',
+};
 
 const W = 1000, H = 380, L = 56, R = 20, T = 20, B = 46;
 const t0 = Date.UTC(2020, 0, 1), t1 = Date.UTC(2026, 11, 31);
@@ -81,6 +95,22 @@ ${maps ? `<div class="grid3">${maps}</div><p class="note">AI class maps inside t
 <h2>4 · Who pays, and what it's worth</h2>
 <div class="card">Lenders, infrastructure funds and government project-monitoring cells releasing money against contractor milestones. Price: per-asset monitoring fee. Worth: inspections avoided when the satellite agrees with the report, plus losses caught when it doesn't. <span class="lab">proposed · pricing unvalidated</span></div>
 
+${rdy ? `<h2>5 · Hand-off to NavContinuity: recovery capacity</h2>
+<div class="card"><table>
+<tr><td>Land conversion started</td><td><b>${rdy.satellite.conversion_start_month}</b> <span class="lab">derived</span></td></tr>
+<tr><td>Plateau reached</td><td><b>${rdy.satellite.plateau_month}</b> <span class="lab">derived</span></td></tr>
+<tr><td>Phase 1 inaugurated</td><td><b>2026-03-28</b> <span class="lab">reported</span></td></tr>
+<tr><td>Usable as diversion / rebooking airport</td><td>${rdy.recovery_capacity.usable_for_navcontinuity}</td></tr>
+<tr><td>Region passed to Track C</td><td>${rdy.region.radius_km} km around ${rdy.region.centre.lat}°N, ${rdy.region.centre.lon}°E <span class="lab">assumed</span></td></tr>
+</table><p class="note">Track C then asks whether GNSS is degraded inside this region; no coverage reads "unknown", never "safe".</p></div>` : ''}
+<h2>6 · Ask the analyst <span class="lab">AI · Gemini</span></h2>
+<div class="card"><p class="note">Answers come only from this page's data, with reported / derived / assumed labels kept. AI text can be wrong: check it against the charts above.</p>
+<p style="display:flex;gap:8px;flex-wrap:wrap"><input id="q" maxlength="600" placeholder="e.g. Why does the baseline fall after 2025?" style="flex:1;min-width:220px;padding:8px;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--fg)">
+<button id="ask">Ask</button><button id="memo">Write lender memo</button></p>
+<p style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><b>Model + Gemini cross-check:</b>
+<select id="vm">${['2026-03', '2024-03', '2020-03'].filter(m => fs.existsSync(path.join(OUT, `classmap_${m}.png`))).map(m => `<option>${m}</option>`).join('')}</select>
+<button id="vis">Check RF map against the satellite photo</button></p>
+<div id="ans" style="white-space:pre-wrap"></div></div>
 <p class="note">Limits: land conversion ≠ completion. The OSM boundary is the finished airport. The AI is trained on WorldCover weak labels. 11 months come from an older collection. Sources and method are in a6/README.md and data/README.md.</p>
 </main><script>
 const L=${P0.loss_if_optimistic.value},e=${P0.inspection_effectiveness.value};
@@ -88,6 +118,30 @@ const c=document.getElementById('c'),p=document.getElementById('p');
 function upd(){const C=+c.value,P=+p.value,rel=P*L,ins=C+P*(1-e)*L;document.getElementById('cv').textContent='$'+C.toLocaleString();document.getElementById('pv').textContent=P.toFixed(2);
 document.getElementById('out').innerHTML='Release: <b>$'+Math.round(rel).toLocaleString()+'</b> · Inspect: <b>$'+Math.round(ins).toLocaleString()+'</b> → <b>'+(ins<rel?'INSPECT':'RELEASE')+'</b> (break-even p = '+(C/(e*L)).toFixed(3)+')';}
 c.oninput=p.oninput=upd;upd();
+const EP=${JSON.stringify(AI_ENDPOINT)},CTX=${JSON.stringify(CTX).replace(/</g, '\\u003c')};
+const ans=document.getElementById('ans');
+let visualCheck=null; // Gemini's last cross-check of the RF map, fed into later answers and the memo
+async function b64(url){const b=await (await fetch(url)).blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(b);});}
+async function ask(question,images){
+ if(!EP){ans.textContent='AI backend not connected yet (see backend/README.md).';return null;}
+ ans.textContent='Thinking…';
+ const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},gemini_visual_check_of_rf:visualCheck};
+ try{const r=await fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,context:ctx,images:images||[]})});
+  const j=await r.json();ans.textContent=j.answer||('Error: '+(j.error||r.status));return j.answer||null;}
+ catch(err){ans.textContent='Could not reach the AI backend: '+err.message;return null;}
+}
+const vis=document.getElementById('vis');
+if(vis)vis.onclick=async()=>{
+ const m=document.getElementById('vm').value;
+ const row=(CTX.derived_ai_all||[]).find(r=>r[0]===m);
+ const imgs=[{label:'Sentinel-2 true colour '+m+' (yellow line = airport footprint)',mime:'image/png',data:await b64('quicklook_'+m+'.png')},
+  {label:'Random Forest class map '+m,mime:'image/png',data:await b64('classmap_'+m+'.png')}];
+ const a=await ask('Cross-check the Random Forest class map for '+m+' against the satellite photo. RF says: '+(row?('built/paved '+Math.round(row[1]*100)+'%, bare '+Math.round(row[2]*100)+'%, vegetation '+Math.round(row[3]*100)+'%'):'see context')+'. Where does the map look right, where does it look wrong, and should we trust the RF numbers for this month?',imgs);
+ if(a)visualCheck={month:m,finding:a.slice(0,1500)};
+};
+document.getElementById('ask').onclick=()=>{const v=document.getElementById('q').value.trim();if(v)ask(v);};
+document.getElementById('q').onkeydown=ev=>{if(ev.key==='Enter')document.getElementById('ask').click();};
+document.getElementById('memo').onclick=()=>ask('Write a short lender memo: should the next tranche be released on the contractor report or should an inspection be commissioned first, using the current slider values. Headings: Evidence / Decision / Caveats.');
 </script></body></html>`;
 fs.writeFileSync(path.join(OUT, 'demo.html'), html);
 console.log('wrote outputs/demo.html');

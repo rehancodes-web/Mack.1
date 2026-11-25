@@ -1,0 +1,65 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-25T19:40:02.482Z",
+ "asset": {
+  "name": "Noida International Airport (Jewar)",
+  "type": "airport",
+  "icao_iata": "reported: VIDX / DXN",
+  "footprint_ha": 1333,
+  "footprint_source": "OSM way 1089989191"
+ },
+ "region": {
+  "centre": {
+   "lon": 77.6082,
+   "lat": 28.1709
+  },
+  "radius_km": 50,
+  "origin": "assumed",
+  "note": "Track C evaluates GNSS evidence inside this circle; no coverage = unknown, not safe"
+ },
+ "reported": [
+  {
+   "date": "2021-11-25",
+   "event": "Foundation stone",
+   "origin": "reported"
+  },
+  {
+   "date": "2025-01-28",
+   "event": "\"80% work complete\"",
+   "origin": "reported"
+  },
+  {
+   "date": "2026-03-28",
+   "event": "Phase 1 inaugurated",
+   "origin": "reported"
+  },
+  {
+   "date": "2026-06-15",
+   "event": "Commercial flights (sources disagree on date)",
+   "origin": "reported"
+  }
+ ],
+ "satellite": {
+  "origin": "derived",
+  "metric": "fp_cleared_12m (land conversion, not completion)",
+  "conversion_start_month": "2023-06",
+  "peak_month": "2025-04",
+  "peak_frac": 0.561,
+  "plateau_month": "2024-12",
+  "ai_classifier": {
+   "status": "unknown",
+   "reason": "progress_ai.json not present"
+  }
+ },
+ "recovery_capacity": {
+  "physically_present": "yes (derived: land conversion plateaued 2024-12)",
+  "operational_status": "reported operational from 2026 (inauguration 28 Mar 2026); satellite cannot confirm runway certification or ATC readiness",
+  "usable_for_navcontinuity": "candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures",
+  "origin": "derived + reported"
+ },
+ "params": {
+  "start_excess": 0.05,
+  "plateau_share_of_peak": 0.9,
+  "region_radius_km": 50
+ }
+}
