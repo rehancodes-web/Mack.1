@@ -10,11 +10,39 @@
 | Rules consolidated | ✅ `RULES.md` |
 | Asset chosen (Jewar airport), footprint, 79-month Sentinel-2 manifest | ✅ `data/` |
 | A6 baseline progress curve on real data + chart + before/after images | ✅ `a6/` |
-| A6 **AI model** compared with the baseline | ❌ **needed** for the 30% "Technical depth & AI" score |
-| A6 **economic decision** (release vs inspect) wired to the curve | ❌ **needed**: Track A requires "turn data into an economic decision" |
+| A6 **AI model** compared with the baseline | 🟡 **code done, results pending**: `a6/classify.mjs` (Random Forest, WorldCover 2021 weak labels, spatial holdout). Was mid-run at the last commit; outputs not committed yet |
+| A6 **economic decision** (release vs inspect) wired to the curve | ✅ `a6/economics.mjs`: tests pass (`node economics.mjs --test`); real case gives 80% reported vs 51% satellite → gap 29 pts → **INSPECT** → `outputs/decision.json` |
+| One offline demo page | 🟡 **code done**: `a6/demo.mjs` builds `outputs/demo.html`. Needs classifier outputs first |
 | Track C module (GNSS evidence + preparation decision) | ❌ optional; only show it if fully done |
 | PPT | ❌ **compulsory** |
 | Demo rehearsal, offline fallback | ❌ |
+
+## Handoff: read this first (updated ~01:15)
+
+**Next steps, in order:**
+1. `cd a6 && npm install` (adds `ml-random-forest`).
+2. `node classify.mjs`
+   - **What it does:** trains on 3 scenes from 2021, then classifies all 79 months.
+   - **Time:** about 20–30 min. Per-month results cache in `a6/cache/`, so a rerun resumes.
+   - **Writes:** `outputs/classifier_metrics.json`, `outputs/progress_ai.{csv,json}`, `outputs/classmap_{2020-03,2022-05,2024-03,2026-03}.png`.
+   - **Check:** overall accuracy and per-class recall in the metrics file. If "bare" has tiny support, say so on the slide.
+   - **Check:** does the AI built/paved curve avoid the baseline's post-2025 dip? Report honestly either way.
+3. `node economics.mjs` (already run once; rerun if `progress_baseline.json` changes).
+4. `node demo.mjs` → open `outputs/demo.html`. This is the 5-minute demo page: images → curves → AI metrics → decision with sliders → who pays.
+5. Commit the outputs, then go to P1 (PPT) below.
+
+**Pitfalls already hit (don't repeat):**
+- **Scale and offset:** reflectance = DN × `scale` + `offset` from the manifest. The older `sentinel-2-l2a` collection is already de-offset, so the manifest forces offset 0 for it. See `data/README.md`.
+- **Line endings:** CRLF checkouts broke CSV parsing; scripts now strip `\r`, and `.gitattributes` pins LF.
+- **Network:** large COG windows fail when fetched in parallel; `classify.mjs` reads bands one at a time with retries.
+- **Shell:** in Git Bash on this machine, long `sed`/`node -e` one-liners in the repo folder sometimes hang; prefer files or PowerShell.
+- **Python:** not installed on the main laptop; everything runs on Node.js.
+
+**Key numbers for the pitch** (baseline, derived):
+- Land conversion starts **mid-2023**.
+- It peaks at **56% (Apr 2025)**.
+- It was **51% in Jan 2025** against the reported **80%**.
+- It is down to **33% (Nov 2026)** as grass regrows.
 
 ## Priorities (do in this order; stop lower items if time runs short)
 

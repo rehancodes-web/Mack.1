@@ -36,7 +36,7 @@ const bb = { minx: fb.minx - PARAMS.ring_m, maxx: fb.maxx + PARAMS.ring_m, miny:
 const inPoly = (x, y) => { let c = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
 
 // ---------- manifest ----------
-const lines = fs.readFileSync(path.join(DATA, 's2_monthly_manifest.csv'), 'utf8').trim().split('\n');
+const lines = fs.readFileSync(path.join(DATA, 's2_monthly_manifest.csv'), 'utf8').replace(/\r/g, '').trim().split('\n');
 const hdr = lines[0].split(',');
 const scenes = lines.slice(1).map(l => Object.fromEntries(l.split(',').map((v, i) => [hdr[i], v])));
 

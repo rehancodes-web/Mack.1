@@ -15,7 +15,7 @@ const gj = JSON.parse(fs.readFileSync(path.join(DATA, 'noida_airport_footprint.g
 const ring = gj.features[0].geometry.coordinates[0].map(([lon, lat]) => proj4('WGS84', utm, [lon, lat]));
 const xs = ring.map(p => p[0]), ys = ring.map(p => p[1]), PAD = 800;
 const bb = { minx: Math.min(...xs) - PAD, maxx: Math.max(...xs) + PAD, miny: Math.min(...ys) - PAD, maxy: Math.max(...ys) + PAD };
-const lines = fs.readFileSync(path.join(DATA, 's2_monthly_manifest.csv'), 'utf8').trim().split('\n');
+const lines = fs.readFileSync(path.join(DATA, 's2_monthly_manifest.csv'), 'utf8').replace(/\r/g, '').trim().split('\n');
 const hdr = lines[0].split(',');
 const scenes = lines.slice(1).map(l => Object.fromEntries(l.split(',').map((v, i) => [hdr[i], v])));
 

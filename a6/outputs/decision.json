@@ -1,0 +1,86 @@
+{
+ "schema_version": "1.0",
+ "mode": "historical_replay_with_assumed_economics",
+ "operational_authorisation": false,
+ "report": {
+  "date": "2025-01-28",
+  "month": "2025-01",
+  "reported_pct": 80,
+  "source": "Business Standard, 28 Jan 2025 (\"80 per cent work complete\")",
+  "origin": "reported"
+ },
+ "satellite_observed_pct": 51,
+ "satellite_metric": "fp_cleared_12m (land conversion, not completion)",
+ "gap_pts": 29,
+ "parameters": {
+  "currency": "USD",
+  "loss_if_optimistic": {
+   "value": 300000,
+   "origin": "assumed"
+  },
+  "inspection_cost": {
+   "value": 15000,
+   "origin": "assumed"
+  },
+  "inspection_effectiveness": {
+   "value": 0.9,
+   "origin": "assumed"
+  },
+  "prior_p": {
+   "value": 0.1,
+   "origin": "assumed"
+  },
+  "gap_to_p": {
+   "value": [
+    [
+     -100,
+     0.03
+    ],
+    [
+     10,
+     0.03
+    ],
+    [
+     20,
+     0.15
+    ],
+    [
+     30,
+     0.4
+    ],
+    [
+     100,
+     0.4
+    ]
+   ],
+   "origin": "assumed"
+  }
+ },
+ "scenarios": [
+  {
+   "name": "No satellite evidence (prior)",
+   "p": 0.1,
+   "release": 30000,
+   "inspect": 18000,
+   "action": "inspect",
+   "break_even_p": 0.05555555555555555
+  },
+  {
+   "name": "Satellite: 51% converted vs 80% reported (gap 29 pts)",
+   "p": 0.375,
+   "release": 112500,
+   "inspect": 26250,
+   "action": "inspect",
+   "break_even_p": 0.05555555555555555
+  },
+  {
+   "name": "Counterfactual: satellite agrees with report",
+   "p": 0.03,
+   "release": 9000,
+   "inspect": 15900,
+   "action": "release",
+   "break_even_p": 0.05555555555555555
+  }
+ ],
+ "caveat": "Land conversion is not construction completion; a gap raises the case for inspection, it does not prove the report false."
+}
