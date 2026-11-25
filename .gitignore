@@ -4,3 +4,5 @@ a6/outputs/classify_log.txt
 a6/outputs/classify_err.txt
 .env
 .vercel
+c/raw/
+c/cache/

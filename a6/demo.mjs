@@ -16,6 +16,8 @@ const pct = v => (v == null ? '–' : `${Math.round(v * 100)}%`);
 const base = rd('progress_baseline.json').results;
 const dec = rd('decision.json');
 const rdy = opt('readiness.json');
+const gnFile = path.join(HERE, '..', 'c', 'outputs', 'gnss_summary.json');
+const gn = fs.existsSync(gnFile) ? JSON.parse(fs.readFileSync(gnFile, 'utf8')) : null; // Track C result for the Jewar region
 const aiJ = opt('progress_ai.json'), ai = aiJ ? aiJ.results : [];
 const met = opt('classifier_metrics.json');
 const rev = opt('nemotron_review.json');
@@ -180,6 +182,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
  <nav class="mods" aria-label="Modules">
   <a href="index.html" aria-current="page">Site Monitor <small>Track A6</small></a>
+  <a href="c.html">GNSS Watch <small>Track C</small></a>
   <a href="b3.html">Nav Integrity <small>Track B3</small></a>
   <a class="soon" aria-disabled="true">Passenger Recovery <small>next</small></a>
  </nav>
@@ -253,7 +256,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
   <h2 id="h-flow">How this feeds NavContinuity</h2>
   <div class="flow">
    <div class="live"><small>Live · Track A6</small><b>Is the airport real?</b>${rdy ? `Land conversion from ${monthName(rdy.satellite.conversion_start_month)}, levelled off ${monthName(rdy.satellite.plateau_month)}.` : ''} Counts as diversion capacity only once an airline confirms slots.</div>
-   <div class="nx"><small>Next · Track C</small><b>Is GPS degraded nearby?</b>Satellite evidence of jamming or spoofing within ${rdy ? rdy.region.radius_km : 50} km. No data reads "unknown", never "safe".</div>
+   <div class="live"><small>Live · Track C</small><b>Is GPS degraded nearby?</b>${gn ? `Within ${gn.jewar_region.radius_km} km: <b style="display:inline">${gn.jewar_region.status}</b> (${gn.jewar_region.aircraft_seen.toLocaleString('en-US')} aircraft, ${gn.days.join(', ')}). Hotspots sit on the India–Pakistan border. <a href="c.html">Open GNSS Watch</a>` : 'Aircraft GPS-integrity reports within 50 km. No data reads "unknown", never "safe".'}</div>
    <div class="nx"><small>Next</small><b>Are passengers recovered?</b>Diverted travellers get a confirmed rebooking, care at the right airport, and their bags tracked.</div>
   </div>
   <p class="note">Who pays: lenders and project-monitoring cells (per-asset fee); airlines for passenger recovery. Pricing not yet validated.</p>
