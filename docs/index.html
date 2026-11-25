@@ -73,7 +73,7 @@ footer{margin-top:72px;border-top:1px solid var(--rule);padding-top:14px}
 </style></head><body><main>
 
 <header>
-<p class="note">Track A6 Infrastructure · Mach-A-Thon Aeromania '26</p>
+<p class="note">Mach-A-Thon Aeromania '26, Track A6: infrastructure monitoring</p>
 <h1>Jewar airport, checked from orbit</h1>
 <p class="lede col">Lenders release money for big projects on the builder's word. We measured Noida International Airport at Jewar from free Sentinel-2 satellite images every month from 2020 to 2026, and checked the claims against what was on the ground.</p>
 
@@ -126,12 +126,12 @@ footer{margin-top:72px;border-top:1px solid var(--rule);padding-top:14px}
 <p class="col">An inspection costs money; trusting an optimistic report can cost far more. Move the sliders to see when the satellite evidence changes the decision.<span class="ev ass">assumed costs</span></p>
 <div class="decide">
 <label for="c">Inspection cost: <output id="cv"></output><input id="c" type="range" min="2000" max="60000" step="1000" value="15000"></label>
-<label for="p">Chance the report is optimistic: <output id="pv"></output><input id="p" type="range" min="0" max="0.6" step="0.01" value="0.38"></label>
+<label for="p">Chance the report is optimistic: <output id="pv"></output><input id="p" type="range" min="0" max="0.6" step="0.005" value="0.375"></label>
 </div>
 <p class="verdict" id="verdict" aria-live="polite"></p>
 <p class="note" id="costs"></p>
 <div class="wrap"><table class="tbl"><caption>Three cases, with a $300,000 tranche at risk and a 90% effective inspection (both assumed)</caption>
-<tr><th scope="col">Evidence</th><th scope="col">Chance optimistic</th><th scope="col">Expected cost if released</th><th scope="col">Expected cost if inspected</th><th scope="col">Do</th></tr><tr><td>No satellite evidence (prior)</td><td>0.10</td><td>$30,000</td><td>$18,000</td><td><b>Inspect</b></td></tr><tr class="hi"><td>Satellite: 51% converted vs 80% reported (gap 29 pts)</td><td>0.38</td><td>$1,12,500</td><td>$26,250</td><td><b>Inspect</b></td></tr><tr><td>Counterfactual: satellite agrees with report</td><td>0.03</td><td>$9,000</td><td>$15,900</td><td><b>Release</b></td></tr></table></div>
+<tr><th scope="col">Evidence</th><th scope="col">Chance optimistic</th><th scope="col">Expected cost if released</th><th scope="col">Expected cost if inspected</th><th scope="col">Do</th></tr><tr><td>No satellite evidence (prior)</td><td>0.10</td><td>$30,000</td><td>$18,000</td><td><b>Inspect</b></td></tr><tr class="hi"><td>Satellite: 51% converted vs 80% reported (gap 29 pts)</td><td>0.38</td><td>$112,500</td><td>$26,250</td><td><b>Inspect</b></td></tr><tr><td>Counterfactual: satellite agrees with report</td><td>0.03</td><td>$9,000</td><td>$15,900</td><td><b>Release</b></td></tr></table></div>
 <p class="note">Inspect when the chance is above 0.056 (inspection cost ÷ (effectiveness × amount at risk)).</p>
 </section>
 
@@ -170,7 +170,7 @@ const L=300000,e=0.9;
 const c=document.getElementById('c'),p=document.getElementById('p');
 const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
 function upd(){const C=+c.value,P=+p.value,rel=P*L,ins=C+P*(1-e)*L,v=document.getElementById('verdict');
- document.getElementById('cv').textContent=fmt(C);document.getElementById('pv').textContent=Math.round(P*100)+'%';
+ document.getElementById('cv').textContent=fmt(C);document.getElementById('pv').textContent=(P*100).toFixed(1).replace(/.0$/,'')+'%';
  const insp=ins<rel;v.textContent=insp?'Inspect before paying':'Release the payment';v.className='verdict '+(insp?'inspect':'release');
  document.getElementById('costs').textContent='Expected cost if released '+fmt(rel)+', if inspected '+fmt(ins)+'. Break-even chance: '+(C/(e*L)*100).toFixed(1)+'%.';}
 c.oninput=p.oninput=upd;upd();

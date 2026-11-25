@@ -85,11 +85,11 @@ const larperBlock = met ? `
 <p>Larper is a Random Forest that labels every 10 m square as built or paved, bare earth, vegetation or water. It learned from ESA WorldCover 2021 on land <em>around</em> the airport, then was tested on a separate block of land it never saw.</p>
 <div class="figs">
   <div><b>${Math.round(met.overall_accuracy * 100)}%</b><span>agreement with WorldCover on unseen land</span></div>
-  <div><b>${met.n_test.toLocaleString()}</b><span>test pixels</span></div>
+  <div><b>${met.n_test.toLocaleString('en-US')}</b><span>test pixels</span></div>
   ${jan25 ? `<div><b>${pct(jan25.built_paved_frac)}</b><span>built or paved, Jan 2025</span></div>` : ''}
 </div>
 <table class="tbl"><caption>How Larper does per class on unseen land</caption><tr><th scope="col">Class</th><th scope="col">Test pixels</th><th scope="col">Found (recall)</th><th scope="col">Right when it says so (precision)</th></tr>
-${met.per_class.map(c => `<tr><td>${c.class.replace('_', ' / ')}</td><td>${c.support.toLocaleString()}</td><td>${pct(c.recall)}</td><td>${pct(c.precision)}</td></tr>`).join('')}</table>
+${met.per_class.map(c => `<tr><td>${c.class.replace('_', ' / ')}</td><td>${c.support.toLocaleString('en-US')}</td><td>${pct(c.recall)}</td><td>${pct(c.precision)}</td></tr>`).join('')}</table>
 <p class="note">WorldCover is itself a model product, so this is agreement with it, not ground truth. Bare earth had few training examples, so Larper finds it less reliably.</p>
 ${MAPS.length ? `<div class="maps">${MAPS.map(m => `<figure><img src="classmap_${m}.png" alt="Larper class map, ${monthName(m)}"><figcaption>${monthName(m)}</figcaption></figure>`).join('')}</div>
 <p class="note legend"><i style="--c:#dc3c3c"></i>built or paved <i style="--c:#e6c878"></i>bare <i style="--c:#3c8c3c"></i>vegetation <i style="--c:#3c78dc"></i>water</p>` : ''}`
@@ -101,7 +101,7 @@ ${rev.curve?.finding ? `<div class="ai-out"><h4>Larper vs the baseline curve</h4
 ${rev.vision.filter(v => v.finding).map(v => `<div class="ai-out"><h4>Map check, ${monthName(v.month)}</h4><div>${esc(v.finding)}</div></div>`).join('')}`
   : `<p class="pending">Nemotron reviews Larper's maps against the photos once both are ready. You can run a check live below.</p>`;
 
-const scen = dec.scenarios.map(s => `<tr${s.name.startsWith('Satellite') ? ' class="hi"' : ''}><td>${esc(s.name)}</td><td>${s.p.toFixed(2)}</td><td>$${Math.round(s.release).toLocaleString()}</td><td>$${Math.round(s.inspect).toLocaleString()}</td><td><b>${s.action === 'inspect' ? 'Inspect' : 'Release'}</b></td></tr>`).join('');
+const scen = dec.scenarios.map(s => `<tr${s.name.startsWith('Satellite') ? ' class="hi"' : ''}><td>${esc(s.name)}</td><td>${s.p.toFixed(2)}</td><td>$${Math.round(s.release).toLocaleString('en-US')}</td><td>$${Math.round(s.inspect).toLocaleString('en-US')}</td><td><b>${s.action === 'inspect' ? 'Inspect' : 'Release'}</b></td></tr>`).join('');
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jewar From Orbit</title>
@@ -178,7 +178,7 @@ footer{margin-top:72px;border-top:1px solid var(--rule);padding-top:14px}
 </style></head><body><main>
 
 <header>
-<p class="note">Track A6 Infrastructure · Mach-A-Thon Aeromania '26</p>
+<p class="note">Mach-A-Thon Aeromania '26, Track A6: infrastructure monitoring</p>
 <h1>Jewar airport, checked from orbit</h1>
 <p class="lede col">Lenders release money for big projects on the builder's word. We measured Noida International Airport at Jewar from free Sentinel-2 satellite images every month from 2020 to 2026, and checked the claims against what was on the ground.</p>
 ${swipe}
@@ -208,7 +208,7 @@ ${swipe}
 <p class="col">An inspection costs money; trusting an optimistic report can cost far more. Move the sliders to see when the satellite evidence changes the decision.<span class="ev ass">assumed costs</span></p>
 <div class="decide">
 <label for="c">Inspection cost: <output id="cv"></output><input id="c" type="range" min="2000" max="60000" step="1000" value="${P0.inspection_cost.value}"></label>
-<label for="p">Chance the report is optimistic: <output id="pv"></output><input id="p" type="range" min="0" max="0.6" step="0.01" value="${dec.scenarios[1].p.toFixed(2)}"></label>
+<label for="p">Chance the report is optimistic: <output id="pv"></output><input id="p" type="range" min="0" max="0.6" step="0.005" value="${dec.scenarios[1].p.toFixed(3)}"></label>
 </div>
 <p class="verdict" id="verdict" aria-live="polite"></p>
 <p class="note" id="costs"></p>
@@ -252,7 +252,7 @@ const L=${P0.loss_if_optimistic.value},e=${P0.inspection_effectiveness.value};
 const c=document.getElementById('c'),p=document.getElementById('p');
 const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
 function upd(){const C=+c.value,P=+p.value,rel=P*L,ins=C+P*(1-e)*L,v=document.getElementById('verdict');
- document.getElementById('cv').textContent=fmt(C);document.getElementById('pv').textContent=Math.round(P*100)+'%';
+ document.getElementById('cv').textContent=fmt(C);document.getElementById('pv').textContent=(P*100).toFixed(1).replace(/\.0$/,'')+'%';
  const insp=ins<rel;v.textContent=insp?'Inspect before paying':'Release the payment';v.className='verdict '+(insp?'inspect':'release');
  document.getElementById('costs').textContent='Expected cost if released '+fmt(rel)+', if inspected '+fmt(ins)+'. Break-even chance: '+(C/(e*L)*100).toFixed(1)+'%.';}
 c.oninput=p.oninput=upd;upd();
