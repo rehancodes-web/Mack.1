@@ -142,7 +142,7 @@ function tick(){const now=performance.now();simT+= (now-last)*(+spd.value);last=
  groups.push(show.LEO?leo.map(s=>({...leoPos(s,d),sys:'LEO'})):[]);
  G.particlesData(groups.map(g=>g.length?g:[{lat:0,lng:0,alt:-1,sys:'GPS'}].slice(0,0)).concat(CX.parts(d)));CX.tips(d);
  clk.textContent=d.toISOString().slice(0,16).replace('T',' ')+' UTC';}
-setInterval(tick,120);tick();paths();setInterval(paths,30000);spd.onchange=paths;
+let lastDraw=0;(function frame(ts){requestAnimationFrame(frame);if(document.hidden||ts-lastDraw<33)return;lastDraw=ts;tick();})(0);tick();paths();setInterval(paths,30000);spd.onchange=paths;
 
 // ---- counts and toggles ----
 for(const k of ['GPS','Galileo','NavIC'])document.getElementById('n'+k).textContent=D.sats[k].length;
@@ -160,30 +160,42 @@ document.getElementById('sf').onsubmit=e=>{e.preventDefault();const q=document.g
 
 
 // ---- collision check: real tracked objects (CelesTrak elements, SGP4), closest approach in the next 6 hours ----
-const scr=[];for(const [name,l1,l2,kind] of (D.screen||[])){try{scr.push({name,id:l1.slice(2,7).trim(),man:!!kind,rec:satellite.twoline2satrec(l1,l2)});}catch(e){}}
+const scr=(D.screen||[]).map(([name,l1,l2,kind])=>{try{return {name,id:l1.slice(2,7).trim(),man:!!kind,rec:satellite.twoline2satrec(l1,l2)};}catch(e){return {name,id:'',man:false,rec:null};}});
 const cbtn=document.getElementById('cbtn'),cp=document.getElementById('cpanel');
-const eci=(o,t)=>{const pv=satellite.propagate(o.rec,t);return pv&&pv.position&&isFinite(pv.position.x)?pv:null;};
+const eci=(o,t)=>{if(!o.rec)return null;const pv=satellite.propagate(o.rec,t);return pv&&pv.position&&isFinite(pv.position.x)?pv:null;};
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 const geo=(p,t)=>{const g=satellite.eciToGeodetic(p,satellite.gstime(t));return {lat:satellite.degreesLat(g.latitude),lng:satellite.degreesLong(g.longitude),alt:g.height/RE,h:g.height};};
 const fmtT=t=>new Date(t).toISOString().slice(11,16)+' UTC';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 let found=null,shift=0; // shift: seconds the manoeuvring object is moved along its track (simulated burn)
-async function screen(){
- const H=6*3600e3,STEP=30e3,CELL=400,t0=Date.now(),cand=new Map();
- for(let k=0,t=t0;t<=t0+H;k++,t+=STEP){const d=new Date(t),grid=new Map(),pos=[];
-  for(let i=0;i<scr.length;i++){const pv=eci(scr[i],d);if(!pv)continue;const p=pv.position;pos[i]=p;
-   const key=Math.floor(p.x/CELL)+','+Math.floor(p.y/CELL)+','+Math.floor(p.z/CELL);(grid.get(key)||grid.set(key,[]).get(key)).push(i);}
-  for(let i=0;i<scr.length;i++){if(!scr[i].man||!pos[i])continue;const p=pos[i],cx=Math.floor(p.x/CELL),cy=Math.floor(p.y/CELL),cz=Math.floor(p.z/CELL);
-   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let c=-1;c<=1;c++){const l=grid.get((cx+a)+','+(cy+b)+','+(cz+c));if(!l)continue;
-    for(const j of l){if(j===i)continue;const dd=dist(p,pos[j]);if(dd>CELL)continue;const key=i<j?i+'-'+j:j+'-'+i,o=cand.get(key);if(!o||dd<o.d)cand.set(key,{i,j,t,d:dd});}}}
-  if(k%12===0){cbtn.textContent='Screening '+scr.length.toLocaleString('en-US')+' objects… '+Math.round(100*(t-t0)/H)+'%';await new Promise(r=>setTimeout(r,0));}}
- // refine each candidate to its time of closest approach (golden-section search within ±STEP)
- let best=null;for(const c of cand.values()){let lo=c.t-STEP,hi=c.t+STEP;const f=t=>{const a=eci(scr[c.i],new Date(t)),b=eci(scr[c.j],new Date(t));return a&&b?dist(a.position,b.position):1e9;};
-  for(let n=0;n<40;n++){const m1=lo+(hi-lo)*.382,m2=lo+(hi-lo)*.618;if(f(m1)<f(m2))hi=m2;else lo=m1;}const t=(lo+hi)/2,d=f(t);const pa=eci(scr[c.i],new Date(t)),pb=eci(scr[c.j],new Date(t));if(!pa||!pb)continue;
-  // skip objects moving together (docked modules, formation neighbours): a real conjunction is a crossing at speed
-  const vr=Math.hypot(pa.velocity.x-pb.velocity.x,pa.velocity.y-pb.velocity.y,pa.velocity.z-pb.velocity.z);if(vr<1)continue;
-  if(!best||d<best.d)best={...c,t,d};}
- return best;}
+const workerSrc=`importScripts('https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js');
+onmessage=e=>{const {tles,t0,H,STEP,CELL}=e.data;const S=[];for(const [l1,l2,man] of tles){try{S.push({rec:satellite.twoline2satrec(l1,l2),man});}catch(x){S.push(null);}}
+ const pv=(i,t)=>{const o=S[i];if(!o)return null;const r=satellite.propagate(o.rec,new Date(t));return r&&r.position&&isFinite(r.position.x)?r:null;};
+ const cand=new Map(),n=S.length;
+ for(let k=0,t=t0;t<=t0+H;k++,t+=STEP){const grid=new Map(),P=new Array(n);
+  for(let i=0;i<n;i++){const r=pv(i,t);if(!r)continue;P[i]=r;const p=r.position,key=Math.floor(p.x/CELL)*1e6+Math.floor(p.y/CELL)*1e3+Math.floor(p.z/CELL);let l=grid.get(key);if(!l)grid.set(key,l=[]);l.push(i);}
+  for(let i=0;i<n;i++){if(!S[i]||!S[i].man||!P[i])continue;const p=P[i].position,v=P[i].velocity,cx=Math.floor(p.x/CELL),cy=Math.floor(p.y/CELL),cz=Math.floor(p.z/CELL);
+   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let c=-1;c<=1;c++){const l=grid.get((cx+a)*1e6+(cy+b)*1e3+(cz+c));if(!l)continue;
+    for(const j of l){if(j===i)continue;const q=P[j].position,w=P[j].velocity,d=Math.hypot(p.x-q.x,p.y-q.y,p.z-q.z);if(d>CELL)continue;
+     const rx=p.x-q.x,ry=p.y-q.y,rz=p.z-q.z,ux=v.x-w.x,uy=v.y-w.y,uz=v.z-w.z,uu=ux*ux+uy*uy+uz*uz;
+     if(uu<1)continue; // moving together (docked, formation): not a conjunction
+     // straight-line relative motion: predicted miss distance and its time, good for fast crossings
+     let ts=-(rx*ux+ry*uy+rz*uz)/uu;if(ts<-STEP/1e3)ts=-STEP/1e3;if(ts>STEP/1e3)ts=STEP/1e3;
+     const e=Math.hypot(rx+ux*ts,ry+uy*ts,rz+uz*ts);
+     const key=i<j?i*1e5+j:j*1e5+i,o=cand.get(key);if(!o||e<o.e)cand.set(key,{i,j,t:t+ts*1e3,d,e});}}}
+  if(k%10===0)postMessage({progress:(t-t0)/H*0.9});}
+ let best=null,m=0;const list=[...cand.values()].sort((x,y)=>x.e-y.e).slice(0,600); // refine the most promising pairs only
+ for(const c of list){let lo=c.t-STEP,hi=c.t+STEP;const f=t=>{const A=pv(c.i,t),B=pv(c.j,t);return A&&B?Math.hypot(A.position.x-B.position.x,A.position.y-B.position.y,A.position.z-B.position.z):1e9;};
+  for(let s=0;s<28;s++){const m1=lo+(hi-lo)*.382,m2=lo+(hi-lo)*.618;if(f(m1)<f(m2))hi=m2;else lo=m1;}const t=(lo+hi)/2,d=f(t);if(!best||d<best.d)best={i:c.i,j:c.j,t,d};
+  if(++m%500===0)postMessage({progress:.9+.1*m/list.length});}
+ postMessage({done:best,candidates:list.length});};`;
+let worker=null;
+function screen(){return new Promise((res,rej)=>{if(worker)worker.terminate();
+ worker=new Worker(URL.createObjectURL(new Blob([workerSrc],{type:'text/javascript'})));
+ worker.onerror=e=>{rej(new Error(e.message||'worker error'));};
+ worker.onmessage=e=>{const m=e.data;if(m.progress!=null)cbtn.textContent='Screening '+scr.length.toLocaleString('en-US')+' objects… '+Math.round(m.progress*100)+'%';
+  if('done' in m){worker.terminate();worker=null;res(m.done);}};
+ worker.postMessage({tles:(D.screen||[]).map(([n,l1,l2,k])=>[l1,l2,!!k]),t0:Date.now(),H:6*3600e3,STEP:30e3,CELL:400});});}
 function describe(b){const A=scr[b.i],B=scr[b.j],d=new Date(b.t),pa=eci(A,d),pb=eci(B,d);
  const vr=Math.hypot(pa.velocity.x-pb.velocity.x,pa.velocity.y-pb.velocity.y,pa.velocity.z-pb.velocity.z),ga=geo(pa.position,d),gb=geo(pb.position,d);
  const lead=Math.min(Math.max((b.t-Date.now())/1000-600,600),2*3600); // burn ~1 orbit ahead, at least 10 min, never in the past
@@ -231,7 +243,7 @@ async function ask(){const b=found,I=b.info,box=document.getElementById('cai');b
  const named=I.opts.findIndex(o=>o.can_manoeuvre&&b.ai&&b.ai.includes(o.name));b.moveIdx=named>=0?named:I.opts.findIndex(o=>o.can_manoeuvre);panel();}
 cbtn.onclick=async()=>{if(found){cp.hidden=false;return;}cbtn.disabled=true;G.controls().autoRotate=false;
  try{const b=await screen();if(!b){cbtn.textContent='No close approach found';return;}b.info=describe(b);found=b;mover=-1;shift=0;
-  cp.hidden=false;panel();draw();G.pointOfView({lat:b.info.ga.lat,lng:b.info.ga.lng,altitude:b.info.ga.alt+.35},1800);cbtn.textContent='⚠ Collision found: '+(b.d<1?Math.round(b.d*1000)+' m':b.d.toFixed(1)+' km');}
+  cp.hidden=false;panel();draw();G.pointOfView({lat:b.info.ga.lat,lng:b.info.ga.lng,altitude:b.info.ga.alt+.35},2600);cbtn.textContent='⚠ Collision found: '+(b.d<1?Math.round(b.d*1000)+' m':b.d.toFixed(1)+' km');}
  catch(e){cbtn.textContent='Screen failed: '+e.message;}finally{cbtn.disabled=false;}};
 
 // ---- airport pop-up with the before/after viewer ----
@@ -244,9 +256,14 @@ const close=()=>{modal.hidden=true;frame.src='about:blank';tourStop();};
 // ---- tour: every airport in turn, starting with Jewar, then India, then the world from west to east ----
 const tourList=[...aps].sort((x,y)=>(y.jewar-x.jewar)||((y.cc==='IN')-(x.cc==='IN'))||(x.lng-y.lng));
 const tourEl=document.getElementById('tour'),tplay=document.getElementById('tplay'),tcount=document.getElementById('tcount');
-let tourI=-1,tourTimer=null,tourOn=false;const TOUR_MS=8000;
+let tourI=-1,tourTimer=null,tourOn=false;const TOUR_MS=9000;
 function tourGo(i){tourI=(i+tourList.length)%tourList.length;const a=tourList[tourI];
- G.pointOfView({lat:a.lat,lng:a.lng,altitude:.5},900);openAirport(a);tourEl.classList.add('on');
+ G.pointOfView({lat:a.lat,lng:a.lng,altitude:.5},1600);
+ if(!modal.hidden&&frame.contentWindow&&/earth.html/.test(frame.src)){ // glide the open viewer instead of reloading it
+  frame.contentWindow.postMessage({fly:[a.lat,a.lng,a.large?13:14]},location.origin);
+  document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · Sentinel-2 cloudless, drag to compare';
+  document.getElementById('mfull').href='earth.html#'+[a.lat.toFixed(4),a.lng.toFixed(4),a.large?13:14,2018,2025].join(',');}
+ else openAirport(a);tourEl.classList.add('on');
  tcount.textContent=(tourI+1).toLocaleString('en-US')+' / '+tourList.length.toLocaleString('en-US');}
 function tourPlay(){tourOn=true;tplay.textContent='Pause';clearInterval(tourTimer);tourTimer=setInterval(()=>tourGo(tourI+1),TOUR_MS);}
 function tourPause(){tourOn=false;tplay.textContent='Play';clearInterval(tourTimer);}

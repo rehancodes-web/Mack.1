@@ -95,6 +95,9 @@ function clip(){const size=map.getSize(),x=Math.round(size.x*frac),nw=map.contai
 function labels(){yl.textContent=st.a;yr.textContent=st.b;}
 function hash(){const c=map.getCenter();st.lat=+c.lat.toFixed(4);st.lon=+c.lng.toFixed(4);st.z=map.getZoom();history.replaceState(null,'','#'+[st.lat,st.lon,st.z,st.a,st.b].join(','));}
 map.on('move zoom resize zoomanim',clip);map.on('moveend',hash);
+// the globe's airport tour glides the open viewer to the next airport instead of reloading it
+addEventListener('message',e=>{if(e.origin!==location.origin||!e.data||!Array.isArray(e.data.fly))return;const [la,lo,z]=e.data.fly;
+ const far=map.getCenter().distanceTo([la,lo])>2e6;map.flyTo([la,lo],z,{duration:far?2.2:1.4,easeLinearity:.2});});
 sa.onchange=()=>{st.a=+sa.value;map.removeLayer(left);left=mk(st.a).addTo(map);labels();hash();};
 sb.onchange=()=>{st.b=+sb.value;map.removeLayer(right);right=mk(st.b,'right').addTo(map);labels();clip();hash();};
 // divider drag (mouse, touch, keyboard)
