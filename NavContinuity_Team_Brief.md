@@ -1,14 +1,79 @@
 # Navigation continuity and recovery
 
-## Team research and implementation briefs
+## Team research and implementation brief
 
-Prepared for the Mach A Thon Aeromania 26 team. Version 1.0. Research reference date 25 November 2026. Working product name NavContinuity. This document is a project specification and research handoff, not an operational navigation procedure.
+Prepared for the Mach A Thon Aeromania 26 team. Version 1.1. Research reference date 25 November 2026. Working product name NavContinuity. This document is a project specification and research handoff, not an operational navigation procedure.
 
-The recommended project uses real satellite receiver observations to analyse navigation degradation, then demonstrates how that evidence could support a bounded economic decision. The initial commercial hypothesis is a specialist module for airline operations and maintenance teams. A separate spacecraft scenario supplies a credible orbital extension. The hackathon must distinguish measured satellite results from simulated aircraft outcomes and assumed costs.
+**Version 1.1 change (read first).** The organisers' 9:36 pm update requires every team to complete at least one objective from Track A's six listed bullets as its compulsory primary problem, plus optionally one of Track B or Track C, with a flow linking them. GNSS degradation is not one of the six Track A bullets, so version 1.0 risked failing the compulsory requirement. The project is now structured as:
+
+- **Primary problem: Track A, objective 6, Infrastructure.** Monitor construction progress of a critical aviation asset (an airport or runway under construction) from Sentinel-2 imagery and turn it into a lender's or owner's inspection-and-disbursement decision. Specified in the new section "Primary problem: Track A6 infrastructure monitoring" below. This must be finished and demonstrated on real data.
+- **Optional track: Track C, GNSS resilience and critical infrastructure.** The original NavContinuity work (navigation degradation evidence and a preparation decision) now runs for the same asset's region. Everything from "Event requirements and project fit" onward that describes GNSS evidence, airline preparation and its economics now describes this Track C module.
+- **Flow:** the A6 module tells you which asset is coming into service and when. The Track C module asks whether the navigation environment around that asset is degraded and what preparation is worth paying for before and after it opens.
+- **Dropped from the pitch:** the orbital task-planning extension. It reads as Track B, and the update says to choose one optional track. It stays in the post-event backlog.
+
+Where a later section still says "Track A" about GNSS receiver data, read "Track C module". The A6 section takes precedence over any older text it conflicts with.
+
+The Track C module uses real satellite receiver observations to analyse navigation degradation, then demonstrates how that evidence could support a bounded economic decision. Its initial commercial hypothesis is a specialist module for airline operations and maintenance teams operating at the monitored asset. The hackathon must distinguish measured satellite results from simulated aircraft outcomes and assumed costs.
 
 The underlying problem is established. The proposed commercial gap is not yet established. Interference detection, aircraft recovery monitoring and airline disruption optimisation already exist. The team must show why combining evidence, equipment-dependent recovery and preparation costs adds something useful to existing workflows. Do not describe this as the world's first system, an unsolved category, a certified navigation product or a demonstrated source of airline savings.
 
-Deliver a small, reproducible result before expanding the product. The first milestone is a successfully parsed real satellite sample. The second is an honest comparison between a baseline and an AI model. The third is a cost-sensitive operational scenario with explicit assumptions. The fourth, if time permits, is a separate orbital task-planning simulation.
+Deliver a small, reproducible result before expanding the product. Milestones, in order: (1) a real Sentinel-2 time series over the chosen asset footprint; (2) a construction-progress curve from a baseline index and an AI classifier, compared honestly; (3) the A6 inspection-or-release decision with explicit assumptions; (4) a parsed real GNSS receiver sample for the asset's region; (5) the Track C preparation scenario linked to the asset. Milestones 1 to 3 are compulsory; 4 and 5 are the optional track and must be fully met if presented.
+
+## Primary problem: Track A6 infrastructure monitoring
+
+### Problem and decision
+
+Large infrastructure projects are financed in tranches released against reported construction milestones. Lenders, owners and public monitoring agencies often depend on contractor reports and periodic site visits, which are costly and infrequent. Satellite imagery can give an independent, frequent and cheap view of physical progress: land clearing, earthworks, paved surfaces and new structures inside a known footprint.
+
+The proposed user is a project-monitoring analyst at a lender, infrastructure fund, insurer or government monitoring cell. The decision is: **before releasing the next disbursement tranche, approve on the contractor's report or commission an independent site inspection?** Satellite-measured progress that lags the reported milestone raises the chance that the report is optimistic, which makes inspection worthwhile. Satellite progress that agrees with the report lets the analyst skip an unnecessary inspection.
+
+The monitored asset should be an aviation asset under construction or expansion (a greenfield airport, a new runway or a terminal apron), so the same asset carries through into the Track C module. Choose one asset with large, visible change during a period covered by Sentinel-2 (2017 onward), a publicly announced timeline to compare against, and a footprint that can be drawn as a polygon from OpenStreetMap or a public plan. **Chosen asset: Noida International Airport, Jewar** (OSM footprint ≈ 1334 ha, Sentinel-2 tile 43RGM). Site works were reported from August 2021, the foundation stone was laid on 25 November 2021 and phase 1 was inaugurated on 28 March 2026, after reported opening targets of September 2024, April 2025 and 30 October 2025 were missed. The before-state is farmland, which gives a clean vegetation-to-paved signal. Navi Mumbai International Airport is the backup. Asset record, sources, footprint and scene manifest: `data/README.md`.
+
+### Data
+
+- **Primary:** Sentinel-2 Level-2A surface reflectance (10 m bands B2, B3, B4, B8 and 20 m bands B11, B12, plus the scene classification layer for cloud masking). Primary access is Element 84 Earth Search (`sentinel-2-c1-l2a`, no account, cloud-optimised GeoTIFFs), with gaps filled from `sentinel-2-l2a`. Microsoft Planetary Computer and Copernicus Data Space are backups. All three were tested on 25 November 2026. `data/s2_monthly_manifest.csv` lists 79 monthly scenes from January 2020 to November 2026 with direct band URLs. Subtract the 1000 DN offset where the manifest says so (older-collection scenes from 25 January 2022 onward) before computing indices.
+- **Optional for monsoon cloud gaps:** Sentinel-1 GRD backscatter (VV, VH), which sees through cloud and responds strongly to new structures and paving.
+- **Labels and context:** ESA WorldCover (2020, 2021) built-up and bare classes as weak labels; OpenStreetMap for the footprint polygon and surrounding context; GHSL as a cross-check where resolution allows.
+- **Reported milestones:** public announcements of the project timeline. Store them as `reported`, never as ground truth.
+
+Keep the time window bounded (for example, one image per month with acceptable cloud cover over three to five years). Record every scene identifier, acquisition date, cloud fraction and processing baseline in the manifest, as for the GNSS data.
+
+### Baseline and AI
+
+Baseline: per-scene spectral indices inside the footprint after cloud masking: NDVI (vegetation loss), NDBI or a built-up index using SWIR (new structures and paving) and a bare-soil index (earthworks). Report the median index and the fraction of footprint pixels past a fixed threshold, per date. This produces a transparent progress curve.
+
+AI model: a small pixel classifier (Random Forest or gradient boosting) trained on multi-band features with WorldCover classes as weak labels from a year and area outside the evaluation window, predicting per-pixel class (vegetation, bare or earthworks, built or paved). Progress = fraction of footprint classified bare plus built over time, and built alone as the later-stage signal. A pretrained land-cover product may be used as a comparison, credited. Validate on held-out dates and a held-out nearby area; spot-check a sample of pixels against visible high-resolution imagery and record agreement. Report where the classifier and the baseline disagree, and cloud-affected dates as gaps, not as zero progress.
+
+### From imagery to decision (illustrative economics)
+
+Define the progress gap as reported completion minus satellite-estimated completion at the tranche date. The mapping from progress gap to the probability that the report is materially optimistic is an **assumption** the analyst sets and the demo varies; it is not learned from labelled defaults.
+
+All numbers below are invented for illustration. Tranche at risk if the report is optimistic: expected loss L = 300000 dollars (carrying cost and overrun exposure). Independent inspection costs C = 15000 dollars and catches an optimistic report with effectiveness e = 0.9.
+
+- Expected cost without inspection = p × L. Expected cost with inspection = C + p × (1 − e) × L.
+- Break-even probability p* = C ÷ (e × L) = 0.0556.
+- Without satellite evidence, assume prior p = 0.10: skip costs 30000, inspect costs 18000, so **inspect**.
+- Satellite progress agrees with the report, assume p = 0.03: skip costs 9000, inspect costs 15900, so **skip** and save an unnecessary 15000-dollar visit.
+- Satellite progress lags by a large gap, assume p = 0.40: skip costs 120000, inspect costs 27000, so **inspect**.
+
+The point to demonstrate is that satellite evidence changes the action, which is the "operational scenario with satellite evidence versus without it" ablation the validation section asks for. The value per decision is illustrative; who pays is the lender or owner (per-asset monitoring fee or per-portfolio licence), and the worth is bounded by inspections avoided plus losses caught. Prices are not established.
+
+### A6 acceptance tests
+
+- **A6-AT1 Real data:** every point on the progress curve traces to a named Sentinel-2 scene, date, band set and cloud mask.
+- **A6-AT2 Cloud gaps:** a fully clouded date appears as a gap, never as a progress drop.
+- **A6-AT3 Baseline vs AI:** both curves are shown on the same dates with the held-out validation result; no improvement is reported honestly.
+- **A6-AT4 Footprint:** the polygon source and area are shown; pixels outside it are excluded.
+- **A6-AT5 Economics:** the illustrative cases return 30000/18000, 9000/15900 and 120000/27000; p* = 0.0556; raising inspection cost above e × p × L flips the decision.
+- **A6-AT6 Labels:** reported milestones, satellite-derived progress and assumed probabilities are visibly labelled `reported`, `derived` and `assumed`.
+
+### Flow into the Track C module
+
+The A6 module outputs the asset, its footprint, its estimated readiness date and its region. The Track C module takes that region and asks a protective question: is there satellite evidence of GNSS degradation in this region, and what preparation (contingency procedures, conventional navigation-aid readiness, maintenance support for arriving aircraft) is worth paying for as the asset enters service? One shared asset record links the two. If no GNSS evidence or no coverage exists for the region, the Track C module says "unknown" for that region rather than "safe".
+
+Coverage note: CYGNSS observes roughly between 38 degrees north and south, which includes India; Sentinel-1 onboard GNSS data is global but describes the spacecraft's location. Confirm actual coverage for the chosen region from retrieved files.
+
+Track C protective rule: the module monitors and builds resilience. It does not locate transmitters, attribute sources, support targeting or track individual people.
 
 ## Reading guide and immediate actions
 
@@ -20,23 +85,25 @@ Immediate actions are to verify sample access, confirm the dataset licence and p
 
 ## Event requirements and project fit
 
-The supplied event deck describes a 12-hour hackathon in collaboration with Boeing. Its umbrella challenge is to create economic and strategic value on Earth and in orbit using AI and space-based assets. Track A asks teams to turn satellite data into an economic decision and requires a working demonstration on real data. Track B permits simulations, prototypes or a solid architecture supported by approximate cost and physics. Track C explicitly includes GNSS resilience and requires protective applications without weapons, targeting or tracking individual people. The organiser's accompanying message makes Track A compulsory and B and C additional work as achievable. [S01]
+The supplied event deck describes a 12-hour hackathon in collaboration with Boeing. Its umbrella challenge is to create economic and strategic value on Earth and in orbit using AI and space-based assets. Track A asks teams to turn satellite data into an economic decision and requires a working demonstration on real data. Track B permits simulations, prototypes or a solid architecture supported by approximate cost and physics. Track C explicitly includes GNSS resilience and requires protective applications without weapons, targeting or tracking individual people. The organisers' follow-up messages make at least one Track A objective compulsory as the primary problem, allow one optional track (B or C) whose objectives must all be met if taken, require a flow between them, and require a short presentation of what was accomplished. [S01]
 
 The judging allocation in the deck is economic or strategic impact 30 percent, technical depth and AI use 30 percent, feasibility 20 percent, and demonstration and pitch 20 percent. Teams have five minutes to present. These weights support a modest working prototype with credible economics more strongly than a broad unvalidated product claim. [S01]
 
-Our interpretation is that satellite receiver measurements qualify as satellite data under Track A's broad wording. The starter examples emphasise Earth observation, so confirm this interpretation with an event mentor if possible. GNSS interference is expressly named in Track C, but Track C relevance does not remove the compulsory Track A requirement. Show actual satellite-origin records and the economic decision they inform.
+Version 1.0 interpreted satellite receiver measurements as satellite data under Track A. After the 9:36 pm update this is not relied on: the compulsory primary problem is Track A objective 6 (infrastructure monitoring, see above), and the GNSS work is presented as Track C, where GNSS resilience and critical infrastructure are named explicitly. Show actual satellite-origin records and the economic decision they inform in both modules.
 
-Earth value should be expressed as better preparation for operational disruption. Orbital value should be expressed as assessing navigation degradation experienced by a spacecraft and comparing mission-task options under uncertainty. The two applications share parts of the evidence pipeline but require distinct equipment and impact models. A map labelled Earth and Orbit is not by itself evidence of value in both environments.
+Earth value should be expressed as better preparation for operational disruption at the monitored asset. The orbital task-planning idea is moved to the post-event backlog so that only one optional track is presented.
 
 ## Recommended scope decision
 
-Build a historical analysis and decision-support demonstrator. Its proposed user is an airline maintenance-control or operations-control analyst reviewing a navigation-related disruption and preparing the next aircraft turnaround. The proposed decision is whether to prepare maintenance support or another resource before arrival, given an uncertain chance of unresolved symptoms and subsequent delay.
+This section and those that follow specify the **Track C module**. The A6 module above is built first and must work end to end before Track C work takes priority.
+
+For Track C, build a historical analysis and decision-support demonstrator. Its proposed user is an airline maintenance-control or operations-control analyst reviewing a navigation-related disruption and preparing the next aircraft turnaround. The proposed decision is whether to prepare maintenance support or another resource before arrival, given an uncertain chance of unresolved symptoms and subsequent delay.
 
 The real-data component establishes satellite-observed signal anomalies and their limitations. The aircraft component uses a declared scenario unless a partner supplies suitable operational records. Do not imply that a spacecraft anomaly directly proves a particular aircraft suffered interference. Ground or airborne observations are required to validate that connection.
 
 The primary deliverable should answer: what was observed, how reliable is that observation, which operational assumptions were applied, what preparations are being compared, and under which assumptions does each preparation become worthwhile? The software should explain when evidence is insufficient to connect an observation to an operational consequence.
 
-The optional orbital scenario asks whether to keep or move a hypothetical position-sensitive task when navigation quality is degraded. The task value, fallback capability and rescheduling penalty are scenario inputs unless actual mission information is supplied. Do not infer collision probability, image geolocation error or loss of pointing solely from signal strength.
+Backlog only (not in the hackathon pitch): the orbital scenario asks whether to keep or move a hypothetical position-sensitive task when navigation quality is degraded. The task value, fallback capability and rescheduling penalty are scenario inputs unless actual mission information is supplied. Do not infer collision probability, image geolocation error or loss of pointing solely from signal strength.
 
 Explicit exclusions for the first build are live navigation commands, cockpit procedures, autonomous flight decisions, transmitter localisation, interference-source attribution, hardware design, a replacement positioning service, a complete airline recovery optimiser and claims of spoofing detection from a low-signal threshold.
 
@@ -138,7 +205,7 @@ With permission and suitable integration, an airline sends a symptom event, equi
 
 This is a proposed future workflow. It is not available from the public satellite archive alone. A model probability must not be treated as a maintenance release or as confirmation that an approach is available.
 
-### Orbital scenario journey
+### Orbital scenario journey (backlog, not in the hackathon pitch)
 
 A mission analyst selects a historical spacecraft receiver anomaly. The application shows the actual receiver measurements and their orbital context. A separate scenario provides a hypothetical task, its timing flexibility, a navigation-quality constraint and a cost of delay. The demonstration compares keeping the task with moving it to another window. If no validated mapping from receiver observations to task quality exists, that mapping remains an editable simulation assumption.
 
@@ -210,7 +277,7 @@ Detailed recovery prediction needs timestamps for onset and resolution, symptom 
 
 ### Access gate
 
-Within the first 90 minutes, retrieve at least one usable real observation file, parse it, list the actual variables and produce a small plot. Log the source URL, product version, observation dates, retrieval time and checksum. If access fails, try the alternative documented satellite source within the time budget. If neither is usable, report the Track A blocker rather than substitute synthetic data under a real-data label.
+Within the first 90 minutes, retrieve at least one usable real observation file, parse it, list the actual variables and produce a small plot. Log the source URL, product version, observation dates, retrieval time and checksum. If access fails, try the alternative documented satellite source within the time budget. If neither is usable, report the Track C blocker rather than substitute synthetic data under a real-data label; the A6 module still carries the compulsory Track A demonstration. The A6 module has its own gate: within the first 90 minutes, retrieve and cloud-mask at least one Sentinel-2 scene over the asset footprint and plot it.
 
 The project has not yet downloaded or validated these datasets. This document identifies documented candidate sources and the checks the implementation team must perform.
 
@@ -351,6 +418,7 @@ navcontinuity/
     processed/
     fixtures/
   src/
+    infra/            # Track A6: sentinel2 fetch, footprint, indices, classifier, progress, inspection economics
     ingest/
     normalize/
     features/
@@ -445,7 +513,7 @@ The scenario panel should show the asset assumptions, remaining time, preparatio
 
 The results panel should show all compared actions, expected costs and sensitivity. Include an explicit statement when the satellite-to-aircraft connection has not been validated. A source drawer or export can contain the full provenance, but material limitations must remain visible in the main result.
 
-The orbital panel should use the same evidence conventions and a distinct domain model. Show real spacecraft observations alongside simulated task consequences. The user should never need to infer which side is real.
+Backlog only: an orbital panel would use the same evidence conventions and a distinct domain model. Show real spacecraft observations alongside simulated task consequences. The user should never need to infer which side is real.
 
 Avoid a fake live indicator, precise probabilities from an uncalibrated anomaly score, unsupported global coverage, invented customers, fabricated incident histories, automatic maintenance instructions or guaranteed savings. Do not label every green map cell safe.
 
@@ -485,9 +553,11 @@ AT16 Claim traceability: every quantitative presentation claim is either tied to
 
 ## Work packages and dependencies
 
+WP0 Track A6 infrastructure monitoring owns the asset choice, footprint, Sentinel-2 retrieval, cloud masking, index baseline, pixel classifier, progress curve, inspection economics and A6 acceptance tests. It is the compulsory deliverable and gets the strongest data person from hour 0. It publishes the shared asset record (name, footprint, region, readiness estimate) that the Track C packages consume.
+
 WP1 Evidence and product scope owns the claim register, competitor matrix, event requirements and customer questions. It delivers a one-page scope agreement before the application is built. It can run alongside dataset exploration but must not change the scientific interpretation without discussing it with the data owner.
 
-WP2 Data access and provenance owns retrieval, parsing, units, timestamps, quality filtering and manifests. Its first deliverable is a real sample and a data card. Modelling depends on this package. Interface work can use a clearly synthetic fixture until the schema is stable, but the final Track A demonstration requires real data.
+WP2 Data access and provenance owns retrieval, parsing, units, timestamps, quality filtering and manifests. Its first deliverable is a real sample and a data card. Modelling depends on this package. Interface work can use a clearly synthetic fixture until the schema is stable, but the final Track C demonstration requires real data (the A6 module carries the compulsory Track A demo).
 
 WP3 Baseline and AI owns feature definitions, split manifests, baseline reproduction, model training and evaluation. It delivers a model card and a compact result file. It does not define business probabilities from anomaly scores without evidence.
 
@@ -497,21 +567,19 @@ WP5 Application and integration owns the evidence timeline, coverage display, sc
 
 WP6 Validation and pitch owns reproducibility, claim checking, demonstration rehearsal and the final presentation. It should review early rather than waiting until the last hour. A team member should be able to explain every number without relying on an AI-generated narrative.
 
-For a three-person team, combine WP1 with WP6, WP2 with WP3, and WP4 with WP5. For a four-person team, keep data and modelling separate while one person owns integration. For larger teams, keep a single schema owner and integration branch to prevent duplicated work.
+For a three-person team: person 1 owns WP0; person 2 owns WP2 and WP3 (Track C data and model); person 3 owns WP4, WP5 and the pitch (WP1 and WP6). If the team is two people, WP0 and the pitch come first and Track C is presented only if all its objectives are met. For a four-person team, keep data and modelling separate while one person owns integration. For larger teams, keep a single schema owner and integration branch to prevent duplicated work.
 
 ## Twelve hour execution schedule
 
-Hours 0 to 1: freeze scope, inspect the event requirements, select the primary dataset and retrieve a sample. Produce the initial manifest and schema. The lead starts the competitor and claim register. A failure to access data is escalated immediately.
+Hours 0 to 1: freeze scope. Choose the A6 asset and draw its footprint; retrieve one Sentinel-2 scene over it (A6 gate). In parallel, pick the Track C GNSS source for the asset's region and retrieve a sample. Produce manifests and the shared asset record. A failure to access either dataset is escalated immediately.
 
-Hours 1 to 2: parse real measurements, confirm units and time, create a coverage view and identify obvious data-quality issues. Select one usable historical interval. Decide whether Sentinel or CYGNSS is the primary route based on actual files, not aesthetic preference.
+Hours 1 to 3: A6: build the cloud-masked monthly time series and the index baseline progress curve. Track C: parse real receiver measurements, confirm units and time, create a coverage view for the region. Build both cost calculators separately with unit tests.
 
-Hours 2 to 4: implement the baseline and produce a first reproducible result. Build cost arithmetic separately with unit tests. The interface uses the agreed schema and marks any fixture data as synthetic.
+Hours 3 to 5: A6: train and validate the pixel classifier, compare with the baseline, wire up the inspection decision with the satellite-vs-no-satellite comparison. Track C: implement the baseline anomaly result. **Hour 5 checkpoint: the A6 demo must run end to end on real data. If it does not, everyone helps A6 until it does.**
 
-Hours 4 to 6: add a small AI model only if the baseline and data quality are understood. Freeze the evaluation split. Connect the first real result to the interface. At hour 6, remove optional features if the core replay is not working.
+Hours 5 to 8: Track C: add the small AI model if the baseline is understood, finish the preparation scenario, sensitivity and link it to the asset record. A6: polish the progress view, exports and acceptance tests.
 
-Hours 6 to 8: finish the bounded preparation scenario, assumptions editor and sensitivity comparison. Connect provenance and exports. Ensure the aircraft-impact link is not overstated. Begin the orbital scenario only if the primary evidence and economic workflow work end to end.
-
-Hours 8 to 10: implement the orbital scenario if feasible, run the acceptance tests and prepare cached replay inputs. Compare the final model with the baseline. Remove unsupported labels and inspect all screenshots for misleading claims.
+Hours 8 to 10: run both sets of acceptance tests and prepare cached replay inputs. If any Track C objective is not met by hour 9, decide whether to drop Track C from the pitch rather than present it half-done. Remove unsupported labels and inspect all screenshots for misleading claims.
 
 Hours 10 to 11: prepare the five-minute pitch, rehearse the demonstration and assign speakers. Record actual runtime, input coverage, model performance and limitations. Do not invent better numbers to improve the story.
 
@@ -569,7 +637,7 @@ R05 Existing vendors already serve the gap. Mitigation: conduct a capability com
 
 R06 Simulated savings are mistaken for actual savings. Mitigation: retain assumed provenance in every view and export; separate model evaluation from economic simulation.
 
-R07 Scope becomes too broad. Mitigation: keep one primary decision and one optional orbital scenario; put all other industries in the research backlog.
+R07 Scope becomes too broad. Mitigation: keep the A6 decision plus the one Track C decision; the orbital scenario and all other industries stay in the research backlog.
 
 R08 Stale observations are presented as live. Mitigation: display observation and availability dates, use historical replay terminology and avoid a live status indicator.
 
@@ -579,13 +647,19 @@ R10 A polished demonstration hides scientific uncertainty. Mitigation: show raw 
 
 R11 Operational material is treated as a command. Mitigation: use approved reference material for context only and keep the prototype outside operational control.
 
+R13 Clouds hide the asset (monsoon season). Mitigation: pick months with usable scenes, show gaps, add Sentinel-1 backscatter if time allows.
+
+R14 Track C runs late and is shown half-done, which the organisers penalise. Mitigation: hour 5 and hour 9 checkpoints; drop Track C from the pitch rather than present unmet objectives.
+
+R15 The A6 classifier learns seasonal vegetation change as construction. Mitigation: compare same-season dates, report the built class separately from bare soil, and check a sample of pixels visually.
+
 R12 Multi-agent work diverges. Mitigation: one schema, one scope owner, explicit interfaces, short handoff notes and a single integration checklist.
 
 ## Instructions for all receiving AI agents
 
 The following is a reusable handoff. The team may copy it into each agent's conversation along with this document. These instructions define the intended project, not permission to access private accounts, send messages, deploy externally or operate real assets.
 
-You are contributing to NavContinuity, a Mach A Thon prototype using real satellite receiver observations and AI to analyse navigation degradation and demonstrate a bounded economic preparation decision. Read the entire brief before changing scope. Preserve the distinction between observed satellite data, derived anomaly results, unvalidated aircraft-impact links and simulated operational outcomes.
+You are contributing to NavContinuity, a Mach A Thon prototype with two linked modules: a compulsory Track A6 module that measures construction progress of an aviation asset from Sentinel-2 imagery and drives an inspection-or-release decision, and an optional Track C module that uses real satellite receiver observations to analyse navigation degradation around the same asset and demonstrate a bounded preparation decision. Read the entire brief, starting with the version 1.1 change and the A6 section, before changing scope. Preserve the distinction between observed satellite data, derived anomaly results, unvalidated aircraft-impact links and simulated operational outcomes.
 
 Your work must use the shared schema and an explicit historical interval. Do not invent datasets, file fields, receiver outcomes, incident counts, savings or customer demand. Verify source access and software compatibility. Credit any reproduced research method. Anomaly scores are not calibrated probabilities. A spacecraft position is not a jammer location or a ground-risk footprint.
 
@@ -594,6 +668,12 @@ Deliver runnable work, a short README, relevant validation, a list of assumption
 At the end of your task, report files changed, commands to reproduce, inputs used, checks performed, known limitations and dependencies on other work. The team lead approves schema changes and final claims. Prefer a small functioning implementation over speculative breadth.
 
 ## Role specific AI agent prompts
+
+### Infrastructure monitoring agent (Track A6, compulsory)
+
+Task: for the chosen asset footprint, retrieve a bounded Sentinel-2 L2A time series, apply cloud masking, compute the index baseline and train a small pixel classifier with WorldCover weak labels from outside the evaluation window. Produce a progress curve with gaps for cloudy dates, compare baseline and classifier on held-out dates and area, and implement the inspection-or-release cost comparison from the A6 section.
+
+Deliver fetch script, manifest of scene IDs, footprint file, progress results, model card, cost engine with tests reproducing the illustrative cases, and the shared asset record for the Track C module. Acceptance: A6-AT1 to A6-AT6 pass; reported milestones are never used as training labels or presented as ground truth.
 
 ### Research and product validation agent
 
@@ -627,7 +707,7 @@ Deliver a runnable application, configuration, export function and offline repla
 
 ### Orbital extension agent
 
-Task: use real spacecraft GNSS observations as evidence for a separate mission-task scenario. Preserve the distinction between receiver anomalies, actual orbit uncertainty and hypothetical task consequences. Add a simulated comparison of keeping versus moving a position-sensitive task only when the main workflow is stable.
+Backlog only after version 1.1: do not start this during the hackathon. It would read as a second optional track. Original task, kept for later: use real spacecraft GNSS observations as evidence for a separate mission-task scenario. Preserve the distinction between receiver anomalies, actual orbit uncertainty and hypothetical task consequences. Add a simulated comparison of keeping versus moving a position-sensitive task only when the main workflow is stable.
 
 Deliver a domain-specific scenario, assumptions, costs and explanation of the additional mission telemetry required for validation. Do not claim collision avoidance, precise orbit correction or recovered mission revenue. Acceptance: every real observation and simulated consequence is distinguishable, and the orbital extension does not delay the compulsory Track A core.
 
@@ -639,17 +719,17 @@ Deliver a test report, issue list, claim corrections, presentation outline and f
 
 ## Five minute presentation plan
 
-Seconds 0 to 40: describe one concrete consequence of unresolved navigation degradation and identify the operations or maintenance decision. Use one credible reported example, with its scope and date, rather than a montage of unrelated disasters.
+The organisers also require a small PPT of what was accomplished. Keep it to about six slides that follow this timing, with the first slide naming "Primary: Track A6 Infrastructure; Optional: Track C GNSS resilience".
 
-Seconds 40 to 80: acknowledge existing interference detection and recovery monitoring. State the preparation-cost hypothesis and the limits of current validation. Explain why the team chose this narrower workflow.
+Seconds 0 to 30: the problem. Infrastructure tranches are released against contractor reports; independent checks are costly and rare. Name the asset and the buyer (lender or owner).
 
-Seconds 80 to 160: demonstrate the real satellite sample, coverage, quality filtering, baseline and AI result. Show one inspectable observation. State clearly whether it is a historical case study or a validated detector.
+Seconds 30 to 120: the A6 demo on real data. Sentinel-2 time series over the footprint, cloud gaps shown, baseline vs classifier progress curves, held-out validation result. Then the inspection decision: show the action changing between "no satellite evidence", "progress agrees" and "progress lags", and move one assumption across break-even. State that probabilities and costs are assumed.
 
-Seconds 160 to 220: open the operational scenario, compare costs and change one assumption to demonstrate a decision reversal. State that the operational outcomes are simulated unless partner records have actually been obtained.
+Seconds 120 to 150: the flow. The asset is coming into service; its approaches depend on satellite navigation. This is where Track C starts.
 
-Seconds 220 to 260: show the orbital extension if it works. Otherwise explain the architecture and required mission data without pretending it was implemented.
+Seconds 150 to 240: the Track C module. Real receiver observations for the region, coverage, baseline and AI anomaly result, then the preparation scenario with a decision reversal. State that aircraft outcomes are simulated and that the satellite-to-aircraft link is unvalidated. If any Track C objective is incomplete, skip this block and say what was built instead.
 
-Seconds 260 to 300: name the buyer, the proposed pilot, the main data dependency and the next validation gate. End with a precise statement of what the team achieved in the event.
+Seconds 240 to 300: who pays and what it is worth for each module, the next validation gate and a precise statement of what the team achieved in the event.
 
 Likely judge question: Why do you need satellite data? Answer with the actual contribution shown in the experiment. If the operational mapping remains unvalidated, state that the satellite layer supplies a complementary historical observation and that partner records are needed to validate its incremental decision value.
 
@@ -673,7 +753,7 @@ Keep the final pitch consistent with the claim register even if an AI agent gene
 
 The following sources underpin the brief. Source existence and the stated evidence were checked during the research conversation. Dataset downloads, end-to-end implementation and customer validation remain work for the team. URLs can change; receiving agents should verify the current page before making a new time-sensitive claim. Summaries here are intentionally short; read the originals for context and do not quote beyond applicable limits.
 
-S01 Mach A Thon Aeromania 26 event deck and organiser screenshot. User-supplied primary event materials. Local deck: C:\Users\mubee\Downloads\Mach-A-Thon_Aeromania_26.pptx. Slides 2 and 3 define tracks; slide 4 defines deliverables; slide 5 defines judging. Share the original deck separately with teammates if available. The organiser screenshot adds compulsory Track A and a short achievement presentation.
+S01 Mach A Thon Aeromania 26 event deck and organiser screenshot. User-supplied primary event materials. Local deck: C:\Users\mubee\Downloads\Mach-A-Thon_Aeromania_26.pptx. Slides 2 and 3 define tracks; slide 4 defines deliverables; slide 5 defines judging. Share the original deck separately with teammates if available. The organiser messages (9:15 pm and 9:36 pm) add: at least one Track A objective is compulsory as the primary problem; one optional track (B or C) may be added with all its objectives met; Track B needs at least one of its three subheadings completed; a flow must link primary and optional work; every team presents a small PPT of what it accomplished. Consolidated in RULES.md.
 
 S02 EASA Global Navigation Satellite System Outages and Alterations. Regulator description of mechanisms, effects and affected areas. https://www.easa.europa.eu/en/domains/air-operations/global-navigation-satellite-system-outages-and-alterations
 
@@ -735,6 +815,6 @@ Calibration means that predicted probabilities correspond appropriately to obser
 
 ## Completion checklist for the team lead
 
-Confirm the event requirements and compulsory Track A interpretation. Confirm the selected real dataset can be accessed and parsed. Confirm the observation schema and coordinate semantics. Confirm the baseline and model comparison. Confirm all operational assumptions are labelled. Confirm the cost model has a no-preparation comparator and a decision-reversal test. Confirm the orbital extension uses a separate domain model. Confirm the claim register agrees with the pitch. Confirm the local demonstration runs without hidden dependencies. Confirm the final handoff lists what was built, what was tested and what remains a hypothesis.
+Confirm the A6 asset, footprint and Sentinel-2 time series; confirm the A6 progress curve, baseline-vs-classifier comparison and inspection decision pass A6-AT1 to A6-AT6. Confirm the shared asset record links the A6 and Track C modules. Confirm Track C is either complete or dropped from the pitch. Confirm the PPT names the Track A objective and the optional track. For the Track C module: confirm the selected real dataset can be accessed and parsed. Confirm the observation schema and coordinate semantics. Confirm the baseline and model comparison. Confirm all operational assumptions are labelled. Confirm the cost model has a no-preparation comparator and a decision-reversal test. Confirm the claim register agrees with the pitch. Confirm the local demonstration runs without hidden dependencies. Confirm the final handoff lists what was built, what was tested and what remains a hypothesis.
 
 The team should leave the event with a reproducible prototype and a precise next validation step. The strongest outcome is not the broadest list of industries; it is a credible explanation of how actual satellite observations could improve one valuable decision, what the demonstration establishes and what additional evidence is still needed.

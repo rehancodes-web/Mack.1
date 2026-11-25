@@ -24,11 +24,28 @@ The first pilot targets navigation disruption. Other delay causes can enter the 
 
 Airline disruption management and self-rebooking products exist, including [Amadeus Self Re-accommodation](https://amadeus.com/en/airlines/products/self-re-accommodation) and [Passenger Recovery](https://amadeus.com/en/airlines/products/passenger-recovery). The product hypothesis is that *earlier, satellite-informed disruption assessment*, a shared flight-to-passenger impact graph, and verification that recovery completed will add value to existing workflows. This needs customer testing.
 
+## Hackathon submission (Mach-A-Thon Aeromania '26)
+
+The event rules make **one Track A objective compulsory**, with a working demo on real satellite data, plus at most one optional track (B or C) linked by a flow. See [RULES.md](RULES.md). The hackathon build therefore has two parts:
+
+| Part | Track | Status |
+|---|---|---|
+| **Primary (compulsory):** construction-progress monitoring of Noida International Airport (Jewar) from Sentinel-2, driving a lender's release-or-inspect decision | **A6 Infrastructure** | **Working baseline on real data**: [a6/](a6/README.md), data access in [data/](data/README.md) |
+| **Optional:** GNSS degradation evidence for the asset's region plus a preparation decision. The passenger-recovery product above is its commercial direction | **C: GNSS resilience / critical infrastructure** | Specified in brief v1.1, not built |
+
+![Jewar progress curve](a6/outputs/progress_chart.png)
+
+Headline (derived, Sentinel-2): land conversion inside the 1333 ha footprint starts in **mid-2023** and peaks at about **56% in April 2025**, around the reported "80% complete" claim. This metric measures land clearing, not building completion. Full method and limits are in [a6/README.md](a6/README.md).
+
+Run it: `cd a6 && npm install && node progress.mjs && node chart.mjs` (Node.js only, about 15 minutes on the first run).
+
 ## Read the documents
 
 - [Product specification](PRODUCT_SPEC.md): users, workflow, data, build sequence, acceptance criteria, and economics.
 - [Research and evidence](RESEARCH.md): passenger complaints, existing products, rights references, and validation questions.
-- [Original team brief](NavContinuity_Team_Brief.md) ([PDF](NavContinuity_Team_Brief.pdf)): historical hackathon research. Its Track A/C requirements and illustrative cases do **not** define the standalone product scope.
+- [Team brief v1.1](NavContinuity_Team_Brief.md) ([PDF](NavContinuity_Team_Brief.pdf)): hackathon specification, restructured as A6 primary plus Track C optional after the organisers' 9:36 pm update. Its track requirements govern the hackathon build, not the long-term product scope.
+- [Event rules](RULES.md) ([PDF](RULES.pdf)): deck plus organiser messages, consolidated.
+- [Plan of action](PLAN.md): what is left before judging, in priority order.
 
 ## Proposed first build
 
