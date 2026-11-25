@@ -1,6 +1,6 @@
 # Navigation continuity and recovery
 
-## Team research and implementation brief
+## Team research and implementation briefs
 
 Prepared for the Mach A Thon Aeromania 26 team. Version 1.0. Research reference date 25 November 2026. Working product name NavContinuity. This document is a project specification and research handoff, not an operational navigation procedure.
 
