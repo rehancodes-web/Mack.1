@@ -12,6 +12,9 @@ const ai = rd('progress_ai.json').results;
 const met = rd('classifier_metrics.json');
 const dec = rd('decision.json');
 const rdy = fs.existsSync(path.join(OUT, 'readiness.json')) ? rd('readiness.json') : null;
+const rev = fs.existsSync(path.join(OUT, 'nemotron_review.json')) ? rd('nemotron_review.json') : null;
+const MODEL_NAME = 'Larper'; // our Random Forest land-cover model
+const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
 const AI_ENDPOINT = process.env.AI_ENDPOINT ?? '/api/analyst'; // same Vercel project serves page + API
 // compact, labelled context the AI analyst may use (nothing else)
 const CTX = {
@@ -70,18 +73,18 @@ input[type=range]{width:100%}.note{color:var(--mut);font-size:13px}
 <div class="card kpi">
 <div><span class="lab">reported</span><b>80%</b>"work complete", Jan 2025</div>
 <div><span class="lab">derived</span><b>${dec.satellite_observed_pct}%</b>land converted (satellite), Jan 2025</div>
-<div><span class="lab">derived</span><b>${Math.round((ai.find(r => r.month === '2025-01')?.built_paved_frac ?? 0) * 100)}%</b>built/paved (AI), Jan 2025</div>
+<div><span class="lab">derived</span><b>${Math.round((ai.find(r => r.month === '2025-01')?.built_paved_frac ?? 0) * 100)}%</b>built/paved (Larper AI), Jan 2025</div>
 <div><span class="lab">assumed economics</span><b>${dec.scenarios[1].action.toUpperCase()}</b>before releasing the tranche</div>
 </div>
 
 <h2>1 · What the satellite saw</h2>
 <div class="grid4">${imgs}</div>
 
-<h2>2 · Progress: baseline vs AI</h2>
-<div class="card"><p class="key"><span><i class="sw" style="background:var(--base)"></i>Baseline: cleared all year (NDVI rule)</span><span><i class="sw" style="background:var(--ai)"></i>AI: built/paved share</span><span><i class="sw" style="background:var(--aix)"></i>AI: built + bare share</span><span><i class="sw" style="background:var(--ms)"></i>Reported milestones</span></p>${chart}
-<p class="note">Latest AI built/paved: ${Math.round(last.built_paved_frac * 100)}% (${last.date}). Grass and scrub left inside the airport boundary stay vegetation, so 100% is not expected.</p></div>
-${maps ? `<div class="grid3">${maps}</div><p class="note">AI class maps inside the footprint: <span style="color:#dc3c3c">■</span> built/paved <span style="color:#e6c878">■</span> bare <span style="color:#3c8c3c">■</span> vegetation <span style="color:#3c78dc">■</span> water.</p>` : ''}
-<div class="card"><b>AI model:</b> Random Forest, ${met.params.rf.nEstimators} trees, 10 features (6 bands + 4 indices), trained on ${met.n_train.toLocaleString()} pixels labelled by ESA WorldCover 2021 <i>outside</i> the airport, tested on ${met.n_test.toLocaleString()} pixels from a separate block of land. Agreement with WorldCover: <b>${Math.round(met.overall_accuracy * 100)}%</b>.
+<h2>2 · Progress: baseline vs Larper (our AI model)</h2>
+<div class="card"><p class="key"><span><i class="sw" style="background:var(--base)"></i>Baseline: cleared all year (NDVI rule)</span><span><i class="sw" style="background:var(--ai)"></i>Larper: built/paved share</span><span><i class="sw" style="background:var(--aix)"></i>Larper: built + bare share</span><span><i class="sw" style="background:var(--ms)"></i>Reported milestones</span></p>${chart}
+<p class="note">Latest Larper built/paved: ${Math.round(last.built_paved_frac * 100)}% (${last.date}). Grass and scrub left inside the airport boundary stay vegetation, so 100% is not expected.</p></div>
+${maps ? `<div class="grid3">${maps}</div><p class="note">Larper class maps inside the footprint: <span style="color:#dc3c3c">■</span> built/paved <span style="color:#e6c878">■</span> bare <span style="color:#3c8c3c">■</span> vegetation <span style="color:#3c78dc">■</span> water.</p>` : ''}
+<div class="card"><b>Larper</b>, our AI model: a Random Forest, ${met.params.rf.nEstimators} trees, 10 features (6 bands + 4 indices), trained on ${met.n_train.toLocaleString()} pixels labelled by ESA WorldCover 2021 <i>outside</i> the airport, tested on ${met.n_test.toLocaleString()} pixels from a separate block of land. Agreement with WorldCover: <b>${Math.round(met.overall_accuracy * 100)}%</b>.
 <table><tr><th>Class</th><th>Test pixels</th><th>Recall</th><th>Precision</th></tr>${pc}</table>
 <p class="note">WorldCover is itself a model product, so this is agreement with it, not ground truth.</p></div>
 
@@ -103,15 +106,20 @@ ${rdy ? `<h2>5 · Hand-off to NavContinuity: recovery capacity</h2>
 <tr><td>Usable as diversion / rebooking airport</td><td>${rdy.recovery_capacity.usable_for_navcontinuity}</td></tr>
 <tr><td>Region passed to Track C</td><td>${rdy.region.radius_km} km around ${rdy.region.centre.lat}°N, ${rdy.region.centre.lon}°E <span class="lab">assumed</span></td></tr>
 </table><p class="note">Track C then asks whether GNSS is degraded inside this region; no coverage reads "unknown", never "safe".</p></div>` : ''}
-<h2>6 · Ask the analyst <span class="lab">AI · NVIDIA Nemotron</span></h2>
+${rev ? `<h2>6 · Nemotron reviews Larper <span class="lab">AI review · NVIDIA Nemotron</span></h2>
+<div class="card"><p class="note">${esc(rev.caveat)}</p>
+${rev.curve?.finding ? `<p><b>Curves:</b></p><div style="white-space:pre-wrap">${esc(rev.curve.finding)}</div>` : ''}
+${rev.vision.filter(v => v.finding).map(v => `<p><b>Map check ${v.month}:</b></p><div style="white-space:pre-wrap">${esc(v.finding)}</div>`).join('')}
+<p class="note">Generated ${esc(rev.generated_utc.slice(0, 16).replace('T', ' '))} UTC with ${esc(rev.curve?.model || rev.vision.find(v => v.model)?.model || 'Nemotron')}.</p></div>` : ''}
+<h2>7 · Ask the analyst <span class="lab">AI · NVIDIA Nemotron</span></h2>
 <div class="card"><p class="note">Answers come only from this page's data, with reported / derived / assumed labels kept. AI text can be wrong: check it against the charts above.</p>
 <p style="display:flex;gap:8px;flex-wrap:wrap"><input id="q" maxlength="600" placeholder="e.g. Why does the baseline fall after 2025?" style="flex:1;min-width:220px;padding:8px;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--fg)">
 <button id="ask">Ask</button><button id="memo">Write lender memo</button></p>
 <p style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><b>Model + Nemotron vision cross-check:</b>
 <select id="vm">${['2026-03', '2024-03', '2020-03'].filter(m => fs.existsSync(path.join(OUT, `classmap_${m}.png`))).map(m => `<option>${m}</option>`).join('')}</select>
-<button id="vis">Check RF map against the satellite photo</button></p>
+<button id="vis">Check Larper map against the satellite photo</button></p>
 <div id="ans" style="white-space:pre-wrap"></div></div>
-<p class="note">Limits: land conversion ≠ completion. The OSM boundary is the finished airport. The AI is trained on WorldCover weak labels. 11 months come from an older collection. Sources and method are in a6/README.md and data/README.md.</p>
+<p class="note">Limits: land conversion ≠ completion. The OSM boundary is the finished airport. Larper is trained on WorldCover weak labels; Nemotron reviews are model opinions. 11 months come from an older collection. Sources and method are in a6/README.md and data/README.md.</p>
 </main><script>
 const L=${P0.loss_if_optimistic.value},e=${P0.inspection_effectiveness.value};
 const c=document.getElementById('c'),p=document.getElementById('p');
@@ -135,8 +143,8 @@ if(vis)vis.onclick=async()=>{
  const m=document.getElementById('vm').value;
  const row=(CTX.derived_ai_all||[]).find(r=>r[0]===m);
  const imgs=[{label:'Sentinel-2 true colour '+m+' (yellow line = airport footprint)',mime:'image/png',data:await b64('quicklook_'+m+'.png')},
-  {label:'Random Forest class map '+m,mime:'image/png',data:await b64('classmap_'+m+'.png')}];
- const a=await ask('Cross-check the Random Forest class map for '+m+' against the satellite photo. RF says: '+(row?('built/paved '+Math.round(row[1]*100)+'%, bare '+Math.round(row[2]*100)+'%, vegetation '+Math.round(row[3]*100)+'%'):'see context')+'. Where does the map look right, where does it look wrong, and should we trust the RF numbers for this month?',imgs);
+  {label:'Larper (Random Forest) class map '+m,mime:'image/png',data:await b64('classmap_'+m+'.png')}];
+ const a=await ask('Cross-check the Larper (Random Forest) class map for '+m+' against the satellite photo. RF says: '+(row?('built/paved '+Math.round(row[1]*100)+'%, bare '+Math.round(row[2]*100)+'%, vegetation '+Math.round(row[3]*100)+'%'):'see context')+'. Where does the map look right, where does it look wrong, and should we trust the RF numbers for this month?',imgs);
  if(a)visualCheck={month:m,finding:a.slice(0,1500)};
 };
 document.getElementById('ask').onclick=()=>{const v=document.getElementById('q').value.trim();if(v)ask(v);};

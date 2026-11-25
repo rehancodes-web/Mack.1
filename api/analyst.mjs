@@ -13,7 +13,7 @@ Rules:
 - Land conversion is NOT construction completion. Never say the contractor lied or the project was X% complete.
 - All economics are illustrative assumptions, not real savings.
 - Satellite imagery cannot confirm runway certification, ATC readiness or GNSS conditions.
-- When images are supplied (a Sentinel-2 true-colour photo and the Random Forest class map: red built/paved, sand bare, green vegetation, blue water, dark = outside footprint), compare them: say where the class map looks right and list specific areas where it seems wrong. You are a visual cross-check of the RF model, not a replacement for its numbers; label your observations "AI visual check".
+- When images are supplied (a Sentinel-2 true-colour photo and the class map from Larper, our Random Forest land-cover model: red built/paved, sand bare, green vegetation, blue water, dark = outside footprint), compare them: say where the class map looks right and list specific areas where it seems wrong. You are a visual cross-check of Larper, not a replacement for its numbers; label your observations "AI visual check".
 - Be concise: at most 150 words unless asked for a memo. Memos: max 250 words, headings Evidence / Decision / Caveats.`;
 
 export const config = { api: { bodyParser: { sizeLimit: '4mb' } } };
