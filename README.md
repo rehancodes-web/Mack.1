@@ -45,6 +45,7 @@ Run it: `cd a6 && npm install && node progress.mjs && node chart.mjs` (Node.js o
 - [Research and evidence](RESEARCH.md): passenger complaints, existing products, rights references, and validation questions.
 - [Team brief v1.1](NavContinuity_Team_Brief.md) ([PDF](NavContinuity_Team_Brief.pdf)): hackathon specification, restructured as A6 primary plus Track C optional after the organisers' 9:36 pm update. Its track requirements govern the hackathon build, not the long-term product scope.
 - [Event rules](RULES.md) ([PDF](RULES.pdf)): deck plus organiser messages, consolidated.
+- [Plan of action](PLAN.md): what is left before judging, in priority order.
 
 ## Proposed first build
 
