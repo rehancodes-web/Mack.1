@@ -4,15 +4,21 @@ The source browser prototype is [`b3.html`](b3.html); the A6 publish script copi
 
 ## What it shows
 
-- A full Earth centered in the 3D view, with Esri World Imagery and explicit Natural Earth country-border polylines. Globe lighting is disabled so the visible side stays bright. The Jewar test receiver is marked on the globe (28.1709° N, 77.6082° E).
-- One simulated circular LEO orbit at 550 km altitude and 53° inclination.
-- A moving satellite, orbit path, and receiver line of sight that changes as the Earth rotates.
-- A synthetic unaided position error and a simple visibility/elevation-based illustrative correction, updated with simulation time.
-- Play/pause, 1×/10×/60× speed, and orbit-time scrubbing.
+- A full Earth centered in the 3D view, with Esri World Imagery and explicit Natural Earth country-border polylines. Globe lighting is disabled so the visible side stays bright.
+- Four moving satellites with distinct orbit planes, including a deliberately timed synthetic encounter where two paths cross at a close approach.
+- A synthetic noisy position estimate for each satellite and an AI-style model-aided filter that corrects the displayed estimate.
+- A live nearest-pair trajectory screen over a 30-minute horizon, with time to closest approach, miss distance, and clearly labeled illustrative risk bands.
+- Sixteen test receivers: two each in the USA, China, India, Russia, Brazil, Canada, Australia, and Japan.
+- A “Check collision” action that jumps to five minutes before the demo encounter, follows LEO-2, changes its along-track phase using a simulated 8 m/s tangential impulse, and draws the planned orbit as a dotted line beside the adjusted solid path in the same satellite color.
+- The receiver-to-LEO visibility and synthetic positioning-error example remain in the demo, using the Jewar reference site.
+- Orbit traces refresh as the simulation advances so Earth-fixed paths keep up with satellite motion and Earth rotation.
+- Play/pause, 1×/10×/60× speed, and 24-hour simulation-time scrubbing.
 
 ## Model and limits
 
-The orbit uses a circular two-body approximation with Earth gravitational parameter 3.986004418×10¹⁴ m³/s² and mean Earth rotation 7.2921159×10⁻⁵ rad/s. The period is approximately 95.4 minutes. The displayed error is a deterministic invented signal for explaining the concept. The correction is an illustrative gain that only applies while the LEO satellite is above the local horizon. It is not real receiver data, an AI model, a validated GNSS algorithm, or suitable for aircraft guidance.
+The orbits use circular two-body approximations with Earth gravitational parameter 3.986004418×10¹⁴ m³/s² and mean Earth rotation 7.2921159×10⁻⁵ rad/s. The reference 550 km orbit has a period of approximately 95.4 minutes. The close pair is deliberately placed on intersecting orbit planes to create an easy-to-see synthetic encounter. No real satellite catalog is used.
+
+All position noise is invented. The AI-style correction reduces that synthetic noise using the known orbit model; it is a demonstrator, not a trained AI model or a validated navigation filter. The 30-minute closest-approach estimate and HIGH (<1 km) / ELEVATED (<5 km) bands are simplified and are not operational collision probabilities. The 8 m/s avoidance example changes along-track phase in a simplified circular-orbit model; it is not a maneuver design. Nothing here is suitable for aircraft guidance or real collision warnings.
 
 ## Run
 
