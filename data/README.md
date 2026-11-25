@@ -58,38 +58,6 @@ The five [Sentinel-2 quick-looks](../a6/outputs/imagery_index.json) share a 10 m
 
 Sentinel-2 and the OSM footprint cover the site-scale historical replay. ESA WorldCover 2021 is an input to the optional classifier, not a dated airport milestone map. Work-package boundaries, dated milestone plans, and inspection records would need to come from the project owner for milestone-level verification.
 
-## Python starter (*untested here: Python is not installed on this machine*)
-
-```bash
-pip install pystac-client rioxarray geopandas numpy pandas scikit-learn
-```
-
-```python
-import geopandas as gpd, pandas as pd, rioxarray, numpy as np
-
-fp = gpd.read_file("data/noida_airport_footprint.geojson").to_crs("EPSG:32643")  # tile 43RGM is UTM 43N
-man = pd.read_csv("data/s2_monthly_manifest.csv")
-
-def band(url, offset):
-    da = rioxarray.open_rasterio(url, masked=True).squeeze()   # COG: only the window is fetched
-    da = da.rio.clip(fp.geometry, fp.crs, drop=True)
-    return (da - offset) / 10000.0
-
-rows = []
-for r in man.itertuples():
-    scl = rioxarray.open_rasterio(r.scl, masked=True).squeeze().rio.clip(fp.geometry, fp.crs, drop=True)
-    red, nir = band(r.red_B04, r.subtract_offset_dn), band(r.nir_B08, r.subtract_offset_dn)
-    swir = band(r.swir16_B11, r.subtract_offset_dn).rio.reproject_match(red)   # 20 m -> 10 m grid
-    clear = ~scl.rio.reproject_match(red).isin([3, 8, 9, 10])
-    ndvi = ((nir - red) / (nir + red)).where(clear)
-    ndbi = ((swir - nir) / (swir + nir)).where(clear)
-    rows.append(dict(month=r.month, clear_frac=float(clear.mean()),
-                     ndvi_med=float(ndvi.median()), ndbi_med=float(ndbi.median())))
-pd.DataFrame(rows).to_csv("outputs/progress_baseline.csv", index=False)
-```
-
-Pre-download a few scenes before the event as an offline fallback. The full COG URLs are in the manifest.
-
 ## Sources
 
 - Opening timeline: [Business Standard, Jan 2025 "80% complete"](https://www.business-standard.com/india-news/noida-s-jewar-airport-on-track-for-april-launch-80-per-cent-work-complete-nc-125012800369_1.html) · [Business Today, Sep 2025 (30 Oct target)](https://www.businesstoday.in/india/story/noida-international-airport-at-jewar-to-open-on-october-30-with-commercial-flights-starting-soon-494534-2025-09-18) · [Business Today, 27 Mar 2026](https://www.businesstoday.in/india/story/jewar-airport-opening-on-march-28-what-makes-noida-international-airport-special-522692-2026-03-27) · [All India Radio, 28 Mar 2026 inauguration](https://www.newsonair.gov.in/pm-modi-inaugurates-noida-international-airport-phase-i-at-jewar/) · [Outlook Traveller, commercial flights](https://www.outlooktraveller.com/amp/story/News/noida-international-airport-to-begin-commercial-flights-on-june-15)
