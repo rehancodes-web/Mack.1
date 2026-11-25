@@ -36,6 +36,8 @@ input[type=text]{flex:1;min-width:0}button{cursor:pointer;font-weight:650}
 .cpanel .tag{font-size:11px;padding:1px 6px;border-radius:9px;border:1px solid var(--rule);color:var(--mut)}.cpanel .x{float:right;border:0;background:none;color:var(--mut);font-size:18px;padding:0 4px}
 .ctip{color:#fff;font:600 12px/1.2 system-ui,sans-serif;padding:3px 7px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-140%);pointer-events:none}
 @media (max-width:820px){.cbtn{top:auto;bottom:12px;right:12px}.cpanel{top:auto;bottom:62px;left:8px;right:8px;width:auto;max-height:55vh}}
+.tourbtn{width:100%;margin:8px 0 4px;padding:9px 10px;border-radius:8px;border:1px solid var(--acc);background:#1D2A4A;color:var(--ink);font:600 13px/1.2 inherit;cursor:pointer}
+.tour{display:none;align-items:center;gap:6px;margin-right:8px}.tour.on{display:flex}.tour button{padding:5px 9px;border-radius:7px;border:1px solid var(--rule);background:#18242B;color:var(--ink);cursor:pointer;font:inherit}.tour span{font-variant-numeric:tabular-nums;color:var(--mut);font-size:12.5px;min-width:96px;text-align:center}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:grid;place-items:center;padding:16px}
 .modal[hidden]{display:none}
 .card{width:min(1100px,100%);height:min(720px,100%);background:#0F171C;border:1px solid var(--rule);border-radius:10px;display:grid;grid-template-rows:auto 1fr;overflow:hidden}
@@ -71,11 +73,12 @@ input[type=text]{flex:1;min-width:0}button{cursor:pointer;font-weight:650}
  <label class="layer"><input type="checkbox" data-l="airports" checked><i style="background:var(--ap)"></i><span><b>Airports</b><small>every airport with scheduled flights, India in green</small></span><em id="nAp"></em></label>
  <form class="search" id="sf"><input type="text" id="sq" placeholder="Find an airport (name or code)" aria-label="Find an airport" autocomplete="off"><button type="submit">Find</button></form>
  <ul id="hits" aria-live="polite"></ul>
+ <button type="button" id="tourbtn" class="tourbtn">▶ Tour every airport, before and after</button>
  <div class="clock"><span id="clk"></span><label>Speed <select id="spd"><option value="1">real time</option><option value="60" selected>60×</option><option value="600">600×</option></select></label></div>
  <div class="note">Orbits: CelesTrak elements, propagated in your browser (SGP4). LEO layer is the Track B3 design, not real satellites. Airports: OurAirports. Globe imagery: NASA Blue Marble.</div>
 </aside>
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mt">
- <div class="card"><header><div><h2 id="mt"></h2><p id="ms"></p></div><span class="sp"></span><a id="mfull" href="#" target="_blank" rel="noopener">Open in Earth Viewer</a><button id="mclose" type="button">Close</button></header>
+ <div class="card"><header><div><h2 id="mt"></h2><p id="ms"></p></div><span class="sp"></span><div class="tour" id="tour" role="group" aria-label="Airport tour"><button type="button" id="tprev" aria-label="Previous airport">◀</button><button type="button" id="tplay">Pause</button><button type="button" id="tnext" aria-label="Next airport">▶</button><span id="tcount"></span></div><a id="mfull" href="#" target="_blank" rel="noopener">Open in Earth Viewer</a><button id="mclose" type="button">Close</button></header>
  <iframe id="mframe" title="Before and after satellite imagery of the airport" loading="lazy"></iframe></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
@@ -237,7 +240,22 @@ function openAirport(a){G.controls().autoRotate=false;
  const z=a.large?13:14,h=[a.lat.toFixed(4),a.lng.toFixed(4),z,2018,2025].join(',');
  document.getElementById('mt').textContent=a.name;document.getElementById('ms').textContent=(a.code?a.code+' · ':'')+a.lat.toFixed(3)+', '+a.lng.toFixed(3)+' · Sentinel-2 cloudless, drag to compare';
  frame.src='earth.html?embed=1#'+h;document.getElementById('mfull').href='earth.html#'+h;modal.hidden=false;document.getElementById('mclose').focus();}
-const close=()=>{modal.hidden=true;frame.src='about:blank';};
+const close=()=>{modal.hidden=true;frame.src='about:blank';tourStop();};
+// ---- tour: every airport in turn, starting with Jewar, then India, then the world from west to east ----
+const tourList=[...aps].sort((x,y)=>(y.jewar-x.jewar)||((y.cc==='IN')-(x.cc==='IN'))||(x.lng-y.lng));
+const tourEl=document.getElementById('tour'),tplay=document.getElementById('tplay'),tcount=document.getElementById('tcount');
+let tourI=-1,tourTimer=null,tourOn=false;const TOUR_MS=8000;
+function tourGo(i){tourI=(i+tourList.length)%tourList.length;const a=tourList[tourI];
+ G.pointOfView({lat:a.lat,lng:a.lng,altitude:.5},900);openAirport(a);tourEl.classList.add('on');
+ tcount.textContent=(tourI+1).toLocaleString('en-US')+' / '+tourList.length.toLocaleString('en-US');}
+function tourPlay(){tourOn=true;tplay.textContent='Pause';clearInterval(tourTimer);tourTimer=setInterval(()=>tourGo(tourI+1),TOUR_MS);}
+function tourPause(){tourOn=false;tplay.textContent='Play';clearInterval(tourTimer);}
+function tourStop(){tourPause();tourEl.classList.remove('on');}
+document.getElementById('tourbtn').onclick=()=>{tourGo(tourI<0?0:tourI);tourPlay();};
+tplay.onclick=()=>tourOn?tourPause():tourPlay();
+document.getElementById('tnext').onclick=()=>{tourGo(tourI+1);if(tourOn)tourPlay();};
+document.getElementById('tprev').onclick=()=>{tourGo(tourI-1);if(tourOn)tourPlay();};
+document.getElementById('tourbtn').textContent='▶ Tour all '+tourList.length.toLocaleString('en-US')+' airports, before and after';
 document.getElementById('mclose').onclick=close;modal.addEventListener('click',e=>{if(e.target===modal)close();});addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close();});
 })();
 </script>
