@@ -208,8 +208,8 @@ input[type=range]{width:100%;accent-color:var(--larper)}
   <a href="globe.html">Globe <small>all tracks</small></a>
   <a href="index.html" aria-current="page">Site Monitor <small>Track A6</small></a>
   <a href="earth.html">Earth Viewer <small>any place</small></a>
-  <a href="c.html">GNSS Watch <small>Track C</small></a>
   <a href="b3.html">Nav Integrity <small>Track B3</small></a>
+  <a href="c.html">GNSS Watch <small>next step</small></a>
   <a class="soon" aria-disabled="true">Passenger Recovery <small>next</small></a>
  </nav>
  <div class="src">Sentinel-2 · ${base.length} monthly scenes · latest ${monthName(base[base.length - 1].month)}</div>
@@ -301,7 +301,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
   <h2 id="h-flow">How this feeds NavContinuity</h2>
   <div class="flow">
    <div class="live"><small>Live · Track A6</small><b>Is the airport real?</b>${rdy ? `Land conversion from ${monthName(rdy.satellite.conversion_start_month)}, levelled off ${monthName(rdy.satellite.plateau_month)}.` : ''} Counts as diversion capacity only once an airline confirms slots.</div>
-   <div class="live"><small>Live · Track C</small><b>Is GPS degraded nearby?</b>${gn ? `Within ${gn.jewar_region.radius_km} km: <b style="display:inline">${gn.jewar_region.status}</b> (${gn.jewar_region.aircraft_seen.toLocaleString('en-US')} aircraft, ${gn.days.join(', ')}). Hotspots sit on the India–Pakistan border. <a href="c.html">Open GNSS Watch</a>` : 'Aircraft GPS-integrity reports within 50 km. No data reads "unknown", never "safe".'}</div>
+   <div class="live"><small>Next step · GNSS Watch prototype</small><b>Is GPS degraded nearby?</b>${gn ? `Within ${gn.jewar_region.radius_km} km: <b style="display:inline">${gn.jewar_region.status}</b> (${gn.jewar_region.aircraft_seen.toLocaleString('en-US')} aircraft, ${gn.days.join(', ')}). Hotspots sit on the India–Pakistan border. <a href="c.html">Open GNSS Watch</a>` : 'Aircraft GPS-integrity reports within 50 km. No data reads "unknown", never "safe".'}</div>
    <div class="nx"><small>Next</small><b>Are passengers recovered?</b>Diverted travellers get a confirmed rebooking, care at the right airport, and their bags tracked.</div>
   </div>
   <p class="note">Who pays: lenders and project-monitoring cells (per-asset fee); airlines for passenger recovery. Pricing not yet validated.</p>
