@@ -19,6 +19,9 @@ const rdy = opt('readiness.json');
 const gnFile = path.join(HERE, '..', 'c', 'outputs', 'gnss_summary.json');
 const gn = fs.existsSync(gnFile) ? JSON.parse(fs.readFileSync(gnFile, 'utf8')) : null; // Track C result for the Jewar region
 const aiJ = opt('progress_ai.json'), ai = aiJ ? aiJ.results : [];
+// 3-month rolling median of Larper converted land: drops one-off bad scenes (e.g. Jan 2021 haze read as 94% built)
+ai.forEach((r, i) => { const w = ai.slice(Math.max(0, i - 1), i + 2).map(x => x.built_or_bare_frac).filter(v => v != null).sort((a, b) => a - b);
+  r.converted_smooth = r.built_or_bare_frac == null || !w.length ? null : w[Math.floor(w.length / 2)]; });
 const met = opt('classifier_metrics.json');
 const rev = opt('nemotron_review.json');
 const AI_ENDPOINT = process.env.AI_ENDPOINT ?? '/api/analyst';
@@ -60,9 +63,9 @@ const chart = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="chartTit
 <desc id="chartDesc">Land cleared all year (NDVI baseline)${ai.length ? ' and Larper built or paved share' : ''}, with the reported 80% claim in January 2025.</desc>
 ${grid}${gaps}
 <path class="ln base" d="${line(base, 'fp_cleared_12m')}"/>
-${ai.length ? `<path class="ln larper" d="${line(ai, 'built_or_bare_frac')}"/>` : ''}
+${ai.length ? `<path class="ln larper" d="${line(ai, 'converted_smooth')}"/>` : ''}
 ${endLabel(base, 'fp_cleared_12m', 'base', 'Cleared land')}
-${ai.length ? endLabel(ai, 'built_or_bare_frac', 'larper', 'Larper: converted') : ''}
+${ai.length ? endLabel(ai, 'converted_smooth', 'larper', 'Larper: converted') : ''}
 <line class="gapline" x1="${claimX}" x2="${claimX}" y1="${claimY}" y2="${obsY}"/>
 <circle class="claim" cx="${claimX}" cy="${claimY}" r="6"/><text class="el claimt" x="${claimX - 10}" y="${claimY - 12}" text-anchor="end">Reported: 80% complete</text>
 <circle class="obs" cx="${claimX}" cy="${obsY}" r="5"/><text class="el base" x="${claimX + 10}" y="${obsY + 18}">Seen from orbit: ${dec.satellite_observed_pct}%</text>
@@ -74,7 +77,7 @@ const larperBuilt = jan25 ? pct(jan25.built_or_bare_frac) : null;
 const scen = dec.scenarios.map(s => `<tr${s.name.startsWith('Satellite') ? ' class="hi"' : ''}><td>${esc(s.name)}</td><td>${s.p.toFixed(2)}</td><td>$${Math.round(s.release).toLocaleString('en-US')}</td><td>$${Math.round(s.inspect).toLocaleString('en-US')}</td><td><b>${s.action === 'inspect' ? 'Inspect' : 'Release'}</b></td></tr>`).join('');
 const classRows = met ? met.per_class.map(c => `<tr><td><i class="dot ${c.class}"></i>${c.class.replace('_', ' / ')}</td><td>${pct(c.recall)}</td><td>${pct(c.precision)}</td></tr>`).join('') : '';
 const reviewItems = rev ? [
-  ...(rev.curve?.finding ? [`<div class="msg bot"><b>Review: Larper vs baseline</b>${esc(rev.curve.finding)}</div>`] : []),
+  ...(rev.curve?.finding ? [`<div class="msg bot"><b>Review: Larper vs baseline</b>${esc(rev.curve.finding)}${rev.curve.human_check ? `<span class="hc"><b>Human check</b>${esc(rev.curve.human_check)}</span>` : ''}</div>`] : []),
   ...rev.vision.filter(v => v.finding).map(v => `<div class="msg bot"><b>Map check, ${monthName(v.month)}</b>${esc(v.finding)}</div>`),
 ].join('') : '';
 
@@ -171,6 +174,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
 .msg.bot{background:color-mix(in srgb,var(--larper) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--larper) 22%,var(--rule))}
 .msg.me{background:var(--bg);align-self:flex-end;max-width:88%}
 .msg.err{border:1px solid var(--claim);color:var(--ink)}
+.hc{display:block;margin-top:8px;padding:7px 9px;border-left:3px solid var(--claim);background:var(--claimbg);color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}.chips button{font-size:12px;padding:4px 9px;border-radius:14px;font-weight:600}
 .composer{display:flex;gap:6px;padding:10px 14px 14px;border-top:1px solid var(--rule)}.composer input{flex:1;min-width:0}
 @media (max-width:1180px){.app{grid-template-columns:200px minmax(0,1fr)}.co{grid-column:1/-1;position:static;height:auto;border-left:0;border-top:1px solid var(--rule)}.feed{max-height:420px}}
@@ -229,7 +233,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="panel" aria-labelledby="h-prog">
   <h2 id="h-prog">Progress over time <span class="ev der">derived</span></h2>
   ${chart}
-  <p class="note">Green: land free of vegetation all year (crop cycles never count). ${ai.length ? 'Blue: Larper converted land (built or paved plus bare earth). The built-only share is noisy (it reads some dry 2020 fields as paved), so we do not quote it alone.' : 'Larper\'s built/paved line is added when its run finishes.'} Grey: too cloudy to measure. After 2025 the green line dips as grass regrows on unpaved ground; Larper is built to separate that from real change.</p>
+  <p class="note">Green: land free of vegetation all year (crop cycles never count). ${ai.length ? 'Blue: Larper converted land (built or paved plus bare earth), 3-month median so single bad scenes such as hazy Jan 2021 drop out. The built-only share is noisy (it reads some dry 2020 fields as paved), so we do not quote it alone.' : 'Larper\'s built/paved line is added when its run finishes.'} Grey: too cloudy to measure. After 2025 the green line dips as grass regrows on unpaved ground; Larper is built to separate that from real change.</p>
  </section>
 
  <div class="two">
