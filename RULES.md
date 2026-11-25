@@ -82,22 +82,9 @@ Maritime awareness (dark vessels, illegal fishing, smuggling) · borders & remot
 
 ---
 
-## 5. Our chosen structure
+## 5. Our structure
 
-> **Superseded by v2.0 ([TRACKS.md](TRACKS.md)):** the project is now navigation failure + passenger experience, with A6, B3 and C each mapped to it. The v1.1 table below is kept for history.
-
-### v1.1 (NavContinuity brief)
-
-Decided after the 9:36 pm update. Version 1.0 of the brief put GNSS receiver data under Track A, but GNSS isn't one of the six Track A objectives, so the plan was restructured:
-
-| Part | Track | What it is |
-|---|---|---|
-| **Primary (compulsory)** | **A6 Infrastructure** | Sentinel-2 construction-progress monitoring of **Noida International Airport, Jewar** (2020–2026, see `data/README.md`); drives a lender/owner decision: release the tranche on the contractor's report or commission an inspection |
-| **Optional (one only)** | **C: GNSS resilience + critical infrastructure** | The original NavContinuity work: satellite evidence of GNSS degradation in the asset's region, plus a preparation-cost decision. Protective use only |
-| **Flow** | A6 → C | A6 outputs the asset, footprint, region and readiness date; C asks whether that region's navigation environment is degraded and what preparation is worth paying for |
-| **Dropped** | (would be B) | Orbital task-planning extension, now post-event backlog, so only one optional track is presented |
-
-Checkpoints: the A6 demo must run end to end on real data by **hour 5**. If any Track C objective is unmet by **hour 9**, drop Track C from the pitch rather than show it half-done (R3).
+Primary (compulsory): **Track A6 Infrastructure**, Jewar airport monitored from Sentinel-2 as diversion and recovery capacity. Optional (one only): **Track C GNSS resilience**. The flow and the full idea are in [README.md](README.md). If Track C isn't complete, it is mentioned only as a next step (R3).
 
 ---
 
@@ -105,5 +92,4 @@ Checkpoints: the A6 demo must run end to end on real data by **hour 5**. If any 
 
 - **"Choose 1"**: is it *at most one* of B/C, or is doing both allowed for extra credit?
 - **R3 vs R4**: "all objectives met" vs "minimum 1 of 3 subheadings" for Track B. Our reading: complete at least one subheading fully, and don't leave any claimed objective half-done.
-- Confirm that **A6 Infrastructure as primary + Track C as optional** is acceptable as framed in Section 5. We chose the stricter reading, that the primary must be one of the six listed bullets.
 - PPT format: any slide limit, template, or submission deadline/location before 8:00 AM?

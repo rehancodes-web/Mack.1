@@ -13,13 +13,13 @@ const DATA = path.join(HERE, '..', 'data'), OUT = path.join(HERE, 'outputs'), CA
 fs.mkdirSync(OUT, { recursive: true }); fs.mkdirSync(CACHE, { recursive: true });
 
 const P = {
-  version: 'rf-v1',
+  version: 'larper-v1', model_name: 'Larper',
   label_source: 'ESA WorldCover 10m 2021 v200 (tile N27E075)',
   label_url: 'https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N27E075_Map.tif',
   train_months: ['2021-02', '2021-04', '2021-11'], // same year as the labels, three seasons
   train_pad_m: 4000, footprint_gap_m: 300,
   per_class_per_scene: 2500, seed: 42,
-  rf: { nEstimators: 60, maxFeatures: 0.7, replacement: true, seed: 42, treeOptions: { maxDepth: 14 } },
+  rf: { nEstimators: 20, maxFeatures: 0.7, replacement: true, seed: 42, treeOptions: { maxDepth: 12 } },
   invalid_scl: [0, 1, 3, 8, 9, 10], min_clear_frac: 0.6,
 };
 const CLASSES = ['vegetation', 'built_paved', 'bare', 'water'];
@@ -129,12 +129,11 @@ const perClass = CLASSES.map((name, k) => {
   const tp = cm[k][k], fn = cm[k].reduce((a, b) => a + b, 0) - tp, fp = cm.reduce((a, row) => a + row[k], 0) - tp;
   return { class: name, support: tp + fn, recall: tp + fn ? +(tp / (tp + fn)).toFixed(3) : null, precision: tp + fp ? +(tp / (tp + fp)).toFixed(3) : null };
 });
-const metrics = { params: P, classes: CLASSES, n_train: idxTr.length, n_test: total, split: 'spatial: train west of footprint centre line, test east; footprint and 300 m buffer excluded', overall_accuracy: +(correct / total).toFixed(3), per_class: perClass, confusion_rows_true_cols_pred: cm, label_caveat: 'WorldCover is itself a model product (~75-80% global accuracy); this measures agreement with it, not ground truth' };
+const metrics = { params: P, classes: CLASSES, n_train: idxTr.length, n_test: total, deployed_model: 'the same model that was evaluated (trained on the west block only)', split: 'spatial: train west of footprint centre line, test east; footprint and 300 m buffer excluded', overall_accuracy: +(correct / total).toFixed(3), per_class: perClass, confusion_rows_true_cols_pred: cm, label_caveat: 'WorldCover is itself a model product (~75-80% global accuracy); this measures agreement with it, not ground truth' };
 console.log(JSON.stringify({ acc: metrics.overall_accuracy, perClass }, null, 0));
 
-// final model on all labelled samples
-const rfAll = new RandomForestClassifier(P.rf);
-rfAll.train(X, Y);
+// deploy the evaluated model itself, so the reported accuracy belongs to the model that makes the predictions
+const rfAll = rf;
 fs.writeFileSync(path.join(OUT, 'classifier_metrics.json'), JSON.stringify(metrics, null, 1));
 
 // ---------- predict every month inside the footprint ----------

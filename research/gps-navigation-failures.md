@@ -1,6 +1,6 @@
 # Aviation Navigation Failures: Safety Risks, Economic Impact and an AI-Based Monitoring Proposal
 
-**Project:** AeroNav Shield — AI-powered satellite-navigation integrity and aviation risk monitoring
+**Project:** NavContinuity — AI-powered satellite-navigation integrity and aviation risk monitoring
 **Document type:** Research report / background study
 **Scope:** Types of navigation failure, real-world data (global and India), fatal accident case studies, economic costs, Boeing's response, technical improvements, and the proposed system design.
 
@@ -20,14 +20,9 @@
 10. [Economic Impact](#10-economic-impact)
 11. [Boeing and Navigation Failures](#11-boeing-and-navigation-failures)
 12. [How the Satellite-Navigation System Can Be Improved](#12-how-the-satellite-navigation-system-can-be-improved)
-13. [Proposed System: AeroNav Shield](#13-proposed-system-aeronav-shield)
-14. [Reducing Error Toward Zero](#14-reducing-error-toward-zero)
-15. [Differentiation from Boeing's Existing System](#15-differentiation-from-boeings-existing-system)
-16. [Problem Statement and Research Question](#16-problem-statement-and-research-question)
-17. [Project Direction Comparison: Runway Icing vs Navigation Interference](#17-project-direction-comparison-runway-icing-vs-navigation-interference)
-18. [Summary of Key Numbers](#18-summary-of-key-numbers)
-19. [Limitations and Important Distinctions](#19-limitations-and-important-distinctions)
-20. [Sources and Data References](#20-sources-and-data-references)
+13. [Summary of Key Numbers](#13-summary-of-key-numbers)
+14. [Limitations and Important Distinctions](#14-limitations-and-important-distinctions)
+15. [Sources and Data References](#15-sources-and-data-references)
 
 ---
 
@@ -575,199 +570,8 @@ A historical hotspot should **not** automatically be treated as currently danger
 
 ---
 
-## 13. Proposed System: AeroNav Shield
 
-**AeroNav Shield — AI-powered satellite-navigation integrity and aviation risk monitoring.**
-(An earlier version of this concept was called *AeroNav AI*.)
-
-The system acts as an **early-warning and navigation-risk monitoring layer**. It does not control an aircraft's navigation system.
-
-### 13.1 Three core innovations
-1. Multi-source navigation verification.
-2. AI-based anomaly detection.
-3. Geographical risk prediction.
-
-### 13.2 Three measurable outcomes
-
-| Outcome | Description |
-| --- | --- |
-| **Safety** | Identify geographical areas experiencing abnormal navigation signals and alert relevant aviation authorities |
-| **Operational efficiency** | Help airlines and airports anticipate disruptions and plan alternative procedures |
-| **Economic protection** | Estimate potential losses from delays, diversions and cancellations, and compare with a scenario where warnings are available earlier |
-
-### 13.3 Architecture
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│ 1. DATA COLLECTION                                           │
-│    GNSS reports · Aircraft tracking · Satellite data ·       │
-│    Navigation quality indicators                             │
-└──────────────────────────────┬───────────────────────────────┘
-                               ▼
-┌──────────────────────────────────────────────────────────────┐
-│ 2. DATA VALIDATION                                           │
-│    Missing data · Source consistency · Timestamp checks ·    │
-│    Reliability assessment                                    │
-└──────────────────────────────┬───────────────────────────────┘
-                               ▼
-┌──────────────────────────────────────────────────────────────┐
-│ 3. AI ANOMALY DETECTION                                      │
-│    Identify unusual navigation patterns and geographical     │
-│    interference trends                                       │
-└──────────────────────────────┬───────────────────────────────┘
-                               ▼
-┌──────────────────────────────────────────────────────────────┐
-│ 4. RISK ASSESSMENT                                           │
-│    Risk category · Confidence · Affected region ·            │
-│    Data freshness                                            │
-└──────────────────────────────┬───────────────────────────────┘
-                               ▼
-┌──────────────────────────────────────────────────────────────┐
-│ 5. ALERT AND MONITORING DASHBOARD                            │
-│    Geographical risk map · Alerts · Historical trends ·      │
-│    Operational impact estimates                              │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### 13.4 Workflow
-1. **Collect satellite and navigation data** — GNSS interference reports, satellite-navigation quality indicators and relevant satellite observations.
-2. **Monitor aircraft movements** — analyse position reports and flight-track data for unusual discrepancies.
-3. **Identify suspicious patterns** — AI identifies areas and time periods where navigation reliability may be degraded.
-4. **Generate risk predictions** — estimate which areas may have elevated interference risk.
-5. **Alert aviation authorities** — display risk areas and warnings to support ATM and airline planning.
-
-### 13.5 Data requirements
-
-| Data | Why it is useful |
-| --- | --- |
-| GNSS interference reports | Historical examples of affected locations |
-| ADS-B aircraft tracking data | Identify unusual aircraft-position patterns |
-| Satellite-navigation quality indicators | Understand signal reliability |
-| NOTAM information | Identify officially reported navigation hazards |
-| Weather data | Account for weather-related operational disruptions |
-| Airport and airspace locations | Identify geographical risk patterns |
-| Time and date | Identify recurring patterns and risk periods |
-
-**Technical note:** Satellite imagery alone cannot reliably identify GPS spoofing. The model needs navigation-quality information and aircraft tracking data alongside satellite-related observations.
-
-### 13.6 Potential data sources
-- ICAO — aviation safety and navigation standards.
-- DGCA India — Indian aviation regulations and advisories.
-- Airports Authority of India — Indian airport and navigation information.
-- Aviation Weather Center — aviation weather information.
-- EASA GNSS interference monitoring — affected airspace and interference information.
-
-### 13.7 Project priorities
-1. **Early identification of GNSS interference** — identify areas with unusual navigation-signal disruptions.
-2. **Detection of suspicious aircraft-position discrepancies** — find inconsistencies between tracking and navigation information.
-3. **Prediction of high-risk regions** — analyse historical patterns to find where disruptions are more likely.
-
----
-
-## 14. Reducing Error Toward Zero
-
-**Zero error cannot be guaranteed** in a real-world satellite-navigation system — satellites, receivers, software, networks and environmental conditions all have limitations. The system can, however, significantly reduce the chance of an *undetected* error.
-
-| Potential source of error | Proposed protection |
-| --- | --- |
-| Faulty satellite information | Cross-check multiple navigation sources |
-| GPS interference | GNSS anomaly monitoring |
-| Misleading position information | Independent position-consistency checks |
-| AI makes an incorrect prediction | Confidence estimation and uncertainty reporting |
-| Missing or outdated data | Data freshness checks |
-| Sensor malfunction | Independent sensor validation |
-| Model learns incorrect patterns | Testing on unseen airports and time periods |
-| AI fails to recognise an unfamiliar event | Unknown/anomaly category and human review |
-
-### 14.1 Fail-safe uncertainty (most important technical feature)
-
-The model must never announce that navigation is safe just because it has not detected a problem. It distinguishes four states:
-
-1. No anomaly detected.
-2. Anomaly detected.
-3. Navigation information unreliable.
-4. **Insufficient data to assess reliability** — prevents missing information from being mistaken for safe conditions.
-
-For real aircraft, certified avionics, approved navigation procedures and aviation authorities remain responsible for safety decisions. The prototype is an **additional monitoring and decision-support layer**.
-
----
-
-## 15. Differentiation from Boeing's Existing System
-
-Boeing already has GEM, so another GPS-interference dashboard alone would not be original.
-
-| Existing Boeing approach | AeroNav Shield extension |
-| --- | --- |
-| Records interference symptoms experienced by aircraft | Combines several independent sources of navigation-quality information |
-| Analyses geographical interference patterns | Predicts potential risk patterns using historical and recent data |
-| Shares information with operators | Creates a consolidated risk-monitoring dashboard |
-| Works with aircraft maintenance and operational systems | Explores satellite, aircraft-tracking and external reporting data together |
-| Improves aircraft equipment resilience | Provides an additional independent monitoring and early-warning layer |
-
-The project does not claim to replace Boeing's technology; it proposes an additional layer to detect problems earlier and independently verify navigation reliability.
-
----
-
-## 16. Problem Statement and Research Question
-
-### 16.1 Problem statement: AI-Based Aviation Navigation Risk Detection
-
-Modern aviation increasingly depends on satellite-based navigation systems such as GPS/GNSS for accurate aircraft positioning and route guidance. However, rising incidents of GNSS interference, including signal disruption and spoofing, are creating challenges for aviation safety and operational reliability.
-
-In India, the Government reported **2,354** GPS interference incidents between November 2023 and December 2025, followed by another **623** incidents during January and February 2026.
-
-Existing navigation and reporting systems help aviation authorities respond to these events, but there is an opportunity to improve early identification of geographical risk patterns.
-
-We propose an AI-powered aviation monitoring system that integrates satellite-navigation indicators, aircraft tracking information and historical interference reports to identify unusual navigation patterns, estimate potential risk areas and provide early warnings to aviation authorities.
-
-### 16.2 Central question
-> Can AI identify unusual aviation navigation patterns early enough to warn aviation authorities about potentially affected airspace?
-
-### 16.3 Main research question
-> Can combining satellite-navigation quality indicators, aircraft tracking information and AI-based anomaly detection identify potentially unreliable navigation areas earlier and more reliably than historical interference reporting alone?
-
-### 16.4 Experimental design
-
-Compare three approaches:
-1. Historical-report-only detection.
-2. Navigation-indicator-only detection.
-3. Combined AI detection.
-
-**Evaluation metrics:**
-- False alarms.
-- Missed anomalies.
-- Detection delay.
-- Geographical accuracy.
-- Confidence calibration.
-
-### 16.5 Biggest unresolved problem
-Detecting when navigation information is **incorrect rather than simply unavailable**:
-- With GPS jamming, the system may lose its signal.
-- With GPS spoofing, the system may receive misleading information and calculate an incorrect position.
-
-EASA has specifically highlighted this distinction.
-
----
-
-## 17. Project Direction Comparison: Runway Icing vs Navigation Interference
-
-| Area | Runway icing prediction | Navigation interference detection |
-| --- | --- | --- |
-| Main problem | Ice, snow and runway contamination | GPS/GNSS disruption and spoofing |
-| AI objective | Predict runway icing risk | Detect unusual navigation patterns |
-| Satellite role | Snow and weather monitoring | Satellite-navigation and related data |
-| Ground data | Runway sensors and condition reports | Aircraft tracking and navigation reports |
-| Indian relevance | Cold-weather airports | Documented incidents across Indian regions |
-| Main challenge | Access to runway-condition labels | Access to detailed GNSS and aircraft data |
-
-**Assessment:**
-- Navigation interference detection has particularly strong India-specific evidence, but access to detailed aircraft navigation data may be difficult.
-- Runway icing is technically challenging because satellite imagery cannot confirm thin ice on a runway.
-- The two should **not** be combined into one AI prediction model — they are distinct problems requiring different training datasets.
-
----
-
-## 18. Summary of Key Numbers
+## 13. Summary of Key Numbers
 
 | # | Figure | Context | Source |
 | --- | --- | --- | --- |
@@ -797,7 +601,7 @@ EASA has specifically highlighted this distinction.
 
 ---
 
-## 19. Limitations and Important Distinctions
+## 14. Limitations and Important Distinctions
 
 - **Navigation errors vs GNSS interference:** AA965 and KE801 were navigation-related accidents (FMS, approach procedures, human factors), not GPS spoofing. Their figures must not be combined with interference statistics.
 - **Reported events vs accidents:** IATA and Indian figures are reported interference events, not crashes.
@@ -814,7 +618,7 @@ EASA has specifically highlighted this distinction.
 
 ---
 
-## 20. Sources and Data References
+## 15. Sources and Data References
 
 **Primary sources cited**
 1. EUROCONTROL — 2025 GNSS interference report; diversion cost estimates (Standard Inputs for Economic Analyses, 2022 prices). https://www.eurocontrol.int
@@ -840,4 +644,4 @@ EASA has specifically highlighted this distinction.
 
 ---
 
-*Final recommendation:* Build AeroNav Shield around multi-source navigation verification, AI-based anomaly detection and geographical risk prediction. This is more defensible and technically meaningful than claiming to create a completely error-free GPS system, and it positions the project as a complementary early-warning layer rather than a replacement for existing manufacturer technology.
+*Final recommendation:* Build NavContinuity around multi-source navigation verification, AI-based anomaly detection and geographical risk prediction. This is more defensible and technically meaningful than claiming to create a completely error-free GPS system, and it positions the project as a complementary early-warning layer rather than a replacement for existing manufacturer technology.
