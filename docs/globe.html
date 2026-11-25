@@ -92,7 +92,8 @@ function orbitPath(s,date){const pts=[];if(s.sys==='LEO'){const per=2*Math.PI/nL
 
 // ---- airports and interference cells ----
 const aps=D.airports.map(([name,code,lat,lng,cc,large])=>({name,code,lat,lng,cc,large,jewar:code==='DXN'||/Noida International/i.test(name)}));
-const cell=(la,lo)=>({type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[lo,la],[lo+1,la],[lo+1,la+1],[lo,la+1],[lo,la]]]}});
+// clockwise ring: on a sphere a counter-clockwise ring means "everything except this square" and paints the whole globe
+const cell=(la,lo)=>({type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[lo,la],[lo,la+1],[lo+1,la+1],[lo+1,la],[lo,la]]]}});
 const gnss=D.gnss.map(([la,lo,lvl,share,n])=>({...cell(la,lo),lvl,share,n,la,lo}));
 
 const el=document.getElementById('globe');
