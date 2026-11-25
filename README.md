@@ -1,26 +1,45 @@
 # NavContinuity
 
-Research and implementation handoff for the Mach-A-Thon Aeromania 26 team.
+**Airline disruption intelligence and passenger recovery.**
 
-NavContinuity is a proposed navigation continuity and recovery project using satellite receiver observations and AI to investigate GNSS degradation and support economic preparation decisions. The initial proposed workflow concerns airline operations and maintenance, with a separate spacecraft scenario.
+NavContinuity is a proposed airline software product. It connects early disruption evidence to network decisions and a confirmed recovery plan for each affected passenger. Its initial focus is navigation disruption: satellite-derived observations can help assess GNSS degradation, while airline systems establish what happened to flights, bookings, and bags.
 
-## Start here
+> **Status:** Product and research specification. This repository does not yet contain a working application, airline integration, trained model, or measured savings.
 
-- [Read the team brief as a PDF](NavContinuity_Team_Brief.pdf)
-- [Read the Markdown brief or give it to an AI agent](NavContinuity_Team_Brief.md)
+## Why build it?
 
-Both versions contain the same core content: approximately 10,700 words, 26 source references, dataset and architecture specifications, economic modelling, seven role-specific agent prompts, 16 acceptance tests, and a 12-hour build plan.
+Passengers report repeated short delay extensions, missed connections, poor rebooking options, long support queues, misplaced care vouchers, and unclear baggage status. Airlines must resolve these while managing aircraft, crew, gates, seats, and downstream disruption. The central measure is **time to a confirmed, workable resolution for each affected passenger**.
 
-## Team workflow
+## The product
 
-1. Read the scope, evidence register and competition assessment.
-2. Verify access to a small real satellite dataset before building the interface.
-3. Agree on the shared schema, historical interval and one economic decision.
-4. Give each contributor the full Markdown document and their role-specific prompt.
-5. Use the acceptance tests and claim policy before presenting results.
+`evidence → forecast → network impact → recovery options → approved action → verified passenger outcome`
 
-## Project status
+- **Operations console:** evidence and uncertainty, flights and connections at risk, feasible actions, cost ranges, and passenger impact.
+- **Passenger recovery flow:** truthful status and next update time, bookable alternatives, confirmed rebooking, appropriate care, baggage events, and human support.
+- **Shared case record:** aligned facts and action state across operations, airport agents, contact centres, and passenger channels.
 
-This repository contains the research and implementation specification, not a completed application. Dataset ingestion, model validation and customer validation remain to be performed. The underlying operational problem is documented; the proposed commercial gap remains a hypothesis. Measured observations, model outputs and simulated economic outcomes must stay clearly distinguished.
+The first pilot targets navigation disruption. Other delay causes can enter the same recovery workflow once their evidence and rules are validated separately.
 
-Research reference date: 25 November 2026.
+## What is already in market?
+
+Airline disruption management and self-rebooking products exist, including [Amadeus Self Re-accommodation](https://amadeus.com/en/airlines/products/self-re-accommodation) and [Passenger Recovery](https://amadeus.com/en/airlines/products/passenger-recovery). The product hypothesis is that *earlier, satellite-informed disruption assessment*, a shared flight-to-passenger impact graph, and verification that recovery completed will add value to existing workflows. This needs customer testing.
+
+## Read the documents
+
+- [Product specification](PRODUCT_SPEC.md): users, workflow, data, build sequence, acceptance criteria, and economics.
+- [Research and evidence](RESEARCH.md): passenger complaints, existing products, rights references, and validation questions.
+- [Original team brief](NavContinuity_Team_Brief.md) ([PDF](NavContinuity_Team_Brief.pdf)): historical hackathon research. Its Track A/C requirements and illustrative cases do **not** define the standalone product scope.
+
+## Proposed first build
+
+Replay one historical navigation disruption with traceable observations and flight data. Show flights, connections, and simulated passenger journeys at risk; compare feasible recovery actions; then show the passenger timeline and whether booking, care, and baggage actions were confirmed or failed. Benchmark against a transparent baseline. Label synthetic records and assumed costs.
+
+A live pilot requires airline-approved access to operations, reservations, seat inventory, ticketing, baggage, care suppliers, and policies. Without those integrations, a prototype cannot complete a real rebooking or issue a usable voucher.
+
+## Product rules
+
+- Distinguish **observed**, **predicted**, **proposed**, **requested**, **confirmed**, and **failed** states.
+- Never say a passenger is rebooked until the authoritative airline system confirms it.
+- Show the last confirmed bag scan; do not present an inferred location as fact.
+- Apply airline-approved safety, operational, privacy, and passenger-care rules with human override.
+- Measure total recovery cost and passenger outcomes, including false alarms and costs shifted to other travellers.
