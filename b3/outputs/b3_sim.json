@@ -1,0 +1,68 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-25T22:27:08.411Z",
+ "evidence_type": "simulation",
+ "params": {
+  "constellations": {
+   "GPS": {
+    "n": 8,
+    "el": [
+     10,
+     85
+    ],
+    "sigma": 3
+   },
+   "NavIC": {
+    "n": 6,
+    "el": [
+     35,
+     80
+    ],
+    "sigma": 4
+   },
+   "LEO": {
+    "n": 3,
+    "el": [
+     10,
+     85
+    ],
+    "sigma": 1.5
+   }
+  },
+  "spoof_offset_m": [
+   10,
+   150
+  ],
+  "spoof_share": 0.5,
+  "n_train": 4000,
+  "n_test": 4000,
+  "target_false_alarm": 0.01
+ },
+ "results": {
+  "GPS only": {
+   "detection_rate": 0.012,
+   "false_alarm_rate": 0.008,
+   "raim_detection_rate": 0.011,
+   "spoofed_median_error_m_uncorrected": 81,
+   "spoofed_median_error_m_ai_corrected": 81,
+   "clean_median_error_m": 6.1
+  },
+  "GPS + NavIC": {
+   "detection_rate": 0.877,
+   "false_alarm_rate": 0.01,
+   "raim_detection_rate": 0.921,
+   "spoofed_median_error_m_uncorrected": 65,
+   "spoofed_median_error_m_ai_corrected": 19,
+   "clean_median_error_m": 5.1
+  },
+  "GPS + NavIC + LEO": {
+   "detection_rate": 0.924,
+   "false_alarm_rate": 0.004,
+   "raim_detection_rate": 0.955,
+   "spoofed_median_error_m_uncorrected": 50,
+   "spoofed_median_error_m_ai_corrected": 8,
+   "clean_median_error_m": 3.8
+  }
+ },
+ "caveat": "Simulated geometry and noise (assumed). Shows the mechanism, not certified performance."
+}

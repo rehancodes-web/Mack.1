@@ -1,16 +1,24 @@
-# A6 baseline: Jewar construction-progress curve
+# A6: Jewar airport from orbit
 
-Track A6 (Infrastructure), baseline v2. Built from real Sentinel-2 L2A data. No Python needed: it runs on Node.js only.
+Track A6 (Infrastructure), the compulsory part of NavContinuity. It shows when Noida International Airport (Jewar), about 70 km from Delhi IGI, physically became usable as a **diversion and recovery airport** for the GPS-failure story. It also drives the Track A economic decision. Built from real Sentinel-2 L2A data, Node.js only.
 
-## Run
+## Pipeline
 
 ```powershell
 cd a6
 npm install
-node progress.mjs        # reads ../data/s2_monthly_manifest.csv, fetches footprint windows, writes outputs/progress_baseline.{csv,json}
-node chart.mjs           # writes outputs/progress_chart.html
-node quicklook.mjs 2020-03 2022-05 2024-03 2026-03   # true-colour PNGs with the footprint outline
+node progress.mjs          # baseline: cleared-land curve -> outputs/progress_baseline.{csv,json}
+node chart.mjs             # outputs/progress_chart.html
+node quicklook.mjs 2020-03 2022-05 2024-03 2026-03   # true-colour PNGs with footprint outline
+node classify.mjs          # Larper (Random Forest, WorldCover weak labels) -> classifier_metrics.json, progress_ai.*, classmap_*.png
+node economics.mjs         # inspect-or-release decision -> decision.json   (node economics.mjs --test for checks)
+node readiness.mjs         # hand-off to the GPS story: readiness + region -> readiness.json
+node nemotron_review.mjs   # NVIDIA Nemotron audits Larper via the live Vercel API -> nemotron_review.json
+node demo.mjs              # outputs/demo.html
+node publish.mjs           # copies the page and images to ../docs/ (served by Vercel)
 ```
+
+**Larper** is a per-pixel Random Forest (20 trees, depth 12) with 10 features: B02–B12 reflectance plus NDVI, NDBI, a green/SWIR index and a bare-soil index. It is trained on ESA WorldCover 2021 labels **outside** the airport and tested on a separate block of land (west = train, east = test). The deployed model is the evaluated model.
 
 The first run fetches about 79 × 4 small windows from public AWS cloud-optimised GeoTIFFs and takes about 15 minutes. Results are cached in `cache/`, so delete it to refetch. To refresh the scene list, run `node ../data/build_manifest.js`.
 
@@ -45,7 +53,7 @@ Run of 26 Nov 2026, baseline v2: 79 scenes, footprint 133,297 px (1333 ha), refe
 **What it says (derived, with the caveats below):**
 1. **Late start:** large-scale land conversion shows in the data from **mid-2023**, not from the 2021 groundbreaking. The 2021–22 "works begun" period is invisible at this scale: the site sat as fallow, scrub-covered land. Compare `quicklook_2022-05.png` with `quicklook_2024-03.png`.
 2. **Peak:** conversion peaked at about 56% of the footprint in spring 2025, then levelled off. That is consistent with earthworks being done while opening targets kept slipping.
-3. **Not a completion percentage:** the post-2025 fall is the metric's limit. Finished but unpaved areas grow grass. The next step, the bare/built/paved classifier, is needed to separate "graded earth" from "runway and terminal" and to stop re-greening reading as negative progress.
+3. **Not a completion percentage:** the post-2025 fall is the metric's limit. Finished but unpaved areas grow grass. Larper (the bare/built/paved classifier) is meant to separate "graded earth" from "runway and terminal" and to stop re-greening reading as negative progress.
 
 **Fixed during the build:** the first run applied the STAC offset (−0.1) to older-collection scenes whose files are already de-offset, which gave NDVI above 1 in mid-2022. The manifest now forces offset 0 for that collection, after checking DN levels. A first version of the metric also counted monsoon grass, so v2 excludes July–September.
 

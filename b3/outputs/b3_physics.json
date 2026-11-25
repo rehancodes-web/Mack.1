@@ -1,0 +1,108 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-25T22:26:11.040Z",
+ "inputs": {
+  "f_l1_hz": {
+   "v": 1575420000,
+   "o": "physics"
+  },
+  "gps_alt_m": {
+   "v": 20200000,
+   "o": "physics"
+  },
+  "gps_min_received_dbm": {
+   "v": -128.5,
+   "o": "published",
+   "src": "IS-GPS-200 minimum L1 C/A received power"
+  },
+  "leo_alt_m": {
+   "v": 1000000,
+   "o": "assumed"
+  },
+  "elev_mask_deg": {
+   "v": 10,
+   "o": "assumed"
+  },
+  "leo_eirp_dbw_extra": {
+   "v": 0,
+   "o": "assumed",
+   "note": "LEO satellite transmits the same EIRP as a GPS satellite; any extra power adds directly"
+  },
+  "jammer_power_w": {
+   "v": 10,
+   "o": "assumed",
+   "note": "small commercial-grade jammer"
+  },
+  "jammer_gain_dbi": {
+   "v": 0,
+   "o": "assumed"
+  },
+  "js_tolerance_db": {
+   "v": 30,
+   "o": "assumed",
+   "note": "jammer-to-signal ratio a civil receiver tolerates before losing lock"
+  },
+  "mean_sats_in_view_target": {
+   "v": 4,
+   "o": "assumed",
+   "note": "mean LEO satellites visible, so that >=2 are almost always in view"
+  },
+  "sat_cost_usd": {
+   "v": 3000000,
+   "o": "assumed",
+   "note": "~150 kg smallsat with navigation payload"
+  },
+  "sat_mass_kg": {
+   "v": 150,
+   "o": "assumed"
+  },
+  "launch_usd_per_kg": {
+   "v": 6000,
+   "o": "assumed",
+   "note": "rideshare-class price"
+  },
+  "ops_usd_per_year": {
+   "v": 8000000,
+   "o": "assumed",
+   "note": "ground segment and operations"
+  },
+  "design_life_years": {
+   "v": 6,
+   "o": "assumed"
+  }
+ },
+ "signal": {
+  "gps_slant_km_at_mask": 24713,
+  "leo_slant_km_at_mask": 2762,
+  "leo_advantage_db": 19,
+  "leo_advantage_factor": 80,
+  "leo_received_dbm": -109.5,
+  "origin": "derived (physics)"
+ },
+ "jamming": {
+  "jammer_eirp_dbm": 40,
+  "gps_denial_radius_km": 127.4,
+  "leo_denial_radius_km": 14.24,
+  "denial_area_reduction_factor": 80,
+  "origin": "derived (physics, free-space, line of sight)"
+ },
+ "constellation": {
+  "altitude_km": 1000,
+  "orbital_period_min": 105,
+  "coverage_half_angle_deg": 21.7,
+  "surface_share_per_sat_pct": 3.53,
+  "satellites_needed": 114,
+  "note": "mean-in-view estimate for near-global shells; Walker design and inclination tuning would refine it",
+  "origin": "derived (geometry)"
+ },
+ "cost": {
+  "capex_usd": 444600000,
+  "per_year_usd": 82100000,
+  "origin": "assumed inputs"
+ },
+ "caveats": [
+  "Free-space, line-of-sight model: terrain and aircraft antennas change real ranges.",
+  "Equal-EIRP comparison; real LEO PNT payloads may transmit more or less.",
+  "Costs are order-of-magnitude assumptions, not quotes."
+ ]
+}

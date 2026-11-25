@@ -1,0 +1,127 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-25T22:32:47.533Z",
+ "evidence_type": "derived (real ADS-B integrity reports)",
+ "source": "ADS-B Exchange free sample data (readsb-hist), aircraft-reported NIC",
+ "days": [
+  "2026-11-01"
+ ],
+ "snapshots": 72,
+ "reports": 24579,
+ "params": {
+  "cell_deg": 1,
+  "nic_bad_below": 7,
+  "min_aircraft": 10,
+  "low_max": 0.02,
+  "medium_max": 0.1,
+  "min_version": 1,
+  "spoof_alt_gap_ft": 1500
+ },
+ "cells_rated": 377,
+ "cells_high": 37,
+ "cells_medium": 125,
+ "hotspots": [
+  {
+   "lat": 33,
+   "lon": 71,
+   "aircraft": 12,
+   "degraded": 8,
+   "share": 0.667,
+   "alt_mismatch_aircraft": 0,
+   "rating": "high"
+  },
+  {
+   "lat": 33,
+   "lon": 70,
+   "aircraft": 24,
+   "degraded": 12,
+   "share": 0.5,
+   "alt_mismatch_aircraft": 0,
+   "rating": "high"
+  },
+  {
+   "lat": 33,
+   "lon": 72,
+   "aircraft": 14,
+   "degraded": 7,
+   "share": 0.5,
+   "alt_mismatch_aircraft": 0,
+   "rating": "high"
+  },
+  {
+   "lat": 17,
+   "lon": 96,
+   "aircraft": 11,
+   "degraded": 5,
+   "share": 0.455,
+   "alt_mismatch_aircraft": 6,
+   "rating": "high"
+  },
+  {
+   "lat": 34,
+   "lon": 71,
+   "aircraft": 19,
+   "degraded": 8,
+   "share": 0.421,
+   "alt_mismatch_aircraft": 0,
+   "rating": "high"
+  },
+  {
+   "lat": 31,
+   "lon": 72,
+   "aircraft": 33,
+   "degraded": 13,
+   "share": 0.394,
+   "alt_mismatch_aircraft": 0,
+   "rating": "high"
+  },
+  {
+   "lat": 28,
+   "lon": 82,
+   "aircraft": 11,
+   "degraded": 4,
+   "share": 0.364,
+   "alt_mismatch_aircraft": 3,
+   "rating": "high"
+  },
+  {
+   "lat": 13,
+   "lon": 97,
+   "aircraft": 12,
+   "degraded": 4,
+   "share": 0.333,
+   "alt_mismatch_aircraft": 8,
+   "rating": "high"
+  }
+ ],
+ "jewar_region": {
+  "name": "Noida International Airport (Jewar)",
+  "lat": 28.1709,
+  "lon": 77.6082,
+  "radius_km": 50,
+  "cells_considered": [
+   "28N 76E",
+   "28N 77E",
+   "28N 78E",
+   "27N 77E",
+   "27N 78E"
+  ],
+  "aircraft_seen": 1092,
+  "status": "normal",
+  "worst_cell": {
+   "lat": 28,
+   "lon": 76,
+   "aircraft": 307,
+   "degraded": 2,
+   "share": 0.007,
+   "alt_mismatch_aircraft": 8,
+   "rating": "low"
+  },
+  "note": "Unknown means not enough aircraft were observed, never \"safe\"."
+ },
+ "caveats": [
+  "NIC drops can also come from avionics faults or single aircraft; ratings need several aircraft per cell.",
+  "Sampled snapshots, not continuous coverage.",
+  "Shows where GPS was degraded, not who caused it (protective use only)."
+ ]
+}
