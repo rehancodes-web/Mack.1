@@ -67,7 +67,7 @@ input{flex:1;min-width:0}button{cursor:pointer;font-weight:650}button.primary{ba
   <div class="row"><label>Left <select id="sa"></select></label><label>Right <select id="sb"></select></label><button id="share" type="button">Copy link</button></div>
   <button id="ask" class="primary" type="button">What changed here? (Nemotron)</button>
   <div id="ans" aria-live="polite"></div>
-  <div class="small">Imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless by EOX IT Services GmbH</a> (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, later years CC BY-NC-SA 4.0, non-commercial use. Search: OpenStreetMap Nominatim. AI answers can be wrong.</div>
+  <div class="small">Imagery: 2014 from <a href="https://livingatlas.arcgis.com/wayback/" target="_blank" rel="noopener">Esri World Imagery Wayback</a> (Esri, Maxar, Earthstar Geographics); 2016 onward <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless by EOX IT Services GmbH</a> (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, later years CC BY-NC-SA 4.0, non-commercial use. Search: OpenStreetMap Nominatim. AI answers can be wrong.</div>
  </section>
 </div>
 </div>
@@ -75,16 +75,18 @@ input{flex:1;min-width:0}button{cursor:pointer;font-weight:650}button.primary{ba
 <script>
 (function(){
 if(new URLSearchParams(location.search).has('embed'))document.body.classList.add('embed');
-const YEARS=[2016,2018,2019,2020,2021,2022,2023,2024,2025];
+const YEARS=[2014,2016,2018,2019,2020,2021,2022,2023,2024,2025];
+// 2014 = Esri World Imagery Wayback, release of 20 Feb 2014 (high resolution; images in it were captured on or before that date)
+const WAYBACK_2014='https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/10/{z}/{y}/{x}';
 const layerId=y=>y===2016?'s2cloudless_3857':'s2cloudless-'+y+'_3857';
-const url=y=>'https://tiles.maps.eox.at/wmts/1.0.0/'+layerId(y)+'/default/g/{z}/{y}/{x}.jpg';
-const attr=y=>'Sentinel-2 cloudless '+y+' &copy; <a href="https://s2maps.eu">EOX</a>, Copernicus Sentinel data';
+const url=y=>y===2014?WAYBACK_2014:'https://tiles.maps.eox.at/wmts/1.0.0/'+layerId(y)+'/default/g/{z}/{y}/{x}.jpg';
+const attr=y=>y===2014?'Esri World Imagery Wayback, 20 Feb 2014 (captured on or before) &copy; Esri, Maxar, Earthstar Geographics':'Sentinel-2 cloudless '+y+' &copy; <a href="https://s2maps.eu">EOX</a>, Copernicus Sentinel data';
 // state from the link (#lat,lon,zoom,yearLeft,yearRight)
 const h=location.hash.slice(1).split(',').map(Number);
-let st={lat:h[0]||28.1709,lon:h[1]||77.6082,z:h[2]||13,a:YEARS.includes(h[3])?h[3]:2018,b:YEARS.includes(h[4])?h[4]:2025};
+let st={lat:h[0]||28.1709,lon:h[1]||77.6082,z:h[2]||13,a:YEARS.includes(h[3])?h[3]:2014,b:YEARS.includes(h[4])?h[4]:2025};
 const map=L.map('map',{zoomControl:true,maxZoom:17,minZoom:3,worldCopyJump:true}).setView([st.lat,st.lon],st.z);
 map.createPane('right');map.getPane('right').style.zIndex=250;
-const mk=(y,pane)=>L.tileLayer(url(y),{maxNativeZoom:15,maxZoom:17,attribution:attr(y),pane:pane||'tilePane',crossOrigin:true});
+const mk=(y,pane)=>L.tileLayer(url(y),{maxNativeZoom:y===2014?17:15,maxZoom:17,attribution:attr(y),pane:pane||'tilePane',crossOrigin:true});
 let left=mk(st.a).addTo(map),right=mk(st.b,'right').addTo(map);
 const sa=document.getElementById('sa'),sb=document.getElementById('sb');
 for(const s of [sa,sb])YEARS.forEach(y=>s.add(new Option(y,y)));sa.value=st.a;sb.value=st.b;

@@ -35,6 +35,7 @@ Rules:
 - Give rough sizes using the scale in CONTEXT when helpful. Say "unclear" rather than guess.
 - Do not identify or track people, vehicles or individual private properties. No military targeting.
 - These are composites of many dates: seasonal colour differences are not change.
+- An image labelled 2014 is Esri high-resolution imagery, much sharper than the 10 m Sentinel-2 years: differences in sharpness or colour between sources are not change.
 - Reply in at most 4 short bullets, then one line "Change level: none / minor / major".`;
 
 export const config = { api: { bodyParser: { sizeLimit: '4mb' } } };
