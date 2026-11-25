@@ -123,6 +123,10 @@ const aps=D.airports.map(([name,code,lat,lng,cc,large])=>({name,code,lat,lng,cc,
 const cell=(la,lo)=>({type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[lo,la],[lo,la+1],[lo+1,la+1],[lo+1,la],[lo,la]]]}});
 const gnss=D.gnss.map(([la,lo,lvl,share,n])=>({...cell(la,lo),lvl,share,n,la,lo}));
 
+// click anywhere near an airport (on the globe, an airport marker or an interference square) -> nearest airport
+function pickAirport(c){if(!c||c.lat==null||!show.airports)return;const lat=c.lat,lng=c.lng,alt=G.pointOfView().altitude,thr=Math.max(.15,Math.min(3,alt*1.2)),r=Math.PI/180;let best=null,bd=1e9;
+ for(const a of aps){const d=Math.acos(Math.min(1,Math.sin(lat*r)*Math.sin(a.lat*r)+Math.cos(lat*r)*Math.cos(a.lat*r)*Math.cos((lng-a.lng)*r)))/r;if(d<bd){bd=d;best=a;}}
+ if(best&&bd<=thr)openAirport(best);}
 const el=document.getElementById('globe');
 // preserveDrawingBuffer: lets screenshots and recordings capture the globe
 const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
@@ -130,9 +134,7 @@ const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).
  .pointsData(aps).pointLat('lat').pointLng('lng').pointAltitude(d=>d.jewar?.06:.006).pointRadius(d=>d.jewar?.45:d.cc==='IN'?.22:.16)
  // all airports merged into ONE mesh (4,000+ separate meshes made the globe stutter); clicks find the nearest airport instead
  .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(true).pointResolution(5)
- .onGlobeClick(({lat,lng})=>{const alt=G.pointOfView().altitude,thr=Math.max(.15,Math.min(3,alt*1.2)),r=Math.PI/180;let best=null,bd=1e9;
-  for(const a of (show.airports?aps:[])){const d=Math.acos(Math.min(1,Math.sin(lat*r)*Math.sin(a.lat*r)+Math.cos(lat*r)*Math.cos(a.lat*r)*Math.cos((lng-a.lng)*r)))/r;if(d<bd){bd=d;best=a;}}
-  if(best&&bd<=thr)openAirport(best);})
+ .onGlobeClick(c=>pickAirport(c)).onPointClick((p,e,c)=>pickAirport(c)).onPolygonClick((p,e,c)=>pickAirport(c))
  .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
  .polygonLabel(d=>'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
  .labelsData(aps.filter(a=>a.jewar)).labelLat('lat').labelLng('lng').labelText(()=>'Jewar').labelSize(1.1).labelDotRadius(.4).labelColor(()=>'#FFD24A').labelAltitude(.065).labelResolution(2)
