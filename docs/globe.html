@@ -96,7 +96,7 @@ const cell=(la,lo)=>({type:'Feature',properties:{},geometry:{type:'Polygon',coor
 const gnss=D.gnss.map(([la,lo,lvl,share,n])=>({...cell(la,lo),lvl,share,n,la,lo}));
 
 const el=document.getElementById('globe');
-const G=Globe()(el).globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
+const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el) // preserveDrawingBuffer: lets screenshots and recordings capture the globe.globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
  .atmosphereColor('#86A3FF').atmosphereAltitude(.18)
  .pointsData(aps).pointLat('lat').pointLng('lng').pointAltitude(d=>d.jewar?.06:.006).pointRadius(d=>d.jewar?.45:d.cc==='IN'?.22:.16)
  .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(false)
