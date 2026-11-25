@@ -6,21 +6,19 @@ Read [README.md](README.md) first. It holds the idea: **GPS failure around an ai
 
 | Piece | State | Where |
 |---|---|---|
-| Track A6: Jewar airport from Sentinel-2 (compulsory) | Baseline curve, decision and readiness hand-off **done**. **Larper** (our Random Forest) trained, monthly results being regenerated | `a6/`, `data/` |
+| Track A6: Jewar airport from Sentinel-2 (compulsory) | **Done.** Baseline curve, decision, readiness hand-off, and **Larper** (Random Forest, 71.4% agreement with WorldCover) on all 79 months. The page plots Larper converted land (built + bare); built-only is noisy | `a6/`, `data/` |
 | Nemotron (NVIDIA) analyst and Larper review | Code done and deployed. **Blocked:** the Vercel variable `NEMOTRON_API_KEY` must be an `nvapi-…` key from build.nvidia.com | `api/analyst.mjs`, `a6/nemotron_review.mjs` |
 | Demo site | Vercel project `mackathon` serves `docs/`, auto-deploys on push to `main` | [mackathon-three.vercel.app](https://mackathon-three.vercel.app) |
-| Track C: GNSS degradation evidence (the one optional track) | **Not started**, see plan below | (new folder `c/`) |
+| Track C: GNSS Watch | **Done (one-day sample).** Real ADS-B integrity reports (ADS-B Exchange samples, 1 Nov 2026, 72 snapshots) rated per 1° cell; hotspots on the India–Pakistan border and Myanmar; Jewar region **normal** | `c/`, [c.html](https://mackathon-three.vercel.app/c.html) |
+| Track B3: Nav Integrity | **Done (architecture + simulation).** LEO link budget (19 dB, jammer area 80× smaller), 114-sat constellation ~$445M, spoofing simulation (50 m → 8 m after correction) | `b3/`, [b3.html](https://mackathon-three.vercel.app/b3.html) |
+| Rules risk | Organisers said **choose one** of B or C. The team chose to show both: confirm with organisers, or present one as "next step" | [RULES.md](RULES.md) |
 | Passenger recovery flow | Spec only | [PRODUCT_SPEC.md](PRODUCT_SPEC.md) |
 | PPT (compulsory, 5 min, slide 1 names "Track A6 Infrastructure") | Not started | |
 
 ## Next tasks, in order
 
 1. Finish A6: `cd a6 && node classify.mjs && node economics.mjs && node readiness.mjs && node nemotron_review.mjs && node demo.mjs && node publish.mjs`, then commit `a6/outputs` and `docs/`, and push.
-2. Track C (only pitch it if *all* of it works, rule R3):
-   - Get one real satellite GNSS-observation sample covering the Delhi/Jewar region. Candidates: **CYGNSS** (covers about ±38° latitude, so India is included; NASA PO.DAAC, needs a free Earthdata login) or **Sentinel-1 onboard GNSS** data. Confirm coverage from the files themselves.
-   - Build a transparent signal-quality baseline and flag anomalies. Report "unknown" where there is no coverage, never "safe".
-   - Turn it into a regional risk level for the region in `a6/outputs/readiness.json` (`region`), plus a preparation-cost decision for an airline.
-   - Protective use only: no transmitter location, no source attribution, no tracking of people (R6). A satellite anomaly does not prove an aircraft lost GPS.
+2. Track C improvements: more days (`cd c && node fetch.mjs 2026/10/01 20 && node analyze.mjs && node page.mjs`), a preparation-cost decision for an airline, optionally satellite GNSS data (CYGNSS) as a second source. Protective use only (R6).
 3. Passenger recovery demo: a replay of a GPS-caused diversion with **synthetic, clearly labelled** passengers. Show status → options → confirmed or failed rebooking, care and bag. Follow the "Acceptance criteria" in PRODUCT_SPEC.md.
 4. PPT and a recorded demo fallback.
 
