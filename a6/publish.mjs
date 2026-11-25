@@ -7,7 +7,7 @@ const HERE = path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-
 const OUT = path.join(HERE, 'outputs'), DOCS = path.join(HERE, '..', 'docs');
 fs.mkdirSync(DOCS, { recursive: true });
 const html = fs.readFileSync(path.join(OUT, 'demo.html'), 'utf8');
-const imgs = [...new Set([...html.matchAll(/src="([^"]+\.png)"/g)].map(m => m[1]))];
+const imgs = fs.readdirSync(OUT).filter(f => /^(quicklook|classmap)_\d{4}-\d{2}\.png$/.test(f)); // date pickers load any of these
 for (const f of imgs) fs.copyFileSync(path.join(OUT, f), path.join(DOCS, f));
 fs.writeFileSync(path.join(DOCS, 'index.html'), html);
 fs.writeFileSync(path.join(DOCS, '.nojekyll'), '');
