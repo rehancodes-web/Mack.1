@@ -16,6 +16,27 @@ Rules:
 - When images are supplied (a Sentinel-2 true-colour photo and the class map from Larper, our Random Forest land-cover model: red built/paved, sand bare, green vegetation, blue water, dark = outside footprint), compare them: say where the class map looks right and list specific areas where it seems wrong. You are a visual cross-check of Larper, not a replacement for its numbers; label your observations "AI visual check".
 - Be concise: at most 150 words unless asked for a memo. Memos: max 250 words, headings Evidence / Decision / Caveats.`;
 
+// Collision mode: a real predicted close approach between two tracked objects (CelesTrak elements, SGP4).
+const SYSTEM_COLLISION = `You are the collision-avoidance assistant in NavContinuity's orbital view (hackathon Track B).
+The CONTEXT holds a close approach computed in the browser from public CelesTrak orbital elements with SGP4, plus a
+physics estimate of an along-track avoidance burn for each object. Rules:
+- Use ONLY the numbers in CONTEXT. Never invent distances, burns, probabilities or times.
+- Debris, rocket bodies and dead satellites cannot manoeuvre. Choose an object with "can_manoeuvre": true; if neither can, say no avoidance burn is possible and recommend monitoring.
+- Address the chosen satellite directly, like a short instruction to its operations team: which object, which direction (prograde or retrograde), how big a burn (from CONTEXT), when, and the expected new miss distance.
+- Say it is temporary: after the encounter the satellite returns to its slot with an equal and opposite burn.
+- State the limits in one line: public TLEs are accurate to roughly 1 km, so a real operator would confirm with a conjunction data message (CDM) from Space-Track before burning. This is a simulation, not a command to a real spacecraft.
+- At most 130 words.`;
+
+// Earth Viewer mode: describe change at any location from two Sentinel-2 cloudless yearly mosaics.
+const SYSTEM_EARTH = `You compare two satellite images of the same place for NavContinuity's Earth Viewer.
+Images: Sentinel-2 cloudless yearly mosaics (EOX), about 10 m per pixel, same area, labelled with their years.
+Rules:
+- Describe only what is visible: new or removed buildings, roads, runways, clearing, farmland, water, mining, flooding.
+- Give rough sizes using the scale in CONTEXT when helpful. Say "unclear" rather than guess.
+- Do not identify or track people, vehicles or individual private properties. No military targeting.
+- These are composites of many dates: seasonal colour differences are not change.
+- Reply in at most 4 short bullets, then one line "Change level: none / minor / major".`;
+
 export const config = { api: { bodyParser: { sizeLimit: '4mb' } } };
 
 export default async function handler(req, res) {
@@ -48,10 +69,14 @@ export default async function handler(req, res) {
   const r = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
-    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 700, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content }] }),
+    // reasoning models can spend the whole budget thinking: turn thinking off for these short, grounded answers
+    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 2048, chat_template_kwargs: { enable_thinking: false, thinking: false },
+      messages: [{ role: 'system', content: '/no_think\n' + (body.mode === 'earth' ? SYSTEM_EARTH : body.mode === 'collision' ? SYSTEM_COLLISION : SYSTEM) }, { role: 'user', content }] }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) return res.status(502).json({ error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}`, model });
-  const text = String(j.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-  return res.status(200).json({ answer: text || '(no answer)', model });
+  const ch = j.choices?.[0] || {};
+  const text = String(ch.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^[\s\S]*<\/think>/, '').trim();
+  if (!text) return res.status(502).json({ error: `Nemotron returned no answer (finish: ${ch.finish_reason || 'unknown'}, reasoning only: ${Boolean(ch.message?.reasoning_content)})`, model });
+  return res.status(200).json({ answer: text, model });
 }

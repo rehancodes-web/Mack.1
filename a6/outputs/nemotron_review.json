@@ -1,0 +1,33 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-25T22:38:42.510Z",
+ "evidence_type": "ai_review",
+ "caveat": "Nemotron output is a model opinion used to audit Larper; it can be wrong and does not replace the measured numbers.",
+ "vision": [
+  {
+   "month": "2020-03",
+   "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "finding": "- Looks right: Larper’s green-dominated map matches the satellite photo’s mostly vegetated footprint; scattered red built/paved patches align with visible settlements and cleared strips.\n- Looks wrong: Larper marks large areas red that appear as green fields or bare earth in the photo; bare fraction (0.01) seems too low given visible bare patches; small blue water specks may be misclassified.\n- Trust level: medium — AI visual check; Larper’s built/paved precision is only 0.61 and bare recall 0.308 per context metrics."
+  },
+  {
+   "month": "2022-05",
+   "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "finding": "- Looks right: Larper's green-dominated map matches the satellite photo's mostly brown/tan agricultural interior; scattered red built/paved patches align with visible settlements and linear features near the footprint edges.\n- Looks wrong: Larper marks large interior areas as built/paved (red) that appear as bare fields in the photo; the map shows no water (blue) though some photo areas look like possible water bodies; Larper's bare fraction (0.089) seems low given the extensive exposed soil visible.\n- Trust level: medium — Larper captures the overall non-vegetated vs vegetated split but visibly over-classifies built/paved inside the footprint; per-class metrics show weak bare recall (0.308) and poor water precision (0.393). AI visual check."
+  },
+  {
+   "month": "2024-03",
+   "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "finding": "- Looks right: runway/taxiway strip and terminal apron areas are red (built/paved); surrounding fields are green (vegetation); large cleared earthworks are sand/bare.\n- Looks wrong: Larper under-maps built/paved — many paved roads, taxiways and terminal pads inside the footprint appear sand/bare or vegetation in the class map; scattered blue water pixels inside the footprint are likely misclassified bare/built areas (reported water frac 0.002 is implausibly low given visible water bodies).\n- Trust level: medium — Larper’s reported built/paved precision is only 0.61 and bare recall 0.308 (reported metrics), so the map directionally matches the photo but misclassifies specific paved and water areas (AI visual check)."
+  },
+  {
+   "month": "2026-03",
+   "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "finding": "- Looks right: runway/taxiway strip and terminal apron appear red (built/paved); large green vegetated blocks match fields inside the footprint; blue patches align with visible water bodies.\n- Looks wrong: extensive tan bare earth inside the footprint is mapped green (vegetation) in places; some green field edges are mapped red (built/paved); scattered blue specks in built areas likely false water.\n- Trust level: medium — Larper captures major infrastructure and broad land cover, but bare vs. vegetation confusion and low water precision (0.393) reduce confidence; built/paved precision is only 0.61. AI visual check."
+  }
+ ],
+ "curve": {
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "finding": "- **Construction start**: Larper built/paved first exceeds 0.1 in 2021-01 (0.937), while baseline_cleared_12m first exceeds 0.1 in 2021-03 (0.076→0.077). Larper signals activity ~2 months earlier.\n- **Baseline dip after 2025**: Larper built/paved and bare series continue rising/fluctuating through 2025‑12 and 2026, showing no dip. The baseline_cleared_12m declines from ~0.56 in mid‑2025 to ~0.33 by end‑2026, reflecting its 12‑month clearing window.\n- **Suspicious months**: 2020‑04 (built/paved 0.071 with bare 0.192), 2021‑08 (built/paved 0.027, bare 0.016), 2023‑11 (built/paved 0.519, bare 0.301) and 2024‑06 (built/paved 0.034, bare 0.417) show high bare/low built that may indicate cloud or seasonal misclassification.\n- **Lender reliance**: The baseline_cleared_12m is the smoother, physically anchored indicator of actual land conversion; Larper’s built/paved series is useful for early detection but should be cross‑checked with the baseline for due‑diligence.",
+  "human_check": "Checked against the data: Jan 2021 is a single hazy winter scene that Larper read as 94% built (Dec 2020: 7%, Feb 2021: 17%), not the start of construction. The baseline stays under 10% until mid-2023, so construction starts mid-2023 in both series. The chart now uses a 3-month median for Larper. The recommendation to rely on the baseline, cross-checked with Larper, stands."
+ }
+}

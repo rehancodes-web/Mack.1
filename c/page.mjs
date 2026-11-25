@@ -78,7 +78,9 @@ svg{width:100%;height:auto;display:block;border-radius:6px}
 <header class="top">
  <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
  <nav class="mods" aria-label="Modules">
+  <a href="globe.html">Globe <small>all tracks</small></a>
   <a href="index.html">Site Monitor <small>Track A6</small></a>
+  <a href="earth.html">Earth Viewer <small>any place</small></a>
   <a href="c.html" aria-current="page">GNSS Watch <small>Track C</small></a>
   <a href="b3.html">Nav Integrity <small>Track B3</small></a>
   <a class="soon" aria-disabled="true">Passenger Recovery <small>next</small></a>

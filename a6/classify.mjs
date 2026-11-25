@@ -119,8 +119,10 @@ for (const m of P.train_months) {
 fs.writeFileSync(trainCache, JSON.stringify({ X, Y, isTest }));
 }
 const idxTr = [...Y.keys()].filter(i => !isTest[i]), idxTe = [...Y.keys()].filter(i => isTest[i]);
-const rf = new RandomForestClassifier(P.rf);
-rf.train(idxTr.map(i => X[i]), idxTr.map(i => Y[i]));
+const modelCache = path.join(CACHE, `model_${P.version}.json`);
+let rf;
+if (fs.existsSync(modelCache)) { rf = RandomForestClassifier.load(JSON.parse(fs.readFileSync(modelCache, 'utf8'))); console.log('model from cache'); }
+else { rf = new RandomForestClassifier(P.rf); rf.train(idxTr.map(i => X[i]), idxTr.map(i => Y[i])); fs.writeFileSync(modelCache, JSON.stringify(rf.toJSON())); }
 const pred = rf.predict(idxTe.map(i => X[i]));
 const cm = CLASSES.map(() => CLASSES.map(() => 0));
 idxTe.forEach((i, n) => cm[Y[i]][pred[n]]++);
@@ -144,7 +146,8 @@ const mapMonths = new Set(['2020-03', '2022-05', '2024-03', '2026-03']);
 const CONCURRENCY = 6; // footprint windows are small, so parallel fetches are safe here
 async function predictScene(s) {
   const cf = path.join(CACHE, `ai_${P.version}_${s.month}_${s.scene_id}.json`);
-  if (fs.existsSync(cf) && !mapMonths.has(s.month)) { results.push(JSON.parse(fs.readFileSync(cf, 'utf8'))); process.stdout.write(`${s.month}c `); return; }
+  const pxf = path.join(CACHE, `px_${P.version}_${s.month}.bin`);
+  if (fs.existsSync(cf) && fs.existsSync(pxf) && !mapMonths.has(s.month)) { results.push(JSON.parse(fs.readFileSync(cf, 'utf8'))); process.stdout.write(`${s.month}c `); return; }
   const { g, feat } = await loadScene(s, fb);
   if (!mask) { mask = new Uint8Array(g.w * g.h); for (let r = 0; r < g.h; r++) for (let c = 0; c < g.w; c++) mask[r * g.w + c] = inPoly(g.ox + (g.c0 + c + 0.5) * 10, g.oy - (g.r0 + r + 0.5) * 10) ? 1 : 0; }
   const F = [], pos = []; let tot = 0;
@@ -156,6 +159,8 @@ async function predictScene(s) {
   CLASSES.forEach((n, k) => row[`${n}_frac`] = gap ? null : +(counts[k] / F.length).toFixed(3));
   row.built_or_bare_frac = gap ? null : +((counts[1] + counts[2]) / F.length).toFixed(3);
   results.push(row); fs.writeFileSync(cf, JSON.stringify(row));
+  const px = new Uint8Array(g.w * g.h).fill(255); pos.forEach((p, n) => { px[p] = yp[n]; });
+  fs.writeFileSync(pxf, Buffer.from(px.buffer));
   if (mapMonths.has(s.month)) {
     const png = new PNG({ width: g.w, height: g.h });
     const col = [[60, 140, 60], [220, 60, 60], [230, 200, 120], [60, 120, 220]];
@@ -169,9 +174,30 @@ const queue = [...scenes];
 await Promise.all(Array.from({ length: CONCURRENCY }, async () => { while (queue.length) await predictScene(queue.shift()); }));
 results.sort((a, b) => a.month.localeCompare(b.month));
 console.log();
+const PERSIST = { window_months: 12, exclude_months: [7, 8, 9], min_obs: 3, min_scenes: 5, share: 0.75 };
+{
+  const mI = m => { const [y, mo] = m.split('-').map(Number); return y * 12 + mo; };
+  const pxOf = m => { const f = fs.readdirSync(CACHE).find(x => x === `px_${P.version}_${m}.bin`); return f ? new Uint8Array(fs.readFileSync(path.join(CACHE, f))) : null; };
+  const maps = new Map(results.filter(r => !r.gap).map(r => [r.month, pxOf(r.month)]).filter(([, v]) => v));
+  const fpIdx = []; if (mask) mask.forEach((v, i) => { if (v) fpIdx.push(i); });
+  for (const r of results) {
+    const win = [...maps.keys()].filter(m => { const d = mI(r.month) - mI(m); return d >= 0 && d < PERSIST.window_months && !PERSIST.exclude_months.includes(Number(m.slice(5))); });
+    r.converted_12m = null; r.built_12m = null;
+    if (r.gap || win.length < PERSIST.min_scenes || !fpIdx.length) continue;
+    const arrs = win.map(m => maps.get(m));
+    let seen = 0, conv = 0, built = 0;
+    for (const i of fpIdx) {
+      let n = 0, cb = 0, b = 0;
+      for (const a of arrs) { const k = a[i]; if (k === 255) continue; n++; if (k === 1 || k === 2) cb++; if (k === 1) b++; }
+      if (n < PERSIST.min_obs) continue;
+      seen++; if (cb / n >= PERSIST.share) conv++; if (b / n >= PERSIST.share) built++;
+    }
+    if (seen) { r.converted_12m = +(conv / seen).toFixed(3); r.built_12m = +(built / seen).toFixed(3); }
+  }
+}
 // join with baseline for the comparison
 for (const r of results) { const b = base.find(x => x.month === r.month); r.baseline_cleared_12m = b?.fp_cleared_12m ?? null; }
 const cols = Object.keys(results[0]);
 fs.writeFileSync(path.join(OUT, 'progress_ai.csv'), [cols.join(','), ...results.map(r => cols.map(c => r[c] ?? '').join(','))].join('\n') + '\n');
-fs.writeFileSync(path.join(OUT, 'progress_ai.json'), JSON.stringify({ schema_version: '1.0', model: P.version, evidence_type: 'derived', metrics_file: 'classifier_metrics.json', results }, null, 1));
-for (const r of results) console.log(`${r.month} built=${r.built_paved_frac} bare=${r.bare_frac} veg=${r.vegetation_frac} water=${r.water_frac} | baseline=${r.baseline_cleared_12m}${r.gap ? ' GAP' : ''}`);
+fs.writeFileSync(path.join(OUT, 'progress_ai.json'), JSON.stringify({ schema_version: '1.0', model: P.version, evidence_type: 'derived', persistence_rule: PERSIST, metrics_file: 'classifier_metrics.json', results }, null, 1));
+for (const r of results) console.log(`${r.month} built=${r.built_paved_frac} bare=${r.bare_frac} veg=${r.vegetation_frac} water=${r.water_frac} | conv12=${r.converted_12m} built12=${r.built_12m} | baseline=${r.baseline_cleared_12m}${r.gap ? ' GAP' : ''}`);
