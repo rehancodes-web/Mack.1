@@ -112,7 +112,7 @@ function realPos(s,date){const pv=satellite.propagate(s.rec,date);if(!pv||!pv.po
 function setPos(s,date){const p=realPos(s,date);if(!p)return;s.o.lat=p.lat;s.o.lng=p.lng;s.o.alt=p.alt;}
 // Orbit ring: one revolution in inertial space (SGP4), written in Earth coordinates at a fixed Earth angle gm0.
 // Each frame the ring is turned by the Earth's rotation since gm0, so every satellite stays exactly on its ring.
-function ring(s,t0,gm0){const pts=[],N=s.sys==='LEO'?60:120;for(let i=0;i<=N;i++){const pv=satellite.propagate(s.rec,new Date(t0+s.per*i/N));if(!pv||!pv.position)continue;
+function ring(s,t0,gm0){const pts=[],N=s.sys==='LEO'?48:96;for(let i=0;i<=N;i++){const pv=satellite.propagate(s.rec,new Date(t0+s.per*i/N));if(!pv||!pv.position)continue;
  const g=satellite.eciToGeodetic(pv.position,gm0);pts.push([satellite.degreesLat(g.latitude),satellite.degreesLong(g.longitude),g.height/RE]);}return {sys:s.sys,orbit:true,pul:s.pul,pts};}
 
 // ---- airports and interference cells ----
@@ -126,13 +126,13 @@ const el=document.getElementById('globe');
 const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
  .atmosphereColor('#86A3FF').atmosphereAltitude(.18)
  .pointsData(aps).pointLat('lat').pointLng('lng').pointAltitude(d=>d.jewar?.06:.006).pointRadius(d=>d.jewar?.45:d.cc==='IN'?.22:.16)
- .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(false)
+ .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(false).pointResolution(5)
  .pointLabel(d=>'<div class="tip"><b>'+d.name.replace(/</g,'&lt;')+'</b>'+(d.code?' · '+d.code:'')+'<br>Click to compare satellite images</div>')
  .onPointClick(openAirport)
  .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
  .polygonLabel(d=>'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
  .labelsData(aps.filter(a=>a.jewar)).labelLat('lat').labelLng('lng').labelText(()=>'Jewar').labelSize(1.1).labelDotRadius(.4).labelColor(()=>'#FFD24A').labelAltitude(.065).labelResolution(2)
- .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>d.col||(d.pul?'#FFFFFFAA':COL[d.sys]+(d.sys==='LEO'?'40':'66'))).pathDashLength(d=>d.dash?.015:1).pathDashGap(d=>d.dash?.012:0).pathDashAnimateTime(0).pathStroke(.6).pathTransitionDuration(0)
+ .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>d.col||(d.pul?'#FFFFFFAA':COL[d.sys]+(d.sys==='LEO'?'40':'66'))).pathDashLength(d=>d.dash?.015:1).pathDashGap(d=>d.dash?.012:0).pathDashAnimateTime(0).pathStroke(d=>d.orbit?null:.6).pathTransitionDuration(0)
  .particlesData([]).particleLat('lat').particleLng('lng').particleAltitude('alt').particlesSize(d=>d.length&&d[0].big?9:d.length&&d[0].pul?7:d.length&&d[0].sys==='LEO'?2.6:3.6).particlesColor(d=>d.length?(d[0].col||(d[0].pul?'#FFFFFF':COL[d[0].sys])):'#fff').particlesSizeAttenuation(false);
 window.NC_GLOBE=G; // handle for debugging in the console
 // globe.gl 2.46 drops the image URLs set during start-up; set them again once it has initialised
