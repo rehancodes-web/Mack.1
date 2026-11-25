@@ -80,9 +80,10 @@ const lastShot = SHOTS[SHOTS.length - 1], firstShot = SHOTS[0];
 const larperBuilt = jan25 ? pct(jan25.converted_smooth) : null;
 const scen = dec.scenarios.map(s => `<tr${s.name.startsWith('Satellite') ? ' class="hi"' : ''}><td>${esc(s.name)}</td><td>${s.p.toFixed(2)}</td><td>$${Math.round(s.release).toLocaleString('en-US')}</td><td>$${Math.round(s.inspect).toLocaleString('en-US')}</td><td><b>${s.action === 'inspect' ? 'Inspect' : 'Release'}</b></td></tr>`).join('');
 const classRows = met ? met.per_class.map(c => `<tr><td><i class="dot ${c.class}"></i>${c.class.replace('_', ' / ')}</td><td>${pct(c.recall)}</td><td>${pct(c.precision)}</td></tr>`).join('') : '';
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // AI text: escape, then render **bold**
 const reviewItems = rev ? [
-  ...(rev.curve?.finding ? [`<div class="msg bot"><b>Review: Larper vs baseline</b>${esc(rev.curve.finding)}${rev.curve.human_check ? `<span class="hc"><b>Human check</b>${esc(rev.curve.human_check)}</span>` : ''}</div>`] : []),
-  ...rev.vision.filter(v => v.finding).map(v => `<div class="msg bot"><b>Map check, ${monthName(v.month)}</b>${esc(v.finding)}</div>`),
+  ...(rev.curve?.finding ? [`<div class="msg bot"><b>Review: Larper vs baseline</b>${md(rev.curve.finding)}${rev.curve.human_check ? `<span class="hc"><b>Human check</b>${esc(rev.curve.human_check)}</span>` : ''}</div>`] : []),
+  ...rev.vision.filter(v => v.finding).map(v => `<div class="msg bot"><b>Map check, ${monthName(v.month)}</b>${md(v.finding)}</div>`),
 ].join('') : '';
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
