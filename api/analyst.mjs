@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   if (!ALLOWED_ORIGINS.includes(origin)) return res.status(403).json({ error: 'origin not allowed' });
 
   const clean = v => String(v || '').trim().replace(/^["']|["']$/g, '');
-  const NV = clean(process.env.NEMOTRON_API_KEY), KEY = clean(process.env.GEMINI_API_KEY);
+  const NV = clean(process.env.NEMOTRON_API_KEY).replace(/^Bearers+/i, ''), KEY = clean(process.env.GEMINI_API_KEY);
   if (!NV && !KEY) return res.status(500).json({ error: 'backend has no NEMOTRON_API_KEY or GEMINI_API_KEY' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
@@ -40,6 +40,8 @@ export default async function handler(req, res) {
   const imgs = (Array.isArray(body.images) ? body.images : []).slice(0, 4)
     .filter(im => im && /^image\/(png|jpeg)$/.test(im.mime) && typeof im.data === 'string' && im.data.length < 1_500_000);
   const userText = `CONTEXT:\n${context}\n\nQUESTION:\n${question}`;
+
+  if (NV && !NV.startsWith('nvapi-')) return res.status(500).json({ error: `NEMOTRON_API_KEY does not look like an NVIDIA key (should start with nvapi-; this one ${NV.startsWith('AIza') ? 'looks like a Google key' : 'has another format'}, length ${NV.length})` });
 
   // ---- NVIDIA Nemotron (OpenAI-compatible API at build.nvidia.com) ----
   if (NV) {
