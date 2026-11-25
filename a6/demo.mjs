@@ -120,12 +120,12 @@ document.getElementById('out').innerHTML='Release: <b>$'+Math.round(rel).toLocal
 c.oninput=p.oninput=upd;upd();
 const EP=${JSON.stringify(AI_ENDPOINT)},CTX=${JSON.stringify(CTX).replace(/</g, '\\u003c')};
 const ans=document.getElementById('ans');
-let visualCheck=null; // Gemini's last cross-check of the RF map, fed into later answers and the memo
+let visualCheck=null; // Nemotron's last cross-check of the RF map, fed into later answers and the memo
 async function b64(url){const b=await (await fetch(url)).blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(b);});}
 async function ask(question,images){
- if(!EP){ans.textContent='AI backend not connected yet (see backend/README.md).';return null;}
+ if(!EP){ans.textContent='AI backend not connected yet (set NEMOTRON_API_KEY in Vercel).';return null;}
  ans.textContent='Thinking…';
- const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},gemini_visual_check_of_rf:visualCheck};
+ const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},nemotron_visual_check_of_rf:visualCheck};
  try{const r=await fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,context:ctx,images:images||[]})});
   const j=await r.json();ans.textContent=j.answer||('Error: '+(j.error||r.status));return j.answer||null;}
  catch(err){ans.textContent='Could not reach the AI backend: '+err.message;return null;}

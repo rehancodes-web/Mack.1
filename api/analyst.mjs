@@ -1,7 +1,6 @@
-// NavContinuity A6 analyst backend on Vercel: proxies the demo page to Google Gemini.
-// The key lives ONLY in the Vercel environment variable GEMINI_API_KEY (never in the repo or the page).
-const ALLOWED_ORIGINS = ['https://mackathon-three.vercel.app', 'https://rehancodes-web.github.io', 'http://localhost:8080'];
-const MODEL_DEFAULT = 'gemini-2.5-flash';
+// NavContinuity A6 analyst backend on Vercel: proxies the demo page to NVIDIA Nemotron (build.nvidia.com).
+// The key lives ONLY in the Vercel environment variable NEMOTRON_API_KEY (never in the repo or the page).
+const ALLOWED_ORIGINS = ['https://mackathon-three.vercel.app', 'http://localhost:8080'];
 const NV_DEFAULT = 'nvidia/nemotron-3.5-lightning-30b-a3b';     // text: Q&A and memo (override with NEMOTRON_MODEL)
 const NV_VL_DEFAULT = 'nvidia/nemotron-3.5-super-vl-120b-a12b'; // vision: RF map cross-check (override with NEMOTRON_VL_MODEL)
 const MAX_Q = 600, MAX_CTX = 12000;
@@ -29,9 +28,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   if (!ALLOWED_ORIGINS.includes(origin)) return res.status(403).json({ error: 'origin not allowed' });
 
-  const clean = v => String(v || '').trim().replace(/^["']|["']$/g, '');
-  const NV = clean(process.env.NEMOTRON_API_KEY).replace(/^Bearers+/i, ''), KEY = clean(process.env.GEMINI_API_KEY);
-  if (!NV && !KEY) return res.status(500).json({ error: 'backend has no NEMOTRON_API_KEY or GEMINI_API_KEY' });
+  const NV = String(process.env.NEMOTRON_API_KEY || '').trim().replace(/^["']|["']$/g, '').replace(/^Bearer\s+/i, '');
+  if (!NV) return res.status(500).json({ error: 'backend has no NEMOTRON_API_KEY' });
+  if (!NV.startsWith('nvapi-')) return res.status(500).json({ error: `NEMOTRON_API_KEY does not look like an NVIDIA key (should start with nvapi-; this one has length ${NV.length})` });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const question = String(body.question || '').slice(0, MAX_Q).trim();
@@ -41,41 +40,18 @@ export default async function handler(req, res) {
     .filter(im => im && /^image\/(png|jpeg)$/.test(im.mime) && typeof im.data === 'string' && im.data.length < 1_500_000);
   const userText = `CONTEXT:\n${context}\n\nQUESTION:\n${question}`;
 
-  if (NV && !NV.startsWith('nvapi-')) return res.status(500).json({ error: `NEMOTRON_API_KEY does not look like an NVIDIA key (should start with nvapi-; this one ${NV.startsWith('AIza') ? 'looks like a Google key' : 'has another format'}, length ${NV.length})` });
-
-  // ---- NVIDIA Nemotron (OpenAI-compatible API at build.nvidia.com) ----
-  if (NV) {
-    const vision = imgs.length > 0;
-    const model = vision ? (process.env.NEMOTRON_VL_MODEL || NV_VL_DEFAULT) : (process.env.NEMOTRON_MODEL || NV_DEFAULT);
-    const content = vision
-      ? [...imgs.flatMap(im => [{ type: 'text', text: `IMAGE: ${String(im.label || '').slice(0, 120)}` }, { type: 'image_url', image_url: { url: `data:${im.mime};base64,${im.data}` } }]), { type: 'text', text: userText }]
-      : userText;
-    const r = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
-      body: JSON.stringify({ model, temperature: 0.2, max_tokens: 700, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content }] }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) return res.status(502).json({ error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}`, model });
-    const text = String(j.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-    return res.status(200).json({ answer: text || '(no answer)', model });
-  }
-
-  // ---- Google Gemini fallback ----
-  const images = imgs.flatMap(im => [{ text: `IMAGE: ${String(im.label || '').slice(0, 120)}` }, { inlineData: { mimeType: im.mime, data: im.data } }]);
-
-  const model = process.env.GEMINI_MODEL || MODEL_DEFAULT;
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+  const vision = imgs.length > 0;
+  const model = vision ? (process.env.NEMOTRON_VL_MODEL || NV_VL_DEFAULT) : (process.env.NEMOTRON_MODEL || NV_DEFAULT);
+  const content = vision
+    ? [...imgs.flatMap(im => [{ type: 'text', text: `IMAGE: ${String(im.label || '').slice(0, 120)}` }, { type: 'image_url', image_url: { url: `data:${im.mime};base64,${im.data}` } }]), { type: 'text', text: userText }]
+    : userText;
+  const r = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM }] },
-      contents: [{ role: 'user', parts: [...images, { text: `CONTEXT:\n${context}\n\nQUESTION:\n${question}` }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 700 },
-    }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${NV}` },
+    body: JSON.stringify({ model, temperature: 0.2, max_tokens: 700, messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content }] }),
   });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) return res.status(502).json({ error: `Gemini ${r.status}: ${j.error?.message || 'error'}` });
-  const text = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+  if (!r.ok) return res.status(502).json({ error: `Nemotron ${r.status}: ${j.detail || j.error?.message || j.title || 'error'}`, model });
+  const text = String(j.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
   return res.status(200).json({ answer: text || '(no answer)', model });
 }
