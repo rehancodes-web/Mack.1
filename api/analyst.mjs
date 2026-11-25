@@ -2,8 +2,8 @@
 // The key lives ONLY in the Vercel environment variable GEMINI_API_KEY (never in the repo or the page).
 const ALLOWED_ORIGINS = ['https://mackathon-three.vercel.app', 'https://rehancodes-web.github.io', 'http://localhost:8080'];
 const MODEL_DEFAULT = 'gemini-2.5-flash';
-const NV_DEFAULT = 'nvidia/llama-3.3-nemotron-super-49b-v1';     // text: Q&A and memo (override with NEMOTRON_MODEL)
-const NV_VL_DEFAULT = 'nvidia/llama-3.1-nemotron-nano-vl-8b-v1'; // vision: RF map cross-check (override with NEMOTRON_VL_MODEL)
+const NV_DEFAULT = 'nvidia/nemotron-3.5-lightning-30b-a3b';     // text: Q&A and memo (override with NEMOTRON_MODEL)
+const NV_VL_DEFAULT = 'nvidia/nemotron-3.5-super-vl-120b-a12b'; // vision: RF map cross-check (override with NEMOTRON_VL_MODEL)
 const MAX_Q = 600, MAX_CTX = 12000;
 
 const SYSTEM = `You are the project-monitoring analyst inside NavContinuity's Track A6 demo.
