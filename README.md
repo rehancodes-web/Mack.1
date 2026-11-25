@@ -26,16 +26,15 @@ Airline disruption management and self-rebooking products exist, including [Amad
 
 ## Hackathon submission (Mach-A-Thon Aeromania '26)
 
-**Our project is aviation navigation failure and passenger (customer) experience.** Every track is fitted to it; the full mapping, the flow between tracks, and the rule risk are in **[TRACKS.md](TRACKS.md)**.
+**Our project is aviation navigation failure and passenger (customer) experience.** Track A6 is the compulsory primary problem and Track C the one optional track; the full mapping, the flow between tracks, and the rule risk are in **[TRACKS.md](TRACKS.md)**.
 
 | Part | Track | Status |
 |---|---|---|
 | Airport and runway readiness from orbit (Jewar, Sentinel-2): the recovery capacity input | **A6 Infrastructure** (compulsory) | **Working on real data**: [a6/](a6/README.md), [data/](data/README.md) |
-| Multi-constellation integrity + AI correction of positioning errors | **B3 Positioning & sensing** | Specified, not built |
 | GNSS jamming/spoofing evidence and regional navigation-risk map, protective only | **C: GNSS resilience** | Specified, not built |
 | Passenger recovery: status, rebooking, care, bags | Customer experience / who pays | Specified, not built |
 
-Rules allow only **one** of B or C to be presented unless organisers confirm otherwise ([RULES.md](RULES.md) R2/R3), so the default pitch is A6 + C.
+Rules allow only **one** of B or C ([RULES.md](RULES.md) R2/R3), so we pitch A6 + C; B3 (positioning integrity) is future work.
 
 ![Jewar progress curve](a6/outputs/progress_chart.png)
 
