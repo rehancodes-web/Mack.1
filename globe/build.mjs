@@ -27,7 +27,10 @@ if (!airports.some(a => a[1] === 'DXN' || /Noida International/i.test(a[0]))) ai
 // --- satellites ---
 const tle = async q => { const t = await (await fetch(`https://celestrak.org/NORAD/elements/gp.php?${q}&FORMAT=tle`)).text();
   const L = t.replace(/\r/g, '').split('\n').filter(Boolean), out = []; for (let i = 0; i + 2 < L.length + 1; i += 3) if (L[i + 1]?.startsWith('1 ') && L[i + 2]?.startsWith('2 ')) out.push([L[i].trim(), L[i + 1], L[i + 2]]); return out; };
-const sats = { GPS: await tle('GROUP=gps-ops'), Galileo: await tle('GROUP=galileo'), NavIC: [...await tle('NAME=IRNSS'), ...await tle('NAME=NVS')] };
+// LEO: real low-orbit navigation satellites. Iridium NEXT carries Iridium STL (commercial positioning and timing, a GPS
+// backup); Xona PULSAR-0 is a dedicated LEO navigation demonstrator. Both are what Track B3 proposes at larger scale.
+const sats = { GPS: await tle('GROUP=gps-ops'), Galileo: await tle('GROUP=galileo'), NavIC: [...await tle('NAME=IRNSS'), ...await tle('NAME=NVS')],
+  LEO: [...await tle('NAME=PULSAR'), ...await tle('GROUP=iridium-NEXT')] };
 
 // --- collision screen: real tracked LEO objects. Iridium NEXT flies in the same ~780 km shell as the Iridium-33 and
 // Cosmos-2251 debris clouds, so real close approaches between a manoeuvrable satellite and debris are common.
@@ -47,4 +50,4 @@ const gnss = fs.existsSync(cellsFile) ? JSON.parse(fs.readFileSync(cellsFile, 'u
 
 const out = { generated_utc: new Date().toISOString(), sources: { airports: 'OurAirports (public domain)', satellites: 'CelesTrak GP elements', collision_screen: 'CelesTrak GP elements: Iridium NEXT, OneWeb, stations, visual, Cosmos-2251 / Iridium-33 / Fengyun-1C debris', gnss: 'Track C, ADS-B Exchange samples 2026-11-01' }, airports, sats, screen, gnss };
 fs.writeFileSync(path.join(DOCS, 'globe-data.json'), JSON.stringify(out));
-console.log(`airports ${airports.length} (India ${airports.filter(a => a[4] === 'IN').length}); sats GPS ${sats.GPS.length}, Galileo ${sats.Galileo.length}, NavIC ${sats.NavIC.length}; gnss cells ${gnss.length}; ${(fs.statSync(path.join(DOCS, 'globe-data.json')).size / 1024).toFixed(0)} kB`);
+console.log(`airports ${airports.length} (India ${airports.filter(a => a[4] === 'IN').length}); sats GPS ${sats.GPS.length}, Galileo ${sats.Galileo.length}, NavIC ${sats.NavIC.length}, LEO ${sats.LEO.length}, screen ${screen.length}; gnss cells ${gnss.length}; ${(fs.statSync(path.join(DOCS, 'globe-data.json')).size / 1024).toFixed(0)} kB`);
