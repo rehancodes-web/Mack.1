@@ -26,12 +26,16 @@ Airline disruption management and self-rebooking products exist, including [Amad
 
 ## Hackathon submission (Mach-A-Thon Aeromania '26)
 
-The event rules make **one Track A objective compulsory**, with a working demo on real satellite data, plus at most one optional track (B or C) linked by a flow. See [RULES.md](RULES.md). The hackathon build therefore has two parts:
+**Our project is aviation navigation failure and passenger (customer) experience.** Every track is fitted to it; the full mapping, the flow between tracks, and the rule risk are in **[TRACKS.md](TRACKS.md)**.
 
 | Part | Track | Status |
 |---|---|---|
-| **Primary (compulsory):** construction-progress monitoring of Noida International Airport (Jewar) from Sentinel-2, driving a lender's release-or-inspect decision | **A6 Infrastructure** | **Working baseline on real data**: [a6/](a6/README.md), data access in [data/](data/README.md) |
-| **Optional:** GNSS degradation evidence for the asset's region plus a preparation decision. The passenger-recovery product above is its commercial direction | **C: GNSS resilience / critical infrastructure** | Specified in brief v1.1, not built |
+| Airport and runway readiness from orbit (Jewar, Sentinel-2): the recovery capacity input | **A6 Infrastructure** (compulsory) | **Working on real data**: [a6/](a6/README.md), [data/](data/README.md) |
+| Multi-constellation integrity + AI correction of positioning errors | **B3 Positioning & sensing** | Specified, not built |
+| GNSS jamming/spoofing evidence and regional navigation-risk map, protective only | **C: GNSS resilience** | Specified, not built |
+| Passenger recovery: status, rebooking, care, bags | Customer experience / who pays | Specified, not built |
+
+Rules allow only **one** of B or C to be presented unless organisers confirm otherwise ([RULES.md](RULES.md) R2/R3), so the default pitch is A6 + C.
 
 ![Jewar progress curve](a6/outputs/progress_chart.png)
 
