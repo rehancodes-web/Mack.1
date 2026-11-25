@@ -84,7 +84,7 @@ Maritime awareness (dark vessels, illegal fishing, smuggling) · borders & remot
 
 ## 5. Our structure
 
-Primary (compulsory): **Track A6 Infrastructure**, Jewar airport monitored from Sentinel-2 as diversion and recovery capacity. Optional (one only): **Track C GNSS resilience**. The flow and the full idea are in [README.md](README.md). If Track C isn't complete, it is mentioned only as a next step (R3).
+Primary (compulsory): **Track A6 Infrastructure**, Jewar airport monitored from Sentinel-2 as diversion and recovery capacity. Optional (one only): **Track B3 Positioning & sensing**, currently scoped to a LEO augmentation simulation. The flow and the full idea are in [README.md](README.md). Track C is not part of this submission choice.
 
 ---
 

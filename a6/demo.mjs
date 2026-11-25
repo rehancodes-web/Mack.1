@@ -26,7 +26,7 @@ const CTX = {
   ai_metrics: { overall_agreement_with_worldcover: met.overall_accuracy, per_class: met.per_class, caveat: met.label_caveat },
   decision: { report_pct: dec.report.reported_pct, satellite_pct: dec.satellite_observed_pct, gap_pts: dec.gap_pts, scenarios: dec.scenarios, assumed_parameters: dec.parameters, caveat: dec.caveat },
   readiness: rdy,
-  product: 'NavContinuity: navigation failure -> passenger recovery. A6 output = recovery capacity + region for Track C GNSS check.',
+  product: 'NavContinuity: navigation resilience -> passenger recovery. A6 output = recovery capacity + Jewar context for the Track B3 LEO positioning simulation.',
 };
 
 const W = 1000, H = 380, L = 56, R = 20, T = 20, B = 46;
@@ -104,8 +104,8 @@ ${rdy ? `<h2>5 · Hand-off to NavContinuity: recovery capacity</h2>
 <tr><td>Plateau reached</td><td><b>${rdy.satellite.plateau_month}</b> <span class="lab">derived</span></td></tr>
 <tr><td>Phase 1 inaugurated</td><td><b>2026-03-28</b> <span class="lab">reported</span></td></tr>
 <tr><td>Usable as diversion / rebooking airport</td><td>${rdy.recovery_capacity.usable_for_navcontinuity}</td></tr>
-<tr><td>Region passed to Track C</td><td>${rdy.region.radius_km} km around ${rdy.region.centre.lat}°N, ${rdy.region.centre.lon}°E <span class="lab">assumed</span></td></tr>
-</table><p class="note">Track C then asks whether GNSS is degraded inside this region; no coverage reads "unknown", never "safe".</p></div>` : ''}
+  <tr><td>Track B3 receiver context</td><td>${rdy.region.radius_km} km around ${rdy.region.centre.lat}°N, ${rdy.region.centre.lon}°E <span class="lab">assumed</span></td></tr>
+</table><p class="note">This Jewar location is the test receiver for the separate B3 concept simulation. Satellite visibility and positioning correction there are simulated, not observed.</p></div>` : ''}
 ${rev ? `<h2>6 · Nemotron reviews Larper <span class="lab">AI review · NVIDIA Nemotron</span></h2>
 <div class="card"><p class="note">${esc(rev.caveat)}</p>
 ${rev.curve?.finding ? `<p><b>Curves:</b></p><div style="white-space:pre-wrap">${esc(rev.curve.finding)}</div>` : ''}

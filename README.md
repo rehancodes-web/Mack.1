@@ -32,14 +32,14 @@ satellite evidence  →  GPS-risk warning  →  which airports can absorb divers
 | Track | Our part | Status |
 |---|---|---|
 | **A6 Infrastructure** (compulsory) | Sentinel-2 monitoring of **Jewar airport** 2020–2026, showing when it physically became a usable diversion and recovery airport. **Larper**, our Random Forest model, labels every 10 m pixel (built/paved, bare, vegetation, water). **NVIDIA Nemotron** audits Larper's maps against the photos and writes the analyst memo. Economic decision: inspect or release funding vs reported progress | **Working on real data** |
-| **C GNSS resilience** (the one optional track) | GPS-degradation evidence for the Delhi/Jewar region, turned into a risk level the recovery flow can act on. Protective only: no locating transmitters, no tracking people | To build |
+| **B3 Positioning & sensing** (the one optional track) | Browser-based 3D concept simulation of a LEO satellite augmenting a synthetic GNSS position near Jewar. Includes orbit/visibility and illustrative correction metrics | Prototype |
 | **Customer experience** (who pays) | Passenger recovery flow: status, rebooking, care, bags. **Airlines pay**: a diversion costs €1,000–77,200 (EUROCONTROL), a block minute about $98 (A4A 2025) | Specified |
 
-Rules allow only one of Track B or C, so we present A6 + C. Full rules: [RULES.md](RULES.md).
+Rules allow only one optional track, so our current choice is A6 + B3. Full rules: [RULES.md](RULES.md).
 
 ## What is built
 
-- **Live demo:** [mackathon-three.vercel.app](https://mackathon-three.vercel.app). It has before/after satellite images, the baseline and Larper progress curves, Larper's accuracy, the decision with sliders, the hand-off to the GPS story, and the Nemotron analyst.
+- **Demo site:** the root page links to the A6 infrastructure demo and the B3 3D simulation. The B3 prototype is `docs/b3.html` and can be opened locally or served from Vercel.
 - **Results so far (derived, Sentinel-2):** land conversion at Jewar starts mid-2023 and peaks at about 56% in April 2025. In Jan 2025 it was about 51% against a reported "80% complete". This measures land conversion, not completion.
 - **Larper:** agrees with ESA WorldCover on about 71% of held-out pixels (built/paved recall 89%, bare 28%). WorldCover is itself a model, so this is agreement, not ground truth.
 
@@ -51,6 +51,7 @@ Rules allow only one of Track B or C, so we present A6 + C. Full rules: [RULES.m
 | [data/](data/README.md) | Jewar footprint and the 79-scene Sentinel-2 manifest |
 | `api/analyst.mjs` | Vercel function for Nemotron. The key is the `NEMOTRON_API_KEY` Vercel variable, never stored in the repo |
 | `docs/` | Built demo page served by Vercel |
+| [spacecraft/](spacecraft/README.md) | Track B3 model notes and simulation assumptions |
 | [PRODUCT_SPEC.md](PRODUCT_SPEC.md) | Passenger-recovery product spec |
 | [research/](research/) | GPS failure evidence and passenger evidence |
 
@@ -62,3 +63,4 @@ Run Track A6: `cd a6 && npm install && node progress.mjs && node classify.mjs &&
 - Land conversion is not construction completion, and a satellite image cannot prove an aircraft lost GPS.
 - Never say a passenger is rebooked until the airline system confirms it.
 - All cost figures are illustrative until tested with an airline.
+- B3 orbit and positioning values in the browser demo are simulated and illustrative; they are not live satellite data, a validated correction algorithm, or certified aviation navigation.
