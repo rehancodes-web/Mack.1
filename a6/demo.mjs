@@ -39,6 +39,14 @@ const MAPS = ['2020-03', '2022-05', '2024-03', '2026-03'].filter(m => has(`class
 const monthName = m => new Date(`${m}-15T00:00:00Z`).toLocaleString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 const aiAt = m => ai.find(r => r.month === m);
 const jan25 = aiAt('2025-01');
+const lastBuilt = [...ai].reverse().find(r => r.built_12m != null) || null; // latest persistent built/paved share, for the map legend
+const pctR = v => Math.round(v * 100) + '%';
+const LG = {
+  trees: met ? met.params.rf.nEstimators : '–',
+  acc: met ? 'agrees with WorldCover on <b>' + pctR(met.overall_accuracy) + '</b> of test land it never saw (built/paved ' + pctR(met.per_class.find(c => c.class === 'built_paved')?.recall ?? 0) + ', bare earth ' + pctR(met.per_class.find(c => c.class === 'bare')?.recall ?? 0) + ')' : 'shown once the model run finishes',
+  why: (jan25 && jan25.converted_12m != null ? ': about <b>' + pctR(jan25.converted_12m) + '</b> of the site converted in Jan 2025' : '') + (lastBuilt ? ', about <b>' + pctR(lastBuilt.built_12m) + '</b> paved by ' + monthName(lastBuilt.month) : ''),
+  share: Object.fromEntries(ai.filter(r => r.vegetation_frac != null).map(r => [r.month, [r.vegetation_frac, r.built_paved_frac, r.bare_frac, r.water_frac]])),
+};
 
 // ---------- AI context (labelled; the analyst may use nothing else) ----------
 const CTX = {
@@ -152,6 +160,10 @@ button{cursor:pointer;font-weight:650}button.primary{background:var(--larper);bo
 .legend i,.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .dot.built_paved,.legend .b{background:#dc3c3c}.dot.bare,.legend .a{background:#e6c878}.dot.vegetation,.legend .g{background:#3c8c3c}.dot.water,.legend .w{background:#3c78dc}
 .legend{display:flex;gap:12px;flex-wrap:wrap}.legend[hidden]{display:none}
+.lcard{margin-top:10px;border:1px solid var(--rule,#2A3840);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.45}.lcard[hidden]{display:none}
+.lcard table{width:100%;border-collapse:collapse;margin:4px 0 8px}.lcard th,.lcard td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--rule,#2A3840);vertical-align:top}
+.lcard td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.lcard th.n{text-align:right}
+.lcard details{margin-top:4px}.lcard summary{cursor:pointer;font-weight:600}.lcard ul{margin:6px 0 4px 18px;padding:0}.lcard li{margin:3px 0}
 .two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
 svg{width:100%;height:auto;display:block}
 .g{stroke:var(--rule)}.ax{fill:var(--mut);font-size:12px}.gap{fill:var(--rule);opacity:.55}
@@ -238,6 +250,25 @@ input[type=range]{width:100%;accent-color:var(--larper)}
    <span>Yellow: airport boundary (OSM)</span>
    <span class="legend" id="legend" hidden><span><i class="b"></i>built / paved</span><span><i class="a"></i>bare</span><span><i class="g"></i>vegetation</span><span><i class="w"></i>water</span></span>
   </div>
+  <div class="lcard" id="lcard" hidden aria-live="polite">
+   <b>Larper map legend</b> · each 10 m square of the airport is labelled by Larper, our AI model <span class="ev ai">AI</span>
+   <table><thead><tr><th>Colour</th><th>Means</th><th class="n" id="lhA">Left</th><th class="n" id="lhB">Right</th></tr></thead><tbody>
+    <tr><td><i class="dot built_paved"></i>Red</td><td><b>Built or paved</b>: runway, terminal, roads, aprons</td><td class="n" id="lA1"></td><td class="n" id="lB1"></td></tr>
+    <tr><td><i class="dot bare"></i>Sand</td><td><b>Bare earth</b>: cleared land, earthworks</td><td class="n" id="lA2"></td><td class="n" id="lB2"></td></tr>
+    <tr><td><i class="dot vegetation"></i>Green</td><td><b>Vegetation</b>: crops, grass, trees</td><td class="n" id="lA0"></td><td class="n" id="lB0"></td></tr>
+    <tr><td><i class="dot water"></i>Blue</td><td><b>Water</b>: ponds, wet ground</td><td class="n" id="lA3"></td><td class="n" id="lB3"></td></tr>
+    <tr><td>Dark</td><td>Outside the airport boundary, or hidden by cloud</td><td></td><td></td></tr>
+   </tbody></table>
+   <details open><summary>What Larper is</summary><ul>
+    <li><b>Our own AI model</b>: a Random Forest of ${LG.trees} decision trees that votes on a label for every 10 m square, every month 2020–2026. A classic, explainable method, not a chatbot.</li>
+    <li><b>Input</b>: the colour and infrared values Sentinel-2 records for each square (6 bands) plus 4 indices for greenness, built-up surfaces and bare soil.</li>
+    <li><b>Teacher</b>: ESA WorldCover 2021, learnt from land <i>around</i> the airport only, so the airport is new to it.</li>
+    <li><b>Accuracy</b>: ${LG.acc}. WorldCover is itself a model, so this is agreement, not ground truth.</li>
+    <li><b>Clean-up rule for the progress curve</b>: a square counts as converted only if Larper calls it built or bare in at least 75% of its clear, non-monsoon looks over 12 months, so dry fields or a hazy day don't read as construction. Single-month maps like these are not cleaned up.</li>
+    <li><b>Why we need it</b>: the vegetation index can't tell a runway from a bare mud field, and it dips when grass regrows on finished ground. Larper separates them${LG.why}.</li>
+    <li><b>Where it fits</b>: it backs the lender check (builder's "80% complete" vs what orbit shows), it dates when Jewar became usable as a diversion airport for GPS trouble around Delhi, and Nemotron's vision model audits these maps against the photos.</li>
+   </ul></details>
+  </div>
  </section>
 
  <section class="panel" aria-labelledby="h-prog">
@@ -303,12 +334,16 @@ r.addEventListener('input',()=>{v.classList.remove('intro');pos(r.value);});
 const lbl=s=>s.options[s.selectedIndex].text;
 function src(m){return (layer==='classmap'&&MAPS.includes(m)?'classmap_':'quicklook_')+m+'.png';}
 function paint(){A.src=src(sa.value);B.src=src(sb.value);A.alt='Site, '+lbl(sa)+(layer==='classmap'?' (Larper layer)':'');B.alt='Site, '+lbl(sb)+(layer==='classmap'?' (Larper layer)':'');ta.textContent=lbl(sa);tb.textContent=lbl(sb);}
-sa.onchange=sb.onchange=paint;
-const bP=document.getElementById('lyPhoto'),bL=document.getElementById('lyLarper'),lg=document.getElementById('legend');
-function setLayer(l){layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');lg.hidden=l!=='classmap';
+sa.onchange=sb.onchange=()=>{paint();if(typeof fillLegend==='function')fillLegend();};
+const bP=document.getElementById('lyPhoto'),bL=document.getElementById('lyLarper'),lg=document.getElementById('legend'),lc=document.getElementById('lcard');
+const SHARE=${JSON.stringify(LG.share)};
+function fillLegend(){const pc=v=>v==null?'–':Math.round(v*100)+'%';const a=SHARE[sa.value],b=SHARE[sb.value];
+ document.getElementById('lhA').textContent=lbl(sa);document.getElementById('lhB').textContent=lbl(sb);
+ for(let k=0;k<4;k++){document.getElementById('lA'+k).textContent=a?pc(a[k]):'–';document.getElementById('lB'+k).textContent=b?pc(b[k]):'–';}}
+function setLayer(l){layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');lg.hidden=l!=='classmap';lc.hidden=l!=='classmap';
  if(l==='classmap'){for(const s of [sa,sb])for(const o of s.options)o.disabled=!MAPS.includes(o.value);if(!MAPS.includes(sa.value))sa.value=MAPS[0];if(!MAPS.includes(sb.value))sb.value=MAPS[MAPS.length-1];}
  else for(const s of [sa,sb])for(const o of s.options)o.disabled=false;paint();}
-bP.onclick=()=>setLayer('quicklook');bL.onclick=()=>{if(MAPS.length)setLayer('classmap');};
+bP.onclick=()=>setLayer('quicklook');bL.addEventListener('click',()=>fillLegend());bL.onclick=()=>{if(MAPS.length)setLayer('classmap');};
 v.classList.add('intro');pos(86);setTimeout(()=>{pos(50);r.value=50;},400);
 
 const L=${P0.loss_if_optimistic.value},e=${P0.inspection_effectiveness.value};

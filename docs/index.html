@@ -61,6 +61,10 @@ button{cursor:pointer;font-weight:650}button.primary{background:var(--larper);bo
 .legend i,.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .dot.built_paved,.legend .b{background:#dc3c3c}.dot.bare,.legend .a{background:#e6c878}.dot.vegetation,.legend .g{background:#3c8c3c}.dot.water,.legend .w{background:#3c78dc}
 .legend{display:flex;gap:12px;flex-wrap:wrap}.legend[hidden]{display:none}
+.lcard{margin-top:10px;border:1px solid var(--rule,#2A3840);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.45}.lcard[hidden]{display:none}
+.lcard table{width:100%;border-collapse:collapse;margin:4px 0 8px}.lcard th,.lcard td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--rule,#2A3840);vertical-align:top}
+.lcard td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.lcard th.n{text-align:right}
+.lcard details{margin-top:4px}.lcard summary{cursor:pointer;font-weight:600}.lcard ul{margin:6px 0 4px 18px;padding:0}.lcard li{margin:3px 0}
 .two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
 svg{width:100%;height:auto;display:block}
 .g{stroke:var(--rule)}.ax{fill:var(--mut);font-size:12px}.gap{fill:var(--rule);opacity:.55}
@@ -146,6 +150,25 @@ input[type=range]{width:100%;accent-color:var(--larper)}
    <label>Right <select id="selB"><option value="2020-03">Mar 2020</option><option value="2022-05">May 2022</option><option value="2024-03">Mar 2024</option><option value="2025-01">Jan 2025</option><option value="2026-03" selected>Mar 2026</option></select></label>
    <span>Yellow: airport boundary (OSM)</span>
    <span class="legend" id="legend" hidden><span><i class="b"></i>built / paved</span><span><i class="a"></i>bare</span><span><i class="g"></i>vegetation</span><span><i class="w"></i>water</span></span>
+  </div>
+  <div class="lcard" id="lcard" hidden aria-live="polite">
+   <b>Larper map legend</b> · each 10 m square of the airport is labelled by Larper, our AI model <span class="ev ai">AI</span>
+   <table><thead><tr><th>Colour</th><th>Means</th><th class="n" id="lhA">Left</th><th class="n" id="lhB">Right</th></tr></thead><tbody>
+    <tr><td><i class="dot built_paved"></i>Red</td><td><b>Built or paved</b>: runway, terminal, roads, aprons</td><td class="n" id="lA1"></td><td class="n" id="lB1"></td></tr>
+    <tr><td><i class="dot bare"></i>Sand</td><td><b>Bare earth</b>: cleared land, earthworks</td><td class="n" id="lA2"></td><td class="n" id="lB2"></td></tr>
+    <tr><td><i class="dot vegetation"></i>Green</td><td><b>Vegetation</b>: crops, grass, trees</td><td class="n" id="lA0"></td><td class="n" id="lB0"></td></tr>
+    <tr><td><i class="dot water"></i>Blue</td><td><b>Water</b>: ponds, wet ground</td><td class="n" id="lA3"></td><td class="n" id="lB3"></td></tr>
+    <tr><td>Dark</td><td>Outside the airport boundary, or hidden by cloud</td><td></td><td></td></tr>
+   </tbody></table>
+   <details open><summary>What Larper is</summary><ul>
+    <li><b>Our own AI model</b>: a Random Forest of 20 decision trees that votes on a label for every 10 m square, every month 2020–2026. A classic, explainable method, not a chatbot.</li>
+    <li><b>Input</b>: the colour and infrared values Sentinel-2 records for each square (6 bands) plus 4 indices for greenness, built-up surfaces and bare soil.</li>
+    <li><b>Teacher</b>: ESA WorldCover 2021, learnt from land <i>around</i> the airport only, so the airport is new to it.</li>
+    <li><b>Accuracy</b>: agrees with WorldCover on <b>71%</b> of test land it never saw (built/paved 88%, bare earth 31%). WorldCover is itself a model, so this is agreement, not ground truth.</li>
+    <li><b>Clean-up rule for the progress curve</b>: a square counts as converted only if Larper calls it built or bare in at least 75% of its clear, non-monsoon looks over 12 months, so dry fields or a hazy day don't read as construction. Single-month maps like these are not cleaned up.</li>
+    <li><b>Why we need it</b>: the vegetation index can't tell a runway from a bare mud field, and it dips when grass regrows on finished ground. Larper separates them: about <b>41%</b> of the site converted in Jan 2025, about <b>10%</b> paved by Nov 2026.</li>
+    <li><b>Where it fits</b>: it backs the lender check (builder's "80% complete" vs what orbit shows), it dates when Jewar became usable as a diversion airport for GPS trouble around Delhi, and Nemotron's vision model audits these maps against the photos.</li>
+   </ul></details>
   </div>
  </section>
 
@@ -233,12 +256,16 @@ r.addEventListener('input',()=>{v.classList.remove('intro');pos(r.value);});
 const lbl=s=>s.options[s.selectedIndex].text;
 function src(m){return (layer==='classmap'&&MAPS.includes(m)?'classmap_':'quicklook_')+m+'.png';}
 function paint(){A.src=src(sa.value);B.src=src(sb.value);A.alt='Site, '+lbl(sa)+(layer==='classmap'?' (Larper layer)':'');B.alt='Site, '+lbl(sb)+(layer==='classmap'?' (Larper layer)':'');ta.textContent=lbl(sa);tb.textContent=lbl(sb);}
-sa.onchange=sb.onchange=paint;
-const bP=document.getElementById('lyPhoto'),bL=document.getElementById('lyLarper'),lg=document.getElementById('legend');
-function setLayer(l){layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');lg.hidden=l!=='classmap';
+sa.onchange=sb.onchange=()=>{paint();if(typeof fillLegend==='function')fillLegend();};
+const bP=document.getElementById('lyPhoto'),bL=document.getElementById('lyLarper'),lg=document.getElementById('legend'),lc=document.getElementById('lcard');
+const SHARE={"2020-01":[0.673,0.307,0.017,0.002],"2020-02":[0.722,0.254,0.022,0.002],"2020-03":[0.729,0.259,0.01,0.003],"2020-04":[0.734,0.071,0.192,0.003],"2020-05":[0.554,0.047,0.398,0.001],"2020-06":[0.539,0.042,0.419,0.001],"2020-07":[0.111,0.388,0.501,0],"2020-08":[0.741,0.197,0.062,0.001],"2020-09":[0.922,0.064,0.012,0.002],"2020-10":[0.93,0.062,0.006,0.001],"2020-11":[0.933,0.058,0.008,0.002],"2020-12":[0.924,0.06,0.015,0.002],"2021-01":[0.049,0.937,0.012,0.002],"2021-02":[0.826,0.124,0.045,0.005],"2021-03":[0.667,0.269,0.064,0],"2021-04":[0.832,0.064,0.103,0.001],"2021-05":[0.368,0.602,0.03,0],"2021-06":[0.816,0.078,0.105,0],"2021-08":[0.956,0.027,0.016,0.001],"2021-09":[0.618,0.238,0.084,0.061],"2021-10":[0.687,0.27,0.015,0.028],"2021-11":[0.582,0.382,0.009,0.026],"2021-12":[0.094,0.841,0.059,0.006],"2022-01":[0.064,0.155,0.781,0],"2022-02":[0.091,0.154,0.755,0],"2022-03":[0.869,0.1,0.03,0.001],"2022-04":[0.939,0.006,0.055,0],"2022-05":[0.737,0.174,0.089,0],"2022-06":[0.815,0.112,0.072,0],"2022-07":[0.867,0.1,0.031,0.001],"2022-08":[0.887,0.08,0.033,0],"2022-09":[0.727,0.219,0.054,0],"2022-10":[0.624,0.269,0.039,0.067],"2022-11":[0.637,0.258,0.089,0.016],"2022-12":[0.766,0.113,0.114,0.007],"2023-01":[0.651,0.142,0.195,0.012],"2023-02":[0.633,0.158,0.2,0.008],"2023-03":[0.635,0.15,0.213,0.001],"2023-04":[0.54,0.177,0.283,0],"2023-05":[0.567,0.052,0.381,0],"2023-06":[0.545,0.038,0.417,0],"2023-07":[0.031,0.536,0.429,0.005],"2023-08":[0.588,0.144,0.268,0],"2023-09":[0.486,0.204,0.31,0],"2023-10":[0.502,0.25,0.243,0.004],"2023-11":[0.179,0.519,0.301,0.001],"2023-12":[0.585,0.166,0.246,0.004],"2024-01":[0.097,0.416,0.483,0.005],"2024-02":[0.385,0.252,0.36,0.003],"2024-03":[0.453,0.151,0.394,0.002],"2024-04":[0.384,0.108,0.508,0.001],"2024-05":[0.317,0.064,0.619,0],"2024-06":[0.214,0.034,0.751,0],"2024-08":[0.316,0.368,0.312,0.004],"2024-10":[0.45,0.171,0.325,0.055],"2024-11":[0.372,0.315,0.257,0.056],"2024-12":[0.492,0.229,0.228,0.051],"2025-01":[0.372,0.312,0.276,0.04],"2025-02":[0.255,0.43,0.283,0.032],"2025-03":[0.378,0.199,0.396,0.026],"2025-04":[0.457,0.083,0.452,0.009],"2025-05":[0.267,0.292,0.441,0],"2025-06":[0.032,0.504,0.465,0],"2025-09":[0.451,0.24,0.248,0.061],"2025-10":[0.429,0.296,0.199,0.076],"2025-11":[0.333,0.319,0.278,0.071],"2025-12":[0.374,0.346,0.205,0.075],"2026-01":[0.055,0.654,0.251,0.039],"2026-02":[0.293,0.367,0.28,0.059],"2026-03":[0.419,0.21,0.318,0.053],"2026-04":[0.512,0.118,0.365,0.005],"2026-05":[0.4,0.232,0.363,0.004],"2026-06":[0.373,0.209,0.417,0.001],"2026-07":[0.519,0.155,0.326,0],"2026-08":[0.661,0.218,0.11,0.01],"2026-09":[0.628,0.255,0.096,0.02],"2026-10":[0.574,0.3,0.104,0.022],"2026-11":[0.548,0.343,0.071,0.038]};
+function fillLegend(){const pc=v=>v==null?'–':Math.round(v*100)+'%';const a=SHARE[sa.value],b=SHARE[sb.value];
+ document.getElementById('lhA').textContent=lbl(sa);document.getElementById('lhB').textContent=lbl(sb);
+ for(let k=0;k<4;k++){document.getElementById('lA'+k).textContent=a?pc(a[k]):'–';document.getElementById('lB'+k).textContent=b?pc(b[k]):'–';}}
+function setLayer(l){layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');lg.hidden=l!=='classmap';lc.hidden=l!=='classmap';
  if(l==='classmap'){for(const s of [sa,sb])for(const o of s.options)o.disabled=!MAPS.includes(o.value);if(!MAPS.includes(sa.value))sa.value=MAPS[0];if(!MAPS.includes(sb.value))sb.value=MAPS[MAPS.length-1];}
  else for(const s of [sa,sb])for(const o of s.options)o.disabled=false;paint();}
-bP.onclick=()=>setLayer('quicklook');bL.onclick=()=>{if(MAPS.length)setLayer('classmap');};
+bP.onclick=()=>setLayer('quicklook');bL.addEventListener('click',()=>fillLegend());bL.onclick=()=>{if(MAPS.length)setLayer('classmap');};
 v.classList.add('intro');pos(86);setTimeout(()=>{pos(50);r.value=50;},400);
 
 const L=300000,e=0.9;
