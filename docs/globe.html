@@ -56,6 +56,7 @@ input[type=text]{flex:1;min-width:0}button{cursor:pointer;font-weight:650}
 .card h2{margin:0;font-size:16px;font-weight:800;font-variation-settings:"wdth" 108}.card header p{margin:0;color:var(--mut);font-size:12.5px}
 .card header .sp{flex:1}.card header a{color:var(--acc);font-weight:650;font-size:13px}
 .card iframe{width:100%;height:100%;border:0;background:#0b1216}
+.aphov .float-tooltip-kap,.aphov .scene-tooltip{display:none !important}
 .tip{background:rgba(10,18,23,.92);border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font:12.5px/1.4 Archivo,system-ui,sans-serif;color:#E4EBEA}
 @media (max-width:820px){.top{flex-wrap:wrap;height:auto;padding:8px 12px}.mods{flex-wrap:wrap}.mods a{padding:6px 8px}#globe{inset:88px 0 0 0}.side{top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:42vh}}
 </style><link rel="stylesheet" href="nd-theme.css?v=3"></head><body>
@@ -128,7 +129,7 @@ const gnss=D.gnss.map(([la,lo,lvl,share,n])=>({...cell(la,lo),lvl,share,n,la,lo}
 function pickAirport(c){if(!c||c.lat==null||!show.airports)return;const lat=c.lat,lng=c.lng,alt=G.pointOfView().altitude,thr=Math.max(.15,Math.min(3,alt*1.2)),r=Math.PI/180;let best=null,bd=1e9;
  for(const a of aps){const d=Math.acos(Math.min(1,Math.sin(lat*r)*Math.sin(a.lat*r)+Math.cos(lat*r)*Math.cos(a.lat*r)*Math.cos((lng-a.lng)*r)))/r;if(d<bd){bd=d;best=a;}}
  if(best&&bd<=thr)openAirport(best);}
-const el=document.getElementById('globe');
+const el=document.getElementById('globe');let hovAp=null;
 // preserveDrawingBuffer: lets screenshots and recordings capture the globe
 const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
  .atmosphereColor('#86A3FF').atmosphereAltitude(.18)
@@ -138,11 +139,22 @@ const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).
  .onGlobeClick(c=>pickAirport(c)).onPointClick((p,e,c)=>pickAirport(c)).onPolygonClick((p,e,c)=>pickAirport(c))
  .onLabelClick((p,e,c)=>pickAirport(c)).onPathClick((p,e,c)=>pickAirport(c)) // the Jewar label and orbit lines sit in front of airports
  .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
- .polygonLabel(d=>'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
+ .polygonLabel(d=>hovAp?'':'<div class="tip"><b>GPS interference '+(d.lvl===2?'high':'medium')+'</b><br>'+Math.round(d.share*100)+'% of '+d.n+' aircraft degraded<br>'+d.la+'–'+(d.la+1)+'°N, '+d.lo+'–'+(d.lo+1)+'°E</div>')
  .labelsData(aps.filter(a=>a.jewar)).labelLat('lat').labelLng('lng').labelText(()=>'Jewar').labelSize(1.1).labelDotRadius(.4).labelColor(()=>'#FFD24A').labelAltitude(.065).labelResolution(2)
  .pathsData([]).pathPoints('pts').pathPointLat(p=>p[0]).pathPointLng(p=>p[1]).pathPointAlt(p=>p[2]).pathColor(d=>d.col||(d.pul?ORB.PUL:ORB[d.sys])).pathDashLength(d=>d.dash?.015:1).pathDashGap(d=>d.dash?.012:0).pathDashAnimateTime(0).pathStroke(d=>d.orbit?null:.6).pathTransitionDuration(0)
  .particlesData([]).particleLat('lat').particleLng('lng').particleAltitude('alt').particlesSize(d=>d.length&&d[0].big?9:d.length&&d[0].pul?7:d.length&&d[0].sys==='LEO'?2.6:3.6).particlesColor(d=>d.length?(d[0].col||(d[0].pul?'#FFFFFF':COL[d[0].sys])):'#fff').particlesSizeAttenuation(false);
 window.NC_GLOBE=G; // handle for debugging in the console
+// Hover names: airports are one merged mesh, so find the nearest airport under the cursor and show its name (wins over GPS squares)
+const atip=document.createElement('div');atip.className='tip';atip.style.cssText='position:fixed;pointer-events:none;z-index:30;display:none';document.body.appendChild(atip);
+el.addEventListener('mousemove',e=>{hovAp=null;
+ if(show.airports){const b=el.getBoundingClientRect(),c=G.toGlobeCoords(e.clientX-b.left,e.clientY-b.top);
+  if(c){const alt=G.pointOfView().altitude,thr=Math.max(.06,Math.min(1.2,alt*.35)),k=Math.PI/180;let bd=1e9,best=null;
+   for(const a of aps){const d=Math.acos(Math.min(1,Math.sin(c.lat*k)*Math.sin(a.lat*k)+Math.cos(c.lat*k)*Math.cos(a.lat*k)*Math.cos((c.lng-a.lng)*k)))/k;if(d<bd){bd=d;best=a;}}
+   if(best&&bd<=thr)hovAp=best;}}
+ document.body.classList.toggle('aphov',!!hovAp);
+ if(hovAp){atip.innerHTML='<b>'+esc(hovAp.name)+'</b>'+(hovAp.code?' · '+esc(hovAp.code):'')+'<br><span style="opacity:.75">click for 1990 vs 2025 imagery</span>';atip.style.left=(e.clientX+14)+'px';atip.style.top=(e.clientY+14)+'px';atip.style.display='block';el.style.cursor='pointer';}
+ else{atip.style.display='none';el.style.cursor='';}});
+el.addEventListener('mouseleave',()=>{atip.style.display='none';hovAp=null;document.body.classList.remove('aphov');});
 // globe.gl 2.46 drops the image URLs set during start-up; set them again once it has initialised
 const setImgs=()=>{if(!G.globeMaterial().map)G.globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png');};
 G.onGlobeReady(setImgs);setTimeout(setImgs,300);setTimeout(setImgs,2000);
