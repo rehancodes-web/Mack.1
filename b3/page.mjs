@@ -111,5 +111,6 @@ ul{margin:6px 0 0;padding-left:18px}
 </section>
 <p class="note">Code: b3/physics.mjs, b3/simulate.mjs in github.com/rehancodes-web/Mack.1. Figures labelled physics are computed from standard formulas; assumed inputs are listed in b3/outputs/b3_physics.json.</p>
 </main></body></html>`;
-fs.writeFileSync(path.join(DOCS, 'b3.html'), html);
-console.log('wrote docs/b3.html');
+// Removed from the public site (team decision): written to b3/outputs/ for reference only.
+fs.writeFileSync(path.join(OUT, 'b3.html'), html);
+console.log('wrote b3/outputs/b3.html (not published)');

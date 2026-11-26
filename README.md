@@ -40,7 +40,7 @@ The story is one GPS chain: **C detects where GPS is failing → A6 shows which 
 
 ## What is built
 
-- **Demo site:** the root page links to the A6 infrastructure demo and the B3 3D simulation. The B3 prototype is `docs/b3.html` and can be opened locally or served from Vercel.
+- **Demo site:** [rehancodes-web.github.io/Mack.1](https://rehancodes-web.github.io/Mack.1/) (GitHub Pages, from `docs/`): Overview, Jewar airport (A6), Globe & satellites (B3), GPS malfunction (C), Passenger impact.
 - **Results so far (derived, Sentinel-2):** land conversion at Jewar starts mid-2023 and peaks at about 56% in April 2025. In Jan 2025 it was about 51% against a reported "80% complete". This measures land conversion, not completion.
 - **Larper:** agrees with ESA WorldCover on about 71% of held-out pixels (built/paved recall 89%, bare 28%). WorldCover is itself a model, so this is agreement, not ground truth.
 
