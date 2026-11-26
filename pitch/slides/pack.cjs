@@ -27,4 +27,5 @@ files.forEach((f, i) => {
   }
   if (notes[i]) s.addNotes(notes[i]);
 });
-pres.writeFile({ fileName: path.join(__dirname, '..', SHORT ? 'FlyWithEase_5min.pptx' : 'FlyWithEase_Pitch.pptx') }).then(f => console.log('wrote', f, files.length, 'slides'));
+const OUTARG = process.argv.find(a => a.startsWith('--out='));
+pres.writeFile({ fileName: OUTARG ? OUTARG.slice(6) : path.join(__dirname, '..', SHORT ? 'FlyWithEase_5min.pptx' : 'FlyWithEase_Pitch.pptx') }).then(f => console.log('wrote', f, files.length, 'slides'));
