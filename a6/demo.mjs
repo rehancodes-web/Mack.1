@@ -242,8 +242,8 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="panel" aria-labelledby="h-view">
   <h2 id="h-view">Site imagery<span class="tools"><span class="seg" role="group" aria-label="Layer">${HIRES.length ? '<button id="lyHi" aria-pressed="false">High-res photo</button>' : ''}<button id="lyPhoto" aria-pressed="true">Sentinel-2</button><button id="lyLarper" aria-pressed="false"${MAPS.length ? '' : ' disabled title="Available when Larper finishes"'}>Larper layer</button></span></span></h2>
   <div class="viewer" id="viewer" style="--pos:50%">
-   <img id="imgB" src="quicklook_${lastShot}.png" alt="Site, ${monthName(lastShot)}">
-   <div class="clip"><img id="imgA" src="quicklook_${firstShot}.png" alt="Site, ${monthName(firstShot)}"></div>
+   <img id="imgB" fetchpriority="high" decoding="async" src="${HIRES.length ? `hires_${HIRES[HIRES.length - 1][1]}.jpg` : `quicklook_${lastShot}.png`}" alt="Site, ${monthName(lastShot)}">
+   <div class="clip"><img id="imgA" fetchpriority="high" decoding="async" src="${HIRES.length ? `hires_${HIRES[0][1]}.jpg` : `quicklook_${firstShot}.png`}" alt="Site, ${monthName(firstShot)}"></div>
    <div class="handle" aria-hidden="true"></div>
    <span class="tag l" id="tagA">${monthName(firstShot)}</span><span class="tag r" id="tagB">${monthName(lastShot)}</span>
    <input type="range" id="swipeR" min="0" max="100" value="50" aria-label="Drag to compare the two dates">

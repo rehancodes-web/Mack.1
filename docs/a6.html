@@ -139,8 +139,8 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <section class="panel" aria-labelledby="h-view">
   <h2 id="h-view">Site imagery<span class="tools"><span class="seg" role="group" aria-label="Layer"><button id="lyHi" aria-pressed="false">High-res photo</button><button id="lyPhoto" aria-pressed="true">Sentinel-2</button><button id="lyLarper" aria-pressed="false">Larper layer</button></span></span></h2>
   <div class="viewer" id="viewer" style="--pos:50%">
-   <img id="imgB" src="quicklook_2026-03.png" alt="Site, Mar 2026">
-   <div class="clip"><img id="imgA" src="quicklook_2020-03.png" alt="Site, Mar 2020"></div>
+   <img id="imgB" fetchpriority="high" decoding="async" src="hires_2026-05-28.jpg" alt="Site, Mar 2026">
+   <div class="clip"><img id="imgA" fetchpriority="high" decoding="async" src="hires_2019-10-09.jpg" alt="Site, Mar 2020"></div>
    <div class="handle" aria-hidden="true"></div>
    <span class="tag l" id="tagA">Mar 2020</span><span class="tag r" id="tagB">Mar 2026</span>
    <input type="range" id="swipeR" min="0" max="100" value="50" aria-label="Drag to compare the two dates">
