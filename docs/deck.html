@@ -1,0 +1,305 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NavContinuity Pitch Deck</title><meta name="description" content="NavContinuity hackathon pitch, structured on the Mach-A-Thon marking scheme.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=B612:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+:root{--paper:#F6F5F1;--card:#FFFFFF;--line:#E3E0D8;--ink:#121418;--sub:#5B616C;--faint:#8B909A;--night:#0F1419;--night2:#1A222B;
+ --a6:#B8288F;--c:#0E7C86;--b3:#1E8A4C;--amber:#C26A0C;--red:#C0392B;--H:'Archivo',sans-serif;--B:'Source Sans 3',sans-serif;--N:'B612',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+.slide{position:relative;width:1280px;height:720px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--B);padding:86px 72px 54px}
+.slide.dark{background:var(--night);color:#EEF2F5}
+.run{position:absolute;left:72px;right:72px;top:30px;display:flex;justify-content:space-between;align-items:center;font-family:var(--H);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.run .rub{letter-spacing:.02em;text-transform:none;font-weight:600;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 12px}
+.dark .run .rub{background:var(--night2);border-color:#2A3540;color:#A9B4BE}
+.run .sec{color:var(--k,var(--sub))}
+h1,h2,h3{font-family:var(--H);font-variation-settings:'wdth' 100}
+.slide:not(.dark){display:flex;flex-direction:column;justify-content:center;padding:92px 72px 60px}
+h2{font-size:41px;line-height:1.08;font-weight:800;letter-spacing:-.015em;max-width:1100px}
+h2 .s{display:block;color:var(--sub);font-weight:600}
+h3{font-size:20px;font-weight:700;line-height:1.2}
+p,li{font-size:17px;line-height:1.42}
+.small{font-size:14.5px;color:var(--sub);line-height:1.4}
+.src{position:absolute;left:72px;right:72px;bottom:24px;font-size:11.5px;color:var(--faint)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.dark .card{background:var(--night2);border-color:#2A3540}
+.black{background:var(--night);color:#EEF2F5;border-radius:16px;padding:22px 26px}
+.num{font-family:var(--N);font-weight:700;line-height:1}
+.grid{display:grid;gap:16px}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:20px;padding:2px 9px;border:1.5px solid currentColor}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+table{width:100%;border-collapse:collapse}
+th{font-family:var(--H);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:left;padding:7px 10px;border-bottom:1.5px solid var(--line)}
+td{font-size:15.5px;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+.k-a6{--k:var(--a6)}.k-c{--k:var(--c)}.k-b3{--k:var(--b3)}.k-am{--k:var(--amber)}
+.kc{color:var(--k)}
+ol.steps{list-style:none;counter-reset:s;display:grid;gap:12px}
+ol.steps li{counter-increment:s;position:relative;padding-left:38px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--k,var(--ink));color:#fff;font-family:var(--N);font-weight:700;font-size:13px;display:grid;place-items:center}
+
+html,body{height:100%;margin:0;background:#0b0f13;overflow:hidden}
+.stage{position:fixed;inset:0;display:grid;place-items:center}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+.deck .slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .35s ease}
+.deck .slide.on{opacity:1;visibility:visible}
+@media (prefers-reduced-motion:reduce){.deck .slide{transition:none}}
+.bar{position:fixed;left:0;bottom:0;height:3px;background:#E46BC5;transition:width .3s}
+.ctl{position:fixed;right:14px;bottom:12px;display:flex;gap:6px;font:600 13px system-ui;color:#9AA6B0;align-items:center}
+.ctl button{background:#1A222B;color:#EEF2F5;border:1px solid #2A3540;border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
+.ctl button:focus-visible{outline:2px solid #F2A93B}
+.notes{position:fixed;left:14px;right:180px;bottom:12px;background:#1A222Bee;color:#EEF2F5;border:1px solid #2A3540;border-radius:8px;padding:10px 12px;font:15px/1.4 system-ui;display:none}
+.notes.on{display:block}
+</style></head><body>
+<main class="stage" aria-roledescription="carousel" aria-label="NavContinuity pitch deck"><div class="deck" id="deck"><section class="slide on dark" aria-label="Slide 1">
+ <img src="hires_2026-05-28.jpg" alt="" style="position:absolute;right:0;top:0;width:640px;height:720px;object-fit:cover;opacity:.85">
+ <div style="position:absolute;right:0;top:0;width:640px;height:720px;background:linear-gradient(90deg,#0F1419 0%,rgba(15,20,25,.35) 40%,rgba(15,20,25,.1))"></div>
+ <div style="position:absolute;right:250px;top:46px;font-family:var(--N);font-weight:700;font-size:15px;color:#F2A93B;border:2px solid #F2A93B;padding:5px 14px;border-radius:5px;background:#0F1419">GPS PRIMARY LOST</div>
+ <div class="run" style="color:#7E8A95"><span>Mach-A-Thon Aeromania '26 · Orbit to Economy: AI in Space</span><span></span><span>with Boeing</span></div>
+ <div style="position:absolute;left:72px;top:150px;width:600px">
+  <h1 style="font-size:84px;font-weight:800;letter-spacing:-.03em;line-height:.95;font-variation-settings:'wdth' 110">NavContinuity</h1>
+  <p style="font-size:26px;line-height:1.3;margin-top:22px;color:#C9D3DB;font-family:var(--H);font-weight:600">When GPS fails near an airport, flights divert. We make sure there is somewhere ready to go, and that no passenger is stranded.</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px">
+   <div style="border-top:3px solid #E46BC5;padding-top:10px"><div style="font-family:var(--H);font-weight:800;font-size:18px;color:#E46BC5">Track A6</div><div style="font-size:14.5px;margin-top:4px">Infrastructure from orbit</div><div style="font-size:12px;color:#7E8A95;margin-top:6px">Primary · 65 marks</div></div><div style="border-top:3px solid #3FC6D1;padding-top:10px"><div style="font-family:var(--H);font-weight:800;font-size:18px;color:#3FC6D1">Track C</div><div style="font-size:14.5px;margin-top:4px">GPS malfunction detection</div><div style="font-size:12px;color:#7E8A95;margin-top:6px">Additional · 25 marks</div></div><div style="border-top:3px solid #4CC38A;padding-top:10px"><div style="font-family:var(--H);font-weight:800;font-size:18px;color:#4CC38A">Track B3</div><div style="font-size:14.5px;margin-top:4px">Harder-to-jam positioning</div><div style="font-size:12px;color:#7E8A95;margin-top:6px">Long-term layer</div></div>
+  </div>
+ </div>
+ <div style="position:absolute;left:72px;bottom:34px;font-size:13px;color:#7E8A95">Live demo: rehancodes-web.github.io/Mack.1</div></section><section class="slide k-am" aria-label="Slide 2"><div class="run "><span class="sec">The problem</span><span class="rub">Track A · Problem understanding & economic impact · 20</span><span>NavContinuity&nbsp;&nbsp;02 / 16</span></div>
+ <h2>GPS fails over India every day.<span class="s">The flights divert. The passengers pay.</span></h2>
+ <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:26px">
+  <div class="card"><div class="num" style="font-size:44px;color:var(--amber)">2,354</div><p class="small" style="margin-top:10px">GPS interference incidents reported to Parliament, Nov 2023 – Dec 2025</p></div><div class="card"><div class="num" style="font-size:44px;color:var(--red)">623</div><p class="small" style="margin-top:10px">more in just Jan–Feb 2026: the rate is rising</p></div><div class="card"><div class="num" style="font-size:44px;color:var(--a6)">71%</div><p class="small" style="margin-top:10px">of India's 2025 incidents meant total loss of GPS on board</p></div><div class="card"><div class="num" style="font-size:44px;color:var(--c)">+500%</div><p class="small" style="margin-top:10px">GPS spoofing reports, 2024 vs 2023 (IATA)</p></div>
+ </div>
+ <div class="black" style="margin-top:20px;display:grid;grid-template-columns:1fr 1.6fr;gap:26px;align-items:center">
+  <div><div style="font-family:var(--H);font-weight:800;font-size:24px">Delhi, 2025</div><p style="color:#B8C2CB;margin-top:6px;font-size:15px">Approaches to IGI Runway 10 were spoofed. Crews switched to contingency procedures; DGCA introduced real-time spoofing reports.</p></div>
+  <ul style="list-style:none;display:grid;gap:9px">
+   <li style="font-size:15.5px;color:#E6ECF0"><span class="dot" style="background:#F2A93B"></span>Interference monitors know where GPS fails, but stop at the map.</li><li style="font-size:15.5px;color:#E6ECF0"><span class="dot" style="background:#F2A93B"></span>Airline ops pick a diversion airport without knowing whether it is built, ready, or in clean airspace.</li><li style="font-size:15.5px;color:#E6ECF0"><span class="dot" style="background:#F2A93B"></span>Passengers get "15 more minutes", missed connections and wrong-city hotels, because recovery starts after the fact.</li>
+  </ul>
+ </div>
+ <div class="src">Sources: Lok Sabha answer, 12 Mar 2026; ICAO Asia-Pacific paper, Jan 2026 (impact shares); IATA; Digital Sansad, 1 Dec 2025. All reported.</div></section><section class="slide k-am" aria-label="Slide 3"><div class="run "><span class="sec">Who it serves</span><span class="rub">Track A · Problem understanding & economic impact · 20</span><span>NavContinuity&nbsp;&nbsp;03 / 16</span></div>
+ <h2>Four users, four decisions, real money on each.</h2>
+ <table style="margin-top:22px">
+  <thead><tr><th style="width:19%">User</th><th style="width:27%">Decision they make</th><th style="width:28%">What it costs today</th><th>What NavContinuity gives them</th></tr></thead>
+  <tbody>
+   <tr><td><b>Airline operations</b></td><td>Where to divert when Delhi's GPS degrades</td><td>€1,000–77,200 per diverted flight; $98 per block minute</td><td>A diversion airport that is built, in clean GPS airspace, with rebooking started early</td></tr>
+   <tr><td><b>Infrastructure lenders</b></td><td>Release the next construction tranche, or inspect first</td><td>Paying against optimistic progress reports (Jewar: 80% claimed)</td><td>Independent progress from orbit: 51% seen. Inspect for $15k instead of risking $112k</td></tr>
+   <tr><td><b>Passengers</b></td><td>Wait, rebook, or find a hotel</td><td>Hours of uncertainty, missed connections, lost bags</td><td>Honest status, a confirmed seat, care at the right airport</td></tr>
+   <tr><td><b>DGCA / AAI</b></td><td>Which airports and regions need protection</td><td>2,977 incidents since Nov 2023 with no shared live picture</td><td>A map of where GPS fails and which airports can absorb traffic</td></tr>
+  </tbody>
+ </table>
+ <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:18px">
+  <div class="card"><div class="num" style="font-size:30px;color:var(--amber)">€77,200</div><p class="small">top-end cost of one intercontinental diversion</p></div>
+  <div class="card"><div class="num" style="font-size:30px;color:var(--a6)">$15k vs $112k</div><p class="small">inspection cost vs expected loss, Jewar case (assumed inputs)</p></div>
+  <div class="card"><div class="num" style="font-size:30px;color:var(--c)">₹0</div><p class="small">data cost: every satellite source we use is free and public</p></div>
+ </div>
+ <div class="src">EUROCONTROL diversion cost (2022 prices); Airlines for America 2025; Lok Sabha 2026; A6 economics use assumed probabilities and costs.</div></section><section class="slide k-a6" aria-label="Slide 4"><div class="run k-a6"><span class="sec">Track A6 · objective</span><span class="rub">Track A · Working demo & objective completion · 10</span><span>NavContinuity&nbsp;&nbsp;04 / 16</span></div>
+ <h2>Objective 6: monitor construction from orbit.<span class="s">We watched the airport Delhi would divert to.</span></h2>
+ <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:26px;margin-top:22px">
+  <div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;border-radius:12px;overflow:hidden;height:250px">
+    <div style="position:relative"><img src="hires_2019-10-09.jpg" style="width:100%;height:100%;object-fit:cover"><span class="pill" style="position:absolute;left:10px;bottom:10px;background:#fff;color:var(--ink);border-color:#fff">2019 · farmland</span></div>
+    <div style="position:relative"><img src="hires_2026-05-28.jpg" style="width:100%;height:100%;object-fit:cover"><span class="pill" style="position:absolute;left:10px;bottom:10px;background:#fff;color:var(--ink);border-color:#fff">2026 · runway + terminal</span></div>
+   </div>
+   <p class="small" style="margin-top:8px">Esri World Imagery Wayback (Maxar, Earthstar), ~2 m. Yellow: 1,333 ha airport boundary (OpenStreetMap).</p>
+  </div>
+  <div class="grid" style="gap:12px;align-content:start">
+   <div class="card"><h3 class="kc">Why Jewar</h3><p style="margin-top:6px">70 km from Delhi IGI, 1,333 ha greenfield site, phase 1 opened 28 Mar 2026. If Delhi's GPS fails, this is where flights go, so it must really be ready.</p></div>
+   <div class="card"><h3>The promise vs. the ground</h3>
+    <table style="margin-top:4px"><tbody>
+     <tr><td>Nov 2021</td><td>Foundation stone</td></tr><tr><td>Sep 2024</td><td>First opening target, missed</td></tr><tr><td>Jan 2025</td><td><b>"80% complete"</b></td></tr><tr><td>Mar 2026</td><td>Phase 1 inaugurated</td></tr>
+    </tbody></table></div>
+  </div>
+ </div></section><section class="slide k-c" aria-label="Slide 5"><div class="run k-c"><span class="sec">Technology · data</span><span class="rub">Track A · Technical depth, AI & satellite data · 20</span><span>NavContinuity&nbsp;&nbsp;05 / 16</span></div>
+ <h2>Seven real datasets, all free and public.</h2>
+ <table style="margin-top:18px">
+  <thead><tr><th style="width:24%">Dataset</th><th style="width:15%">Resolution</th><th style="width:13%">Volume</th><th>What it does for us</th></tr></thead>
+  <tbody>
+   <tr><td><b>Sentinel-2 L2A</b> · ESA Copernicus</td><td>10 m, 13 bands</td><td>79 monthly scenes</td><td>The measurement: land conversion and Larper's inputs, Jan 2020 – Nov 2026</td></tr>
+   <tr><td><b>ESA WorldCover 2021</b></td><td>10 m</td><td>19,068 labelled px</td><td>Training labels for Larper, taken only from land around the airport</td></tr>
+   <tr><td><b>Esri World Imagery Wayback</b></td><td>~2 m</td><td>13 dated versions</td><td>Human-readable before/after; a check on what Larper should see</td></tr>
+   <tr><td><b>OpenStreetMap</b></td><td>vector</td><td>1 polygon</td><td>The 1,333 ha airport boundary used for every measurement</td></tr>
+   <tr><td><b>ADS-B Exchange</b> (aircraft NIC)</td><td>1° cells</td><td>24,579 reports</td><td>Track C: where aircraft report degraded GPS</td></tr>
+   <tr><td><b>CelesTrak</b> orbital elements</td><td>per satellite</td><td>GPS, Galileo, NavIC, LEO</td><td>The 3D globe and Track B3 geometry</td></tr>
+   <tr><td><b>Landsat GLS</b> · NASA/USGS</td><td>30 m</td><td>1975–2010</td><td>Before images for every airport on the globe</td></tr>
+  </tbody>
+ </table>
+ <div class="card" style="margin-top:14px;display:flex;gap:18px;align-items:center"><b style="font-family:var(--H);white-space:nowrap">Real problems we fixed:</b><span class="small" style="font-size:14px">a +1,000 DN offset that differs between Sentinel-2 collections (checked against raw pixels) · an 8-month hole in one catalogue, filled from another · cloud masking per pixel, cloudy months reported as gaps, never zero.</span></div></section><section class="slide k-a6" aria-label="Slide 6"><div class="run k-a6"><span class="sec">Technology · AI</span><span class="rub">Track A · Technical depth, AI & satellite data · 20</span><span>NavContinuity&nbsp;&nbsp;06 / 16</span></div>
+ <h2>Larper: AI that labels every 10 m of the airport.</h2>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:20px">
+  <div>
+   <ol class="steps" style="--k:var(--a6)">
+    <li><b>Fetch</b> only the airport window from cloud-optimised Sentinel-2 files (no full-tile downloads)</li>
+    <li><b>Clean</b>: per-scene scale/offset, cloud and shadow mask from the scene classification layer</li>
+    <li><b>Features</b>: 6 bands + NDVI, NDBI, water index, bare-soil index = 10 per pixel</li>
+    <li><b>Classify</b>: Random Forest, 20 trees, depth 12, built / bare / vegetation / water</li>
+    <li><b>Measure</b>: 12-month median of converted land per month, against a transparent NDVI baseline</li>
+   </ol>
+   <div class="card" style="margin-top:14px"><b>Honest validation:</b> trained west of the airport, tested on a separate block of land to the east (10,483 train / 8,585 test pixels). The airport itself is never in training.</div>
+  </div>
+  <div>
+   <div style="background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden"><img src="classmap_2026-03.png" style="width:100%;display:block"></div>
+   <div style="display:flex;gap:16px;margin-top:8px;font-size:13px;color:var(--sub)"><span><span class="dot" style="background:#dc3c3c"></span>built / paved</span><span><span class="dot" style="background:#e6c878"></span>bare</span><span><span class="dot" style="background:#3c8c3c"></span>vegetation</span><span><span class="dot" style="background:#3c78dc"></span>water</span></div>
+   <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+    <div class="card"><div class="num kc" style="font-size:36px">71%</div><p class="small">agreement with WorldCover on unseen land</p></div>
+    <div class="card"><div class="num" style="font-size:36px">88%</div><p class="small">of built/paved pixels found (recall)</p></div>
+   </div>
+  </div>
+ </div></section><section class="slide k-a6" aria-label="Slide 7"><div class="run k-a6"><span class="sec">Track A6 · result</span><span class="rub">Track A · Working demo & objective completion · 10</span><span>NavContinuity&nbsp;&nbsp;07 / 16</span></div>
+ <h2>The builder said 80%. Orbit saw half.</h2>
+ <div style="display:grid;grid-template-columns:680px 1fr;gap:26px;margin-top:18px">
+  <div class="card" style="padding:16px 18px">
+   <svg width="640" height="320" viewBox="-44 -14 690 330">
+    <line x1="0" x2="620" y1="260" y2="260" stroke="#ECE9E2"/><text x="-8" y="264" font-size="12" fill="#8B909A" text-anchor="end" font-family="B612">0%</text><line x1="0" x2="620" y1="195" y2="195" stroke="#ECE9E2"/><text x="-8" y="199" font-size="12" fill="#8B909A" text-anchor="end" font-family="B612">25%</text><line x1="0" x2="620" y1="130" y2="130" stroke="#ECE9E2"/><text x="-8" y="134" font-size="12" fill="#8B909A" text-anchor="end" font-family="B612">50%</text><line x1="0" x2="620" y1="65" y2="65" stroke="#ECE9E2"/><text x="-8" y="69" font-size="12" fill="#8B909A" text-anchor="end" font-family="B612">75%</text><line x1="0" x2="620" y1="0" y2="0" stroke="#ECE9E2"/><text x="-8" y="4" font-size="12" fill="#8B909A" text-anchor="end" font-family="B612">100%</text>
+    <text x="3.395931142410016" y="282" font-size="12" fill="#8B909A" font-family="B612">2020</text><text x="92.17527386541471" y="282" font-size="12" fill="#8B909A" font-family="B612">2021</text><text x="180.71205007824724" y="282" font-size="12" fill="#8B909A" font-family="B612">2022</text><text x="269.2488262910798" y="282" font-size="12" fill="#8B909A" font-family="B612">2023</text><text x="357.78560250391234" y="282" font-size="12" fill="#8B909A" font-family="B612">2024</text><text x="446.5649452269171" y="282" font-size="12" fill="#8B909A" font-family="B612">2025</text><text x="535.1017214397497" y="282" font-size="12" fill="#8B909A" font-family="B612">2026</text>
+    <rect x="305.8763693270736" y="0" width="162.51956181533643" height="260" fill="#B8288F" opacity=".06"/>
+    <text x="311.8763693270736" y="16" font-size="12" fill="#B8288F" font-family="B612">construction visible</text>
+    <path d="M32.7,240.0 L40.3,241.0 L47.5,241.0 L55.1,241.0 L62.6,241.0 L69.9,251.4 L77.4,251.7 L84.7,251.7 L92.2,251.7 L99.7,251.9 L106.5,240.2 L114.0,240.0 L121.3,244.7 L128.8,246.5 L143.6,246.5 L151.1,246.5 L158.4,254.0 L165.9,254.8 L173.2,254.5 L180.7,254.5 L188.2,254.5 L195.0,254.3 L202.5,254.0 L209.8,254.0 L217.3,253.2 L224.6,253.2 L232.1,253.2 L239.7,253.2 L246.9,255.8 L254.5,253.2 L261.7,253.2 L269.2,253.5 L276.8,253.2 L283.6,248.6 L291.1,248.0 L298.4,248.0 L305.9,230.6 L313.2,230.6 L320.7,230.6 L328.2,230.6 L335.5,204.4 L343.0,201.5 L350.3,184.3 L357.8,184.1 L365.3,181.2 L372.3,175.0 L379.9,165.6 L387.1,165.1 L394.7,159.6 L409.5,159.6 L424.2,137.3 L431.8,140.1 L439.0,124.3 L446.6,126.6 L454.1,126.9 L460.9,119.3 L468.4,114.1 L475.7,116.0 L483.2,116.0 L505.5,116.0 L512.8,136.8 L520.3,134.7 L527.6,133.9 L535.1,133.1 L542.6,134.9 L549.4,134.2 L556.9,138.3 L564.2,138.3 L571.7,139.1 L579.0,139.1 L586.5,139.1 L594.0,139.1 L601.3,162.8 L608.8,173.4" fill="none" stroke="#0E7C86" stroke-width="2.5"/>
+    <path d="M32.7,247.0 L40.3,250.1 L47.5,250.1 L55.1,250.1 L62.6,250.1 L69.9,254.3 L77.4,253.0 L84.7,255.1 L92.2,254.5 L99.7,254.3 L106.5,253.5 L114.0,252.5 L121.3,251.4 L128.8,251.2 L143.6,251.2 L151.1,251.2 L158.4,250.4 L165.9,247.8 L173.2,240.2 L180.7,240.2 L188.2,229.3 L195.0,239.5 L202.5,244.1 L209.8,245.7 L217.3,242.8 L224.6,242.8 L232.1,242.8 L239.7,242.8 L246.9,241.8 L254.5,242.8 L261.7,249.1 L269.2,251.9 L276.8,253.0 L283.6,250.1 L291.1,236.1 L298.4,225.4 L305.9,214.0 L313.2,214.0 L320.7,214.0 L328.2,214.0 L335.5,207.0 L343.0,198.6 L350.3,192.4 L357.8,184.3 L365.3,177.3 L372.3,171.1 L379.9,162.0 L387.1,149.5 L394.7,138.1 L409.5,138.1 L424.2,134.7 L431.8,141.4 L439.0,147.2 L446.6,153.9 L454.1,151.6 L460.9,147.4 L468.4,148.5 L475.7,146.6 L483.2,143.8 L505.5,143.8 L512.8,142.5 L520.3,142.7 L527.6,147.7 L535.1,141.2 L542.6,143.0 L549.4,142.7 L556.9,142.5 L564.2,145.1 L571.7,149.5 L579.0,149.5 L586.5,149.5 L594.0,149.5 L601.3,150.8 L608.8,157.8" fill="none" stroke="#B8288F" stroke-width="3.5"/>
+    <line x1="446.5649452269171" x2="446.5649452269171" y1="52" y2="153.92000000000002" stroke="#C26A0C" stroke-width="2" stroke-dasharray="4 4"/>
+    <circle cx="446.5649452269171" cy="52" r="8" fill="#fff" stroke="#C26A0C" stroke-width="3"/>
+    <text x="432.5649452269171" y="57" font-size="13" fill="#C26A0C" text-anchor="end" font-family="B612" font-weight="700">80% claimed, Jan 2025</text>
+   </svg>
+   <div style="display:flex;gap:20px;font-size:13px;color:var(--sub)"><span><span class="dot" style="background:#B8288F"></span>Larper AI: converted land</span><span><span class="dot" style="background:#0E7C86"></span>NDVI baseline: cleared all year</span></div>
+  </div>
+  <div class="grid" style="gap:12px;align-content:start">
+   <div class="card"><div class="num" style="font-size:44px;color:var(--amber)">80%</div><p class="small">"work complete", builder, Jan 2025 · reported</p></div>
+   <div class="card" style="outline:2px solid var(--a6)"><div class="num kc" style="font-size:44px">41–51%</div><p class="small">land converted, Jan 2025 (Larper – baseline) · derived</p></div>
+   <table><tbody>
+    <tr><td>Conversion starts</td><td><b>Jun 2023</b></td></tr>
+    <tr><td>Peak</td><td><b>56% in Apr 2025</b></td></tr>
+    <tr><td>Built/paved, Mar 2026</td><td><b>21%</b></td></tr>
+   </tbody></table>
+  </div>
+ </div></section><section class="slide k-a6" aria-label="Slide 8"><div class="run k-a6"><span class="sec">Accuracy & reliability</span><span class="rub">Track A · Feasibility, accuracy & applicability · 15</span><span>NavContinuity&nbsp;&nbsp;08 / 16</span></div>
+ <h2>How we know the numbers hold up.</h2>
+ <div style="display:grid;grid-template-columns:1.05fr 1fr;gap:24px;margin-top:18px">
+  <div>
+   <table>
+    <thead><tr><th>Class</th><th>Test pixels</th><th>Recall</th><th>Precision</th><th>Read as</th></tr></thead>
+    <tbody><tr><td><b>vegetation</b></td><td>3,806</td><td>78%</td><td>88%</td><td class="small">reliable</td></tr><tr><td><b>built / paved</b></td><td>2,727</td><td>88%</td><td>61%</td><td class="small">finds construction; some over-calling</td></tr><tr><td><b>bare</b></td><td>1,708</td><td>31%</td><td>79%</td><td class="small">weak: few training examples</td></tr><tr><td><b>water</b></td><td>344</td><td>70%</td><td>39%</td><td class="small">small class, indicative</td></tr></tbody>
+   </table>
+   <div class="black" style="margin-top:16px;padding:16px 20px"><b style="font-family:var(--H)">Two independent methods agree.</b> <span style="color:#B8C2CB;font-size:15px">The Larper AI and a simple NDVI rule both show no change before mid-2023 and a peak in 2025, so the timeline does not depend on one model.</span></div>
+  </div>
+  <div class="grid" style="gap:12px;align-content:start">
+   <div class="card"><h3>Three checks on the AI</h3><ol class="steps" style="--k:var(--a6);margin-top:10px">
+    <li><b>Spatial holdout</b>: tested on land never used in training</li>
+    <li><b>Nemotron vision audit</b>: 4 Larper maps compared with the satellite photos (trust: medium)</li>
+    <li><b>Human spot-check</b>: blind labelling page; a single hazy 2021 scene was caught and smoothed out</li>
+   </ol></div>
+   <div class="card"><h3 style="color:var(--amber)">Limits we state</h3><p class="small" style="margin-top:6px;font-size:14px">Land conversion is not completion · WorldCover is itself a model (agreement, not ground truth) · 10 m pixels cannot see individual buildings · monsoon months are gaps.</p></div>
+  </div>
+ </div></section><section class="slide k-a6" aria-label="Slide 9"><div class="run k-a6"><span class="sec">From data to decision</span><span class="rub">Track A · Feasibility, accuracy & applicability · 15</span><span>NavContinuity&nbsp;&nbsp;09 / 16</span></div>
+ <h2>The satellite gap turns into a money decision.</h2>
+ <table style="margin-top:20px">
+  <thead><tr><th style="width:42%">Evidence</th><th>P(report optimistic)</th><th>Cost if release</th><th>Cost if inspect</th><th>Decision</th></tr></thead>
+  <tbody><tr><td>No satellite evidence (prior)</td><td>0.10</td><td>$30,000</td><td>$18,000</td><td><b style="color:var(--a6)">INSPECT</b></td></tr><tr style="background:#FBEFF8"><td><b>Satellite: 51% converted vs 80% reported (gap 29 pts)</b></td><td>0.38</td><td>$112,500</td><td>$26,250</td><td><b style="color:var(--a6)">INSPECT</b></td></tr><tr><td>Counterfactual: satellite agrees with report</td><td>0.03</td><td>$9,000</td><td>$15,900</td><td><b style="color:var(--b3)">RELEASE</b></td></tr></tbody>
+ </table>
+ <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:18px">
+  <div class="card"><div class="num" style="font-size:30px">0.056</div><p class="small">break-even probability: inspect whenever the chance of an optimistic report is above this</p></div>
+  <div class="card"><div class="num" style="font-size:30px;color:var(--a6)">29 pts</div><p class="small">gap between claim (80%) and orbit (51%) in Jan 2025</p></div>
+  <div class="card"><div class="num" style="font-size:30px;color:var(--b3)">Conditional</div><p class="small">Jewar as a diversion airport: built (orbit), but runway certification and ATC need airline confirmation</p></div>
+ </div>
+ <div class="src">Inputs assumed for illustration: $300k exposure, $15k inspection, 90% of optimistic reports caught. Interactive sliders on the live Jewar page.</div></section><section class="slide " aria-label="Slide 10"><div class="run "><span class="sec">Working demo</span><span class="rub">Track A · Working demo & objective completion · 10</span><span>NavContinuity&nbsp;&nbsp;10 / 16</span></div>
+ <h2>Everything here runs live.<span class="s">rehancodes-web.github.io/Mack.1</span></h2>
+ <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:22px;margin-top:16px">
+  <div style="border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 12px 30px rgba(18,20,24,.12)"><img src="shots/a6.png" style="width:100%;display:block"></div>
+  <div>
+   <ol class="steps" style="--k:var(--ink)">
+    <li><b>Jewar monitor</b>: drag 2019 vs 2026, switch to the Larper layer, read the progress curve</li>
+    <li><b>Move the sliders</b>: inspection cost and probability; watch the decision flip</li>
+    <li><b>GPS malfunction map</b>: 37 red zones, Jewar normal</li>
+    <li><b>3D globe</b>: real GPS, Galileo, NavIC and LEO satellites; click any of 4,155 airports</li>
+    <li><b>Passenger impact</b>: Nemotron's decisions on four real GPS failures</li>
+   </ol>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px"><img src="shots/c.png" style="width:100%;border-radius:8px;border:1px solid var(--line)"><img src="shots/index.png" style="width:100%;border-radius:8px;border:1px solid var(--line)"></div>
+  </div>
+ </div></section><section class="slide k-c" aria-label="Slide 11"><div class="run k-c"><span class="sec">Track C · additional</span><span class="rub">Track B/C · Technical depth & objective completion · 10</span><span>NavContinuity&nbsp;&nbsp;11 / 16</span></div>
+ <h2>Track C: a live map of where GPS is failing.</h2>
+ <div style="display:grid;grid-template-columns:430px 1fr;gap:26px;margin-top:18px">
+  <div style="border-radius:12px;overflow:hidden;height:410px"><img src="gnss_map.png" style="width:100%;height:100%;object-fit:cover;object-position:30% 30%"></div>
+  <div>
+   <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px">
+    <div class="card"><div class="num kc" style="font-size:30px">24,579</div><p class="small">aircraft reports, one day</p></div>
+    <div class="card"><div class="num" style="font-size:30px;color:var(--red)">37</div><p class="small">high-interference zones</p></div>
+    <div class="card"><div class="num" style="font-size:30px;color:var(--b3)">Normal</div><p class="small">Jewar region, 1,092 aircraft</p></div>
+   </div>
+   <table style="margin-top:14px"><thead><tr><th style="width:44%">Track C objective</th><th>How we meet it</th></tr></thead><tbody>
+    <tr><td>Detect GPS jamming / spoofing</td><td>Aircraft broadcast trust in their own position (NIC); low values in a 1° cell = degraded GPS. Altitude mismatches flag possible spoofing.</td></tr>
+    <tr><td>Protect critical infrastructure</td><td>Feeds the A6 decision: a diversion airport must sit in clean airspace</td></tr>
+    <tr><td>Protective use only</td><td>Areas only; no transmitter hunting, no targeting, no tracking of individual flights</td></tr>
+   </tbody></table>
+   <p class="small" style="margin-top:10px">Hotspots: India–Pakistan border and Myanmar. Limit: one day (1 Nov 2026, 72 snapshots); a pilot needs a continuous feed.</p>
+  </div>
+ </div></section><section class="slide k-a6" aria-label="Slide 12"><div class="run k-a6"><span class="sec">AI integration · NVIDIA Nemotron</span><span class="rub">Track A · Technical depth, AI · 20 · Track B/C · Innovation · 10</span><span>NavContinuity&nbsp;&nbsp;12 / 16</span></div>
+ <h2>Nemotron turns satellite numbers into decisions,<span class="s">and checks its own work.</span></h2>
+ <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:24px;margin-top:18px">
+  <table><thead><tr><th style="width:30%">Job</th><th style="width:26%">Model</th><th>What it does</th></tr></thead><tbody>
+   <tr><td><b>Vision audit</b></td><td class="small">super-vl-120b</td><td>Compares 4 Larper maps with satellite photos; flags over-called built land</td></tr>
+   <tr><td><b>Readiness brief</b></td><td class="small">lightning-30b</td><td>Fuses Track C + A6 into a diversion decision: Jewar <b>conditional</b></td></tr>
+   <tr><td><b>Fact-checker</b></td><td class="small">lightning-30b</td><td>Second pass checks the brief against the data: <b>pass with fixes</b>, 5 issues found</td></tr>
+   <tr><td><b>Ops decisions</b></td><td class="small">lightning-30b</td><td>Four real GPS failures: turnaround impact, options, fix</td></tr>
+   <tr><td><b>Analyst on site</b></td><td class="small">lightning-30b</td><td>Lender memos and "what changed here?" on any place</td></tr>
+  </tbody></table>
+  <div class="grid" style="gap:12px;align-content:start">
+   <div class="black" style="padding:18px 20px"><div class="small" style="color:#9AA6B0">Nemotron fact-checker, on the brief</div><p style="margin-top:6px;font-size:15px;color:#EEF2F5">"DATA does not mention GPS-denied operations or contingency procedures; this is an operational assumption."</p><p style="margin-top:8px;font-size:13.5px;color:#E46BC5">Fix: Remove reference to GPS-denied specifics not in DATA; treat as illustrative assumption.</p></div>
+   <div class="card"><h3>Guardrails</h3><p class="small" style="margin-top:6px;font-size:14px">Answers only from supplied data · structured JSON outputs · every number labelled reported, derived or assumed · human check on every case (we corrected Nemotron on Delhi: ILS was available).</p></div>
+  </div>
+ </div></section><section class="slide k-b3" aria-label="Slide 13"><div class="run k-b3"><span class="sec">Track B3 · long-term layer</span><span class="rub">Track B/C · Technical depth · 10</span><span>NavContinuity&nbsp;&nbsp;13 / 16</span></div>
+ <h2>Track B3: bring navigation closer and jamming weakens.</h2>
+ <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:22px">
+  <div class="card"><div class="num kc" style="font-size:40px">19 dB</div><p class="small">stronger: 1,000 km vs 20,200 km (inverse-square law) · physics</p></div>
+  <div class="card"><div class="num kc" style="font-size:40px">80×</div><p class="small">smaller area a 10 W jammer can deny (127 → 14 km radius)</p></div>
+  <div class="card"><div class="num" style="font-size:40px">50→8 m</div><p class="small">spoofed error with an AI cross-check of GPS + NavIC + LEO · simulation</p></div>
+  <div class="card"><div class="num" style="font-size:40px">1→92%</div><p class="small">spoofing detected: GPS alone vs three constellations</p></div>
+ </div>
+ <table style="margin-top:18px"><thead><tr><th>Constellation</th><th>Spoofing detected</th><th>False alarms</th><th>Clean error</th><th>Spoofed error after AI</th></tr></thead><tbody>
+  <tr><td><b>GPS only</b></td><td>1.2%</td><td>0.8%</td><td>6.1 m</td><td>81 m</td></tr><tr><td><b>GPS + NavIC</b></td><td>87.7%</td><td>1.0%</td><td>5.1 m</td><td>19 m</td></tr><tr><td><b>GPS + NavIC + LEO</b></td><td>92.4%</td><td>0.4%</td><td>3.8 m</td><td>8 m</td></tr>
+ </tbody></table>
+ <p class="small" style="margin-top:12px;font-size:14px">114 satellites at 1,000 km for ~4 in view · ~$445M to build, ~$82M a year (assumed inputs). Builds on India's NavIC. Not needed for the pilot.</p></section><section class="slide " aria-label="Slide 14"><div class="run "><span class="sec">Innovation & originality</span><span class="rub">Track B/C · Innovation & economic/strategic impact · 10</span><span>NavContinuity&nbsp;&nbsp;14 / 16</span></div>
+ <h2>Others solve parts of this.<span class="s">Nobody closes the loop.</span></h2>
+ <table style="margin-top:18px"><thead><tr><th style="width:44%">Who</th><th style="text-align:center">Detects GPS failure</th><th style="text-align:center">Verifies diversion airport</th><th style="text-align:center">Recovers passengers</th><th style="text-align:center">Connects all three</th></tr></thead>
+  <tbody><tr><td><b>Spire</b> <span class="small">· satellite RF interference detection</span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--b3)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td></tr><tr><td><b>Jeppesen</b> <span class="small">· interference awareness for pilots</span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;border:2.5px solid var(--amber)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td></tr><tr><td><b>Boeing GPS Event Monitor</b> <span class="small">· on-aircraft GPS event records</span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--b3)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td></tr><tr><td><b>SAT-JAM</b> <span class="small">· Sentinel orbit-level interference maps</span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--b3)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td></tr><tr><td><b>EO construction analytics</b> <span class="small">· satellite progress monitoring</span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;border:2.5px solid var(--amber)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td></tr><tr><td><b>Amadeus Passenger Recovery</b> <span class="small">· rebooking after disruption</span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--b3)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:2px;background:#C9C5BC;vertical-align:middle"></span></td></tr>
+  <tr style="background:#FBEFF8"><td><b style="color:var(--a6);font-family:var(--H);font-size:17px">NavContinuity</b></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--b3)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--b3)"></span></td><td style="text-align:center"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;border:2.5px solid var(--amber)"></span></td><td style="text-align:center"><span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--a6)"></span></td></tr></tbody></table>
+ <div class="black" style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+  <div><div style="font-family:var(--H);font-weight:800;color:#E46BC5;font-size:16px">Satellite-verified capacity</div><p style="color:#C3CCD4;font-size:14px;margin-top:4px">Nobody checks from orbit that the diversion airport is actually built.</p></div><div><div style="font-family:var(--H);font-weight:800;color:#E46BC5;font-size:16px">Interference + capacity in one decision</div><p style="color:#C3CCD4;font-size:14px;margin-top:4px">GPS health and airport readiness feed one Nemotron brief.</p></div><div><div style="font-family:var(--H);font-weight:800;color:#E46BC5;font-size:16px">Self-checking AI</div><p style="color:#C3CCD4;font-size:14px;margin-top:4px">A second Nemotron pass fact-checks every brief before a person sees it.</p></div>
+ </div>
+ <div class="src">Based on public product information, which may be incomplete. Passenger recovery is specified, not built.</div></section><section class="slide k-b3" aria-label="Slide 15"><div class="run k-b3"><span class="sec">Feasibility</span><span class="rub">Track A · Feasibility · 15 · Track B/C · Practical feasibility · 5</span><span>NavContinuity&nbsp;&nbsp;15 / 16</span></div>
+ <h2>Feasible today, with the constraints stated.</h2>
+ <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:20px">
+  <div class="card"><h3 style="color:var(--b3)">Runs today</h3><ul style="margin:8px 0 0 18px;display:grid;gap:5px;font-size:14.5px"><li>79-scene Sentinel-2 pipeline</li><li>Larper trained and tested</li><li>GPS map from real aircraft data</li><li>Nemotron two-pass briefs</li><li>Live site; ₹0 data cost; one laptop</li></ul></div>
+  <div class="card"><h3 style="color:var(--amber)">Assumptions</h3><ul style="margin:8px 0 0 18px;display:grid;gap:5px;font-size:14.5px"><li>Inspection $15k, exposure $300k, 90% catch rate</li><li>Land conversion tracks real progress</li><li>NIC drops mostly mean interference</li><li>B3 satellite cost $3M each</li></ul></div>
+  <div class="card"><h3 style="color:var(--red)">Constraints</h3><ul style="margin:8px 0 0 18px;display:grid;gap:5px;font-size:14.5px"><li>Sentinel-2 revisits every 5 days; clouds in monsoon</li><li>One day of ADS-B so far</li><li>Satellites can't confirm ATC or certification</li><li>Airline systems needed for rebooking</li></ul></div>
+ </div>
+ <table style="margin-top:16px"><thead><tr><th>Risk</th><th>Mitigation</th></tr></thead><tbody>
+  <tr><td>AI misreads bare soil (31% recall)</td><td>Decision uses the NDVI baseline too; Nemotron audit + human spot-check</td></tr>
+  <tr><td>AI gives a wrong operational answer</td><td>Second Nemotron pass fact-checks; a person approves every action</td></tr>
+  <tr><td>Data gaps</td><td>Gaps shown as gaps; "unknown" never reads as "safe"</td></tr>
+ </tbody></table></section><section class="slide dark" aria-label="Slide 16">
+ <div class="run" style="color:#7E8A95"><span>Roadmap</span><span></span><span>NavContinuity&nbsp;&nbsp;16 / 16</span></div>
+ <h2 style="font-size:46px;color:#EEF2F5;max-width:980px">GPS will keep failing.<span class="s" style="color:#9AA6B0">Passengers shouldn't pay for it.</span></h2>
+ <div style="position:relative;margin-top:44px">
+  <div style="position:absolute;left:0;right:0;top:14px;height:3px;background:linear-gradient(90deg,#4CC38A,#F2A93B 50%,#E46BC5)"></div>
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:22px;position:relative">
+   <div><div style="width:30px;height:30px;border-radius:50%;background:#0F1419;border:4px solid #4CC38A"></div><div style="font-family:var(--H);font-weight:800;font-size:22px;color:#4CC38A;margin-top:14px">Now</div><p style="color:#C3CCD4;font-size:15.5px;margin-top:6px">Working prototype: A6 on real data, Track C map, Nemotron briefs, live site</p></div><div><div style="width:30px;height:30px;border-radius:50%;background:#0F1419;border:4px solid #9BCB6A"></div><div style="font-family:var(--H);font-weight:800;font-size:22px;color:#9BCB6A;margin-top:14px">3 months</div><p style="color:#C3CCD4;font-size:15.5px;margin-top:6px">Shadow pilot with one airline at Delhi; daily GPS-integrity feed</p></div><div><div style="width:30px;height:30px;border-radius:50%;background:#0F1419;border:4px solid #F2A93B"></div><div style="font-family:var(--H);font-weight:800;font-size:22px;color:#F2A93B;margin-top:14px">6 months</div><p style="color:#C3CCD4;font-size:15.5px;margin-top:6px">More hubs; satellite GNSS data as a second source; passenger recovery flow</p></div><div><div style="width:30px;height:30px;border-radius:50%;background:#0F1419;border:4px solid #E46BC5"></div><div style="font-family:var(--H);font-weight:800;font-size:22px;color:#E46BC5;margin-top:14px">12 months</div><p style="color:#C3CCD4;font-size:15.5px;margin-top:6px">Regulator dashboard (DGCA, AAI); B3 low-orbit layer with partners</p></div>
+  </div>
+ </div>
+ <div style="margin-top:34px;font-family:var(--H);font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:#7E8A95">How the pilot is judged</div>
+ <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:14px;margin-top:10px">
+  <div class="card" style="padding:14px 16px"><div style="font-family:var(--H);font-weight:700;font-size:16px;color:#EEF2F5">Time to confirmed rebooking</div><p style="color:#9AA6B0;font-size:13.5px;margin-top:4px">per diverted passenger, vs today</p></div><div class="card" style="padding:14px 16px"><div style="font-family:var(--H);font-weight:700;font-size:16px;color:#EEF2F5">Diversions to ready airports</div><p style="color:#9AA6B0;font-size:13.5px;margin-top:4px">share sent to built, clean-airspace alternates</p></div><div class="card" style="padding:14px 16px"><div style="font-family:var(--H);font-weight:700;font-size:16px;color:#EEF2F5">Inspections avoided or justified</div><p style="color:#9AA6B0;font-size:13.5px;margin-top:4px">lender decisions backed by orbit</p></div><div class="card" style="padding:14px 16px"><div style="font-family:var(--H);font-weight:700;font-size:16px;color:#EEF2F5">AI answers passing fact-check</div><p style="color:#9AA6B0;font-size:13.5px;margin-top:4px">Nemotron two-pass, then human sign-off</p></div>
+ </div>
+ <div style="position:absolute;left:72px;right:72px;bottom:46px;display:flex;justify-content:space-between;align-items:end">
+  <div><div style="font-family:var(--H);font-weight:800;font-size:24px">rehancodes-web.github.io/Mack.1</div><p style="color:#9AA6B0;font-size:14px;margin-top:4px">Overview · Jewar (A6) · GPS map (C) · Globe (B3) · Tech · AI · Feasibility · Passengers</p></div>
+  <div style="color:#7E8A95;font-size:12.5px;text-align:right;max-width:420px">Every number is labelled reported, derived, simulated or assumed. Code: github.com/rehancodes-web/Mack.1</div>
+ </div></section></div></main>
+<div class="bar" id="bar"></div><div class="notes" id="notes" aria-live="polite"></div>
+<nav class="ctl" aria-label="Deck controls"><button id="prev" aria-label="Previous slide">‹</button><span id="idx">1 / 16</span><button id="next" aria-label="Next slide">›</button><button id="nb" aria-pressed="false">Notes</button><a href="index.html" style="color:#9AA6B0;margin-left:6px">Site</a></nav>
+<script>
+(function(){
+ const NOTES=["0:00–0:15. GPS jamming hits Indian airspace daily. NavContinuity finds where GPS is failing, confirms from orbit which airport can take the diverted flights, hardens positioning and protects passengers. Primary Track A6, additional Track C, with B3 as the long-term layer.","0:15–0:35. The problem, with sources. GPS interference is routine over India; most incidents mean total loss of GPS. Delhi was spoofed in 2025. Today the warning, the diversion and the passenger recovery are disconnected, so everyone loses.","0:35–0:55. Intended users and economic value. Four users, each with a decision and a cost. Airlines pay for diversions, lenders for infrastructure risk, regulators for national resilience.","0:55–1:10. Track A objective 6: monitor construction and asset progress from orbit. We chose Noida International Airport at Jewar: 70 km from Delhi, the obvious diversion airport, and a project whose opening was promised three times.","1:10–1:25. Technical depth: appropriate satellite data. Seven sources, all free. Sentinel-2 is the measurement; WorldCover trains the AI; Wayback is for the eye; ADS-B powers Track C; CelesTrak the globe. We fixed real data problems along the way.","1:25–1:45. AI approach and implementation. Larper is a Random Forest labelling every 10 m pixel into built, bare, vegetation or water. Trained on WorldCover around the airport, tested on a separate block of land. Five-step pipeline, all in Node.js.","1:45–2:15. The result. Both the AI and the baseline agree: nothing happens until mid-2023, peak in spring 2025. In January 2025 the builder claimed 80%; orbit saw 41 to 51 percent of the land converted. That gap is exactly when a lender should look.","2:15–2:35. Feasibility, accuracy and applicability. We report every class, including the weak one. Two independent methods agree on the timeline. Nemotron audits Larper maps against photos, and a human blind spot-check page exists. Limits are stated.","2:35–2:50. Applicability: the numbers drive a decision. Without satellite data a lender inspects blind; if orbit agreed they could skip a $15k visit; here a 29-point gap makes inspection clearly worth it. The decision flips at a known break-even.","2:50–3:05. Working demo: everything shown is live on the site. If time allows, open the Jewar page and drag the before/after slider.","3:05–3:30. Additional track C, GNSS resilience. Objectives covered: detect jamming and spoofing, protect critical infrastructure, protective use only. Real aircraft data, rated per cell, linked directly to the A6 diversion decision.","3:30–3:55. Where NVIDIA Nemotron sits in the system: five jobs, two models. Most important: the two-pass readiness brief, where one Nemotron call writes the decision and a second fact-checks it against the data. AI proposes, the data and people decide.","3:55–4:05. Track B3 as the long-term layer, briefly: physics, simulation, cost. Shown on the 3D globe.","4:05–4:20. Innovation and originality. Detection exists, rebooking exists, construction analytics exist. Nobody links GPS failure to verified diversion capacity to passenger recovery. That link is our contribution.","4:20–4:40. Practical feasibility: what runs today, what a pilot needs, assumptions and constraints stated plainly. No new satellites needed for the pilot.","4:40–5:00. Roadmap and close. Now a working prototype; three months a shadow-mode pilot with one airline at Delhi; six months more hubs and a continuous GPS feed; twelve months a regulator dashboard and the B3 layer with partners. Thank the judges."];
+ const deck=document.getElementById('deck'),S=[...deck.querySelectorAll('.slide')],bar=document.getElementById('bar'),idx=document.getElementById('idx'),nt=document.getElementById('notes'),nb=document.getElementById('nb');
+ let i=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
+ function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);deck.style.transform='scale('+s+')';}
+ function go(n){S[i].classList.remove('on');i=Math.max(0,Math.min(S.length-1,n));S[i].classList.add('on');idx.textContent=(i+1)+' / '+S.length;bar.style.width=((i+1)/S.length*100)+'%';nt.textContent=NOTES[i];history.replaceState(null,'','#'+(i+1));}
+ addEventListener('resize',fit);fit();go(i);
+ addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(i+1)}else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(i-1)}else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);else if(e.key==='n'){nb.click()}});
+ let lock=0;addEventListener('wheel',e=>{if(Date.now()-lock<600)return;lock=Date.now();go(i+(e.deltaY>0?1:-1));},{passive:true});
+ let x0=null;addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});addEventListener('touchend',e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)go(i+(d<0?1:-1));x0=null;});
+ document.getElementById('prev').onclick=()=>go(i-1);document.getElementById('next').onclick=()=>go(i+1);
+ nb.onclick=()=>{const on=nt.classList.toggle('on');nb.setAttribute('aria-pressed',on);};
+})();
+</script></body></html>

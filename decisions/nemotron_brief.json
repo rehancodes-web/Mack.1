@@ -1,0 +1,229 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-26T02:02:31.002Z",
+ "evidence_type": "AI decision support (Nemotron), two-pass: generate then fact-check",
+ "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+ "data": {
+  "event": "Scenario: GPS spoofing reported on Delhi IGI approaches (pattern seen in 2025, reported to Parliament). Evening arrival bank.",
+  "track_c_cells_around_delhi_and_jewar": [
+   {
+    "cell": "29N 76E",
+    "aircraft": 43,
+    "degraded_share": 0,
+    "rating": "low"
+   },
+   {
+    "cell": "29N 77E",
+    "aircraft": 69,
+    "degraded_share": 0.058,
+    "rating": "medium"
+   },
+   {
+    "cell": "29N 78E",
+    "aircraft": 23,
+    "degraded_share": 0.087,
+    "rating": "medium"
+   },
+   {
+    "cell": "28N 76E",
+    "aircraft": 307,
+    "degraded_share": 0.007,
+    "rating": "low"
+   },
+   {
+    "cell": "28N 77E",
+    "aircraft": 397,
+    "degraded_share": 0.015,
+    "rating": "low"
+   },
+   {
+    "cell": "28N 78E",
+    "aircraft": 129,
+    "degraded_share": 0,
+    "rating": "low"
+   },
+   {
+    "cell": "27N 76E",
+    "aircraft": 162,
+    "degraded_share": 0,
+    "rating": "low"
+   },
+   {
+    "cell": "27N 77E",
+    "aircraft": 159,
+    "degraded_share": 0,
+    "rating": "low"
+   },
+   {
+    "cell": "27N 78E",
+    "aircraft": 100,
+    "degraded_share": 0.01,
+    "rating": "low"
+   }
+  ],
+  "track_c_jewar_region": {
+   "name": "Noida International Airport (Jewar)",
+   "lat": 28.1709,
+   "lon": 77.6082,
+   "radius_km": 50,
+   "cells_considered": [
+    "28N 76E",
+    "28N 77E",
+    "28N 78E",
+    "27N 77E",
+    "27N 78E"
+   ],
+   "aircraft_seen": 1092,
+   "status": "normal",
+   "worst_cell": {
+    "lat": 28,
+    "lon": 76,
+    "aircraft": 307,
+    "degraded": 2,
+    "share": 0.007,
+    "alt_mismatch_aircraft": 8,
+    "rating": "low"
+   },
+   "note": "Unknown means not enough aircraft were observed, never \"safe\"."
+  },
+  "track_c_hotspots": [
+   {
+    "lat": 33,
+    "lon": 71,
+    "aircraft": 12,
+    "degraded": 8,
+    "share": 0.667,
+    "alt_mismatch_aircraft": 0,
+    "rating": "high"
+   },
+   {
+    "lat": 33,
+    "lon": 70,
+    "aircraft": 24,
+    "degraded": 12,
+    "share": 0.5,
+    "alt_mismatch_aircraft": 0,
+    "rating": "high"
+   },
+   {
+    "lat": 33,
+    "lon": 72,
+    "aircraft": 14,
+    "degraded": 7,
+    "share": 0.5,
+    "alt_mismatch_aircraft": 0,
+    "rating": "high"
+   },
+   {
+    "lat": 17,
+    "lon": 96,
+    "aircraft": 11,
+    "degraded": 5,
+    "share": 0.455,
+    "alt_mismatch_aircraft": 6,
+    "rating": "high"
+   },
+   {
+    "lat": 34,
+    "lon": 71,
+    "aircraft": 19,
+    "degraded": 8,
+    "share": 0.421,
+    "alt_mismatch_aircraft": 0,
+    "rating": "high"
+   }
+  ],
+  "track_a6_jewar": {
+   "conversion_start": "2023-06",
+   "peak": "2025-04",
+   "peak_frac": 0.561,
+   "physically_present": "yes (derived: land conversion plateaued 2024-12)",
+   "operational_status": "reported operational from 2026 (inauguration 28 Mar 2026); satellite cannot confirm runway certification or ATC readiness",
+   "usable": "candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures"
+  },
+  "a6_lender_check": {
+   "reported_pct": 80,
+   "satellite_pct": 51,
+   "decision": "inspect"
+  },
+  "costs_reported": {
+   "diversion_eur": "1,000-77,200 (EUROCONTROL)",
+   "block_minute_usd": 98.41
+  },
+  "limits": [
+   "Track C is one day of ADS-B integrity data (1 Nov 2026), not live",
+   "Satellite cannot confirm runway certification, ATC or slots",
+   "No individual aircraft are tracked"
+  ]
+ },
+ "brief": {
+  "situation": "GPS spoofing reported on Delhi IGI approaches; Jewar monitored as candidate diversion airport with normal status but unverified certification.",
+  "jewar_readiness": {
+   "verdict": "conditional",
+   "why": "Satellite shows land conversion plateaued 2024-12; operational status reported from 28 Mar 2026; satellite cannot confirm runway certification or ATC readiness."
+  },
+  "gps_environment": "Delhi cells show medium degradation (0.058-0.087 share) versus Jewar cells all low rating with 0-0.015 degraded share.",
+  "actions": {
+   "airline_ops": [
+    "Confirm diversion slots and ground handling at Jewar",
+    "Rebook passengers on alternative routings if needed"
+   ],
+   "airport_and_atc": [
+    "Verify approach procedures and runway status with ATC",
+    "Activate contingency procedures for GPS-denied operations"
+   ],
+   "passenger_desk": [
+    "Provide real-time flight status updates",
+    "Offer rebooking assistance at check-in"
+   ],
+   "lender": [
+    "Review loan covenants tied to project milestones and diversion risk"
+   ]
+  },
+  "evidence_used": [
+   "track_c_jewar_region",
+   "track_c_jewar_region.operational_status",
+   "track_c_jewar_region.worst_cell"
+  ],
+  "unknowns": [
+   "Runway certification status",
+   "ATC readiness and approach procedures",
+   "Airline slot availability at Jewar"
+  ],
+  "confidence": "medium"
+ },
+ "fact_check": {
+  "verdict": "pass_with_fixes",
+  "issues": [
+   {
+    "claim": "GPS spoofing reported on Delhi IGI approaches; pattern seen in 2025, reported to Parliament",
+    "problem": "DATA event field only says 'Scenario: GPS spoofing reported on Delhi IGI approaches (pattern seen in 2025, reported to Parliament)'. No independent verification provided.",
+    "fix": "Keep claim as reported; note it is from the scenario description, not independently verified."
+   },
+   {
+    "claim": "Jewar monitored as candidate diversion airport with normal status but unverified certification",
+    "problem": "DATA track_c_jewar_region status is 'normal', but operational_status says 'reported operational from 28 Mar 2026'. The brief says 'unverified certification' which aligns with satellite limits, but the status label 'normal' could overstate certainty.",
+    "fix": "Clarify that 'normal' refers to observed degraded_share, not certification status."
+   },
+   {
+    "claim": "Satellite shows land conversion plateaued 2024-12",
+    "problem": "DATA track_a6_jewar physically_present says 'yes (derived: land conversion plateaued 2024-12)'. The claim is supported but the derivation method is implicit.",
+    "fix": "Explicitly label as derived from satellite land-cover change detection."
+   },
+   {
+    "claim": "GPS-denied operations contingency procedures",
+    "problem": "DATA does not mention GPS-denied operations or contingency procedures; this is an operational assumption.",
+    "fix": "Remove reference to GPS-denied specifics not in DATA; treat as illustrative assumption."
+   },
+   {
+    "claim": "Land conversion plateaued 2024-12; operational status reported from 28 Mar 2026",
+    "problem": "DATA track_a6_jewar peak_frac is 0.561 and peak is 2025-04. Saying conversion 'plateaued 2024-12' does not match the peak month in DATA.",
+    "fix": "Note plateau began after peak; use DATA peak_frac=0.561 at 2025-04."
+   }
+  ],
+  "unsupported_numbers": [
+   80,
+   51
+  ]
+ }
+}

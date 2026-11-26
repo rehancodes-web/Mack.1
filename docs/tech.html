@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Technology</title><meta name="description" content="Data, pipeline and the Larper model behind NavContinuity.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23e05fd0' stroke-width='2.4'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23f2a93b'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="site.css">
+<style>.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.box{background:var(--panel-2);border:1px solid var(--rule);border-radius:var(--r-m);padding:18px 20px}.box h3{margin-bottom:8px}.box ul{margin:0;padding-left:18px}.box li{margin:5px 0}.quote{border-left:3px solid var(--route);padding:8px 14px;background:var(--panel-2);border-radius:0 var(--r-m) var(--r-m) 0;margin:10px 0;font-size:15.5px}.tag{font-family:var(--head);font-size:12px;color:var(--dim)}@media(max-width:860px){.grid3,.grid2{grid-template-columns:1fr}}</style>
+</head><body>
+<header class="top"><div class="wrap"><a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>NavContinuity</a>
+<nav class="mods" aria-label="Sections">
+  <a href="index.html">Overview</a>
+  <a href="a6.html">Jewar <small>A6</small></a>
+  <a href="c.html">GPS map <small>C</small></a>
+  <a href="globe.html">Globe <small>B3</small></a>
+  <a href="passengers.html">Passengers</a>
+  <a href="tech.html" aria-current="page">Tech</a>
+  <a href="ai.html">AI</a>
+  <a href="feasibility.html">Feasibility</a>
+  <a href="scorecard.html">Scorecard</a>
+  <a href="deck.html">Deck</a></nav></div></header>
+<main class="page">
+<h1>Technology</h1>
+<p class="lead">Seven free satellite and aviation datasets, a Node.js pipeline that reads only the pixels it needs, and Larper, a Random Forest that labels every 10 m of the airport. Rubric: <b>Track A · Technical depth, AI &amp; satellite data (20)</b>.</p>
+
+<h2>Data</h2>
+<table><thead><tr><th>Dataset</th><th>Resolution</th><th>Volume</th><th>Role</th></tr></thead><tbody>
+<tr><td><b>Sentinel-2 L2A</b> (ESA Copernicus, via Element 84 Earth Search)</td><td>10 m</td><td>79 monthly scenes, Jan 2020 – Nov 2026</td><td>The measurement; Larper's inputs</td></tr>
+<tr><td><b>ESA WorldCover 2021</b></td><td>10 m</td><td>19,068 labelled pixels</td><td>Training labels, only from land around the airport</td></tr>
+<tr><td><b>Esri World Imagery Wayback</b> (Maxar, Earthstar)</td><td>~2 m</td><td>13 dated versions over Jewar</td><td>Human-readable before/after; visual check</td></tr>
+<tr><td><b>OpenStreetMap</b></td><td>vector</td><td>1 polygon, 1,333 ha</td><td>Airport boundary for every measurement</td></tr>
+<tr><td><b>ADS-B Exchange</b> (aircraft NIC)</td><td>1° cells</td><td>24,579 reports, 72 snapshots</td><td>Track C GPS malfunction map</td></tr>
+<tr><td><b>CelesTrak</b> orbital elements</td><td>per satellite</td><td>GPS, Galileo, NavIC, Iridium, Xona</td><td>3D globe, Track B3 geometry</td></tr>
+<tr><td><b>Landsat GLS</b> (NASA/USGS)</td><td>30 m</td><td>1975–2010</td><td>Historic before images on the globe</td></tr>
+</tbody></table>
+
+<h2>Pipeline</h2>
+<ol class="plan">
+<li><span class="leg">1</span><span class="what c-data">Fetch</span><span>Read only the airport window from cloud-optimised GeoTIFFs; per-month scene manifest with direct band URLs.</span><span class="trk c-dim">data/build_manifest.js</span></li>
+<li><span class="leg">2</span><span class="what c-data">Clean</span><span>Per-scene scale and offset (checked against raw pixel values), cloud and shadow masking from the scene classification layer; cloudy months become gaps.</span><span class="trk c-dim">a6/progress.mjs</span></li>
+<li><span class="leg">3</span><span class="what c-route">Features</span><span>6 bands + NDVI, NDBI, water index, bare-soil index: 10 features per 10 m pixel.</span><span class="trk c-dim">a6/classify.mjs</span></li>
+<li><span class="leg">4</span><span class="what c-route">Classify</span><span>Larper Random Forest: built/paved, bare, vegetation, water, every month.</span><span class="trk c-dim">a6/classify.mjs</span></li>
+<li><span class="leg">5</span><span class="what c-normal">Decide</span><span>12-month median of converted land vs reported milestones → release-or-inspect decision; Nemotron brief.</span><span class="trk c-dim">a6/economics.mjs</span></li>
+</ol>
+
+<h2>Larper model card</h2>
+<div class="grid2">
+<div class="box"><h3>Set-up</h3><ul>
+<li>Random Forest, 20 trees, max depth 12, 70% features per split</li>
+<li>Labels: ESA WorldCover 10m 2021 v200 (tile N27E075)</li>
+<li>Training scenes: 2021-02, 2021-04, 2021-11 (three seasons, same year as labels)</li>
+<li>Split: spatial: train west of footprint centre line, test east; footprint and 300 m buffer excluded</li>
+<li>10,483 training pixels, 8,585 test pixels</li>
+</ul></div>
+<div class="box"><h3>Results on unseen land</h3>
+<table><thead><tr><th>Class</th><th>Pixels</th><th>Recall</th><th>Precision</th></tr></thead><tbody>
+<tr><td>vegetation</td><td>3,806</td><td>78%</td><td>88%</td></tr><tr><td>built / paved</td><td>2,727</td><td>88%</td><td>61%</td></tr><tr><td>bare</td><td>1,708</td><td>31%</td><td>79%</td></tr><tr><td>water</td><td>344</td><td>70%</td><td>39%</td></tr>
+</tbody></table><p class="note">Overall agreement with WorldCover: <b>71%</b>. WorldCover is itself a model product (~75-80% global accuracy); this measures agreement with it, not ground truth</p></div>
+</div>
+
+<h2>Stack and engineering</h2>
+<div class="grid3">
+<div class="box"><h3>Stack</h3><ul><li>Node.js only (geotiff.js, proj4, ml-random-forest, pngjs)</li><li>Static site on GitHub Pages</li><li>NVIDIA Nemotron via API (key server-side only)</li></ul></div>
+<div class="box"><h3>Problems solved</h3><ul><li>+1,000 DN offset differs between collections</li><li>8-month catalogue hole, filled from a second catalogue</li><li>Large window reads throttled; bands read one at a time with retries</li></ul></div>
+<div class="box"><h3>Reproduce</h3><ul><li><code>node data/build_manifest.js</code></li><li><code>cd a6 && node progress.mjs && node classify.mjs</code></li><li><code>node economics.mjs && node demo.mjs && node publish.mjs</code></li></ul></div>
+</div></main><footer><div class="wrap">Mach-A-Thon Aeromania '26 · numbers generated from the repository outputs by site_pages.mjs · labels: reported, derived, simulated, assumed. Code: <a href="https://github.com/rehancodes-web/Mack.1">github.com/rehancodes-web/Mack.1</a></div></footer></body></html>

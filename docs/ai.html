@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI and Nemotron</title><meta name="description" content="Where NVIDIA Nemotron and the Larper model work inside NavContinuity, with real outputs.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23e05fd0' stroke-width='2.4'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23f2a93b'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="site.css">
+<style>.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.box{background:var(--panel-2);border:1px solid var(--rule);border-radius:var(--r-m);padding:18px 20px}.box h3{margin-bottom:8px}.box ul{margin:0;padding-left:18px}.box li{margin:5px 0}.quote{border-left:3px solid var(--route);padding:8px 14px;background:var(--panel-2);border-radius:0 var(--r-m) var(--r-m) 0;margin:10px 0;font-size:15.5px}.tag{font-family:var(--head);font-size:12px;color:var(--dim)}@media(max-width:860px){.grid3,.grid2{grid-template-columns:1fr}}</style>
+</head><body>
+<header class="top"><div class="wrap"><a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>NavContinuity</a>
+<nav class="mods" aria-label="Sections">
+  <a href="index.html">Overview</a>
+  <a href="a6.html">Jewar <small>A6</small></a>
+  <a href="c.html">GPS map <small>C</small></a>
+  <a href="globe.html">Globe <small>B3</small></a>
+  <a href="passengers.html">Passengers</a>
+  <a href="tech.html">Tech</a>
+  <a href="ai.html" aria-current="page">AI</a>
+  <a href="feasibility.html">Feasibility</a>
+  <a href="scorecard.html">Scorecard</a>
+  <a href="deck.html">Deck</a></nav></div></header>
+<main class="page">
+<h1>AI and NVIDIA Nemotron</h1>
+<p class="lead">Two kinds of AI: <b>Larper</b> measures the ground from satellite pixels; <b>NVIDIA Nemotron</b> reasons over those measurements and the GPS map to make decisions, then checks its own work. Every output on this page is real and saved in the repository.</p>
+
+<h2>Where AI sits in the system</h2>
+<table><thead><tr><th>Job</th><th>Model</th><th>Input</th><th>Output</th></tr></thead><tbody>
+<tr><td><b>Measure the airport</b></td><td>Larper (Random Forest)</td><td>79 Sentinel-2 scenes</td><td>Built / bare / vegetation / water per 10 m pixel, monthly</td></tr>
+<tr><td><b>Vision audit</b></td><td>nvidia/nemotron-3.5-super-vl-120b-a12b</td><td>Larper map + satellite photo, 4 months</td><td>What Larper got right and wrong, trust level</td></tr>
+<tr><td><b>Readiness brief</b></td><td>nvidia/nemotron-3.5-lightning-30b-a3b</td><td>Track C cells around Delhi and Jewar + A6 readiness</td><td>Diversion decision with actions per team</td></tr>
+<tr><td><b>Fact-checker</b></td><td>nvidia/nemotron-3.5-lightning-30b-a3b</td><td>The brief + the same data</td><td>Verdict, issues, fixes</td></tr>
+<tr><td><b>Ops decisions</b></td><td>nvidia/nemotron-3.5-lightning-30b-a3b</td><td>Four real GPS-failure cases</td><td>Turnaround impact, options, decision, fix (human-checked)</td></tr>
+<tr><td><b>Analyst on site</b></td><td>nvidia/nemotron-3.5-lightning-30b-a3b</td><td>Page evidence, sliders, images</td><td>Lender memos, "what changed here?"</td></tr>
+</tbody></table>
+
+<h2>Two-pass readiness brief: Delhi GPS spoofing scenario</h2>
+<div class="grid2">
+<div class="box"><span class="tag">Pass 1 · Nemotron writes the brief</span>
+<h3 style="margin-top:6px">Jewar: <span class="c-caution">conditional</span></h3>
+<p>Satellite shows land conversion plateaued 2024-12; operational status reported from 28 Mar 2026; satellite cannot confirm runway certification or ATC readiness.</p><p><b>GPS environment:</b> Delhi cells show medium degradation (0.058-0.087 share) versus Jewar cells all low rating with 0-0.015 degraded share.</p>
+<ul><li><b>airline ops:</b> Confirm diversion slots and ground handling at Jewar; Rebook passengers on alternative routings if needed</li><li><b>airport and atc:</b> Verify approach procedures and runway status with ATC; Activate contingency procedures for GPS-denied operations</li><li><b>passenger desk:</b> Provide real-time flight status updates; Offer rebooking assistance at check-in</li><li><b>lender:</b> Review loan covenants tied to project milestones and diversion risk</li></ul>
+<p class="note"><b>Unknowns it named:</b> Runway certification status · ATC readiness and approach procedures · Airline slot availability at Jewar · confidence medium</p></div>
+<div class="box"><span class="tag">Pass 2 · Nemotron fact-checks it against the data</span>
+<h3 style="margin-top:6px">Verdict: <span class="c-route">pass with fixes</span></h3>
+<div class="quote"><b>Claim:</b> GPS spoofing reported on Delhi IGI approaches; pattern seen in 2025, reported to Parliament<br><b>Problem:</b> DATA event field only says 'Scenario: GPS spoofing reported on Delhi IGI approaches (pattern seen in 2025, reported to Parliament)'. No independent verification provided.<br><span class="c-route"><b>Fix:</b> Keep claim as reported; note it is from the scenario description, not independently verified.</span></div><div class="quote"><b>Claim:</b> Jewar monitored as candidate diversion airport with normal status but unverified certification<br><b>Problem:</b> DATA track_c_jewar_region status is 'normal', but operational_status says 'reported operational from 28 Mar 2026'. The brief says 'unverified certification' which aligns with satellite limits, but the status label 'normal' could overstate certainty.<br><span class="c-route"><b>Fix:</b> Clarify that 'normal' refers to observed degraded_share, not certification status.</span></div><div class="quote"><b>Claim:</b> Satellite shows land conversion plateaued 2024-12<br><b>Problem:</b> DATA track_a6_jewar physically_present says 'yes (derived: land conversion plateaued 2024-12)'. The claim is supported but the derivation method is implicit.<br><span class="c-route"><b>Fix:</b> Explicitly label as derived from satellite land-cover change detection.</span></div><div class="quote"><b>Claim:</b> GPS-denied operations contingency procedures<br><b>Problem:</b> DATA does not mention GPS-denied operations or contingency procedures; this is an operational assumption.<br><span class="c-route"><b>Fix:</b> Remove reference to GPS-denied specifics not in DATA; treat as illustrative assumption.</span></div><div class="quote"><b>Claim:</b> Land conversion plateaued 2024-12; operational status reported from 28 Mar 2026<br><b>Problem:</b> DATA track_a6_jewar peak_frac is 0.561 and peak is 2025-04. Saying conversion 'plateaued 2024-12' does not match the peak month in DATA.<br><span class="c-route"><b>Fix:</b> Note plateau began after peak; use DATA peak_frac=0.561 at 2025-04.</span></div>
+</div></div>
+
+<h2>Vision audit of Larper</h2>
+<div class="grid2"><div class="box"><span class="tag">Mar 2020 · nvidia/nemotron-3.5-super-vl-120b-a12b</span><p style="white-space:pre-line;margin-top:6px">- Looks right: Larper’s green-dominated map matches the satellite photo’s mostly vegetated footprint; scattered red built/paved patches align with visible settlements and cleared strips.
+- Looks wrong: Larper marks large areas red that appear as green fields or bare earth in the photo; bare fraction (0.01) seems too low given visible bare patches; small blue water specks may be misclassified.
+- Trust level: medium — AI visual check; Larper’s built/paved precision is only 0.61 and bare recall 0.308 per context metrics.</p></div><div class="box"><span class="tag">May 2022 · nvidia/nemotron-3.5-super-vl-120b-a12b</span><p style="white-space:pre-line;margin-top:6px">- Looks right: Larper's green-dominated map matches the satellite photo's mostly brown/tan agricultural interior; scattered red built/paved patches align with visible settlements and linear features near the footprint edges.
+- Looks wrong: Larper marks large interior areas as built/paved (red) that appear as bare fields in the photo; the map shows no water (blue) though some photo areas look like possible water bodies; Larper's bare fraction (0.089) seems low given the extensive exposed soil visible.
+- Trust level: medium — Larper captures the overall non-vegetated vs vegetated split but visibly over-classifies built/paved inside the footprint; per-class metrics show weak bare recall (0.308) and poor water precision (0.393). AI visual check.</p></div><div class="box"><span class="tag">Mar 2024 · nvidia/nemotron-3.5-super-vl-120b-a12b</span><p style="white-space:pre-line;margin-top:6px">- Looks right: runway/taxiway strip and terminal apron areas are red (built/paved); surrounding fields are green (vegetation); large cleared earthworks are sand/bare.
+- Looks wrong: Larper under-maps built/paved — many paved roads, taxiways and terminal pads inside the footprint appear sand/bare or vegetation in the class map; scattered blue water pixels inside the footprint are likely misclassified bare/built areas (reported water frac 0.002 is implausibly low given visible water bodies).
+- Trust level: medium — Larper’s reported built/paved precision is only 0.61 and bare recall 0.308 (reported metrics), so the map directionally matches the photo but misclassifies specific paved and water areas (AI visual check).</p></div><div class="box"><span class="tag">Mar 2026 · nvidia/nemotron-3.5-super-vl-120b-a12b</span><p style="white-space:pre-line;margin-top:6px">- Looks right: runway/taxiway strip and terminal apron appear red (built/paved); large green vegetated blocks match fields inside the footprint; blue patches align with visible water bodies.
+- Looks wrong: extensive tan bare earth inside the footprint is mapped green (vegetation) in places; some green field edges are mapped red (built/paved); scattered blue specks in built areas likely false water.
+- Trust level: medium — Larper captures major infrastructure and broad land cover, but bare vs. vegetation confusion and low water precision (0.393) reduce confidence; built/paved precision is only 0.61. AI visual check.</p></div></div>
+
+<h2>Guardrails</h2>
+<div class="grid3">
+<div class="box"><h3>Grounded</h3><p>Nemotron answers only from supplied data, in structured JSON, with named unknowns.</p></div>
+<div class="box"><h3>Self-checked</h3><p>A second Nemotron pass flags invented numbers and overstated certainty before a person sees the brief.</p></div>
+<div class="box"><h3>Human sign-off</h3><p>Every case is checked by the team; Nemotron was corrected on Delhi (ILS was available). See <a href="passengers.html">Passenger impact</a>.</p></div>
+</div></main><footer><div class="wrap">Mach-A-Thon Aeromania '26 · numbers generated from the repository outputs by site_pages.mjs · labels: reported, derived, simulated, assumed. Code: <a href="https://github.com/rehancodes-web/Mack.1">github.com/rehancodes-web/Mack.1</a></div></footer></body></html>
