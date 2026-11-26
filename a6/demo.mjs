@@ -31,6 +31,8 @@ if (ai.some(r => r.converted_12m != null)) ai.forEach(r => { r.converted_smooth 
 const preFloor = (() => { const w = ai.filter(r => r.month < '2023-01' && r.converted_smooth != null).map(r => r.converted_smooth).sort((a, b) => a - b); return w.length ? w[Math.floor(w.length / 2)] : null; })();
 const met = opt('classifier_metrics.json');
 const rev = opt('nemotron_review.json');
+// Saved Nemotron answers for the preset buttons: shown if the live analyst cannot be reached (e.g. on GitHub Pages)
+const SAVED = fs.existsSync(path.join(OUT, 'analyst_saved.json')) ? JSON.parse(fs.readFileSync(path.join(OUT, 'analyst_saved.json'), 'utf8')) : {};
 const AI_ENDPOINT = process.env.AI_ENDPOINT ?? 'https://mackathon-three.vercel.app/api/analyst';
 const P0 = DEFAULTS;
 
@@ -363,6 +365,7 @@ function upd(){const C=+c.value,P=+p.value,rel=P*L,ins=C+P*(1-e)*L,insp=ins<rel,
  vd.className='verdict '+(insp?'inspect':'release');vd.innerHTML='<b>'+(insp?'Inspect before paying':'Release the payment')+'</b><span>Expected cost: release '+fmt(rel)+', inspect '+fmt(ins)+'</span>';}
 c.oninput=p.oninput=upd;upd();
 
+const SAVED=${JSON.stringify(SAVED).replace(/</g, '\u003c')};
 const EP=${JSON.stringify(AI_ENDPOINT)},CTX=${JSON.stringify(CTX).replace(/</g, '\\u003c')};
 const feed=document.getElementById('feed');let visualCheck=null;
 const btns=()=>document.querySelectorAll('.chips button,.composer button');
@@ -373,8 +376,12 @@ async function ask(shown,question,images){
  add('me','',shown);const w=add('bot','Nemotron','Working on it…');btns().forEach(b=>b.disabled=true);
  const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},nemotron_live_visual_check:visualCheck};
  try{const res=await fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,context:ctx,images:images||[]})});const j=await res.json();
-  if(j.answer){fmtInto(w.lastChild,j.answer);return j.answer;}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
- catch(err){w.className='msg err';w.lastChild.textContent='The analyst is unreachable ('+err.message+'). The panels on the left are unaffected.';return null;}
+  if(j.answer){fmtInto(w.lastChild,j.answer);return j.answer;}if(SAVED[shown]){fmtInto(w.lastChild,SAVED[shown]+'
+
+(Saved Nemotron answer; live analyst offline.)');return SAVED[shown];}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
+ catch(err){if(SAVED[shown]){fmtInto(w.lastChild,SAVED[shown]+'
+
+(Saved Nemotron answer; live analyst offline.)');return SAVED[shown];}w.className='msg err';w.lastChild.textContent='The analyst is unreachable ('+err.message+'). The panels on the left are unaffected.';return null;}
  finally{btns().forEach(b=>b.disabled=false);feed.scrollTop=feed.scrollHeight;}}
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=async()=>{const q=b.dataset.q;
  if(q==='memo')return ask('Write lender memo','Write a short lender memo: release the next tranche on the contractor report, or commission an inspection first, using the current slider values. Headings: Evidence / Decision / Caveats.');
