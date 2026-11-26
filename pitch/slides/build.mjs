@@ -954,10 +954,11 @@ add({ so: "All imagery is from public satellites (ESA Sentinel-2 and NASA/USGS L
  ], 12.5)}</div>`) });
 
 // 46 APIS, LIBRARIES, BUILD
-add({ so: "No servers to buy: Node.js scripts turn the data into JSON files, a static site shows them, and one small serverless function talks to NVIDIA Nemotron.", notes: 'Tech reference: the APIs we call, the libraries, and how the project is built and deployed, end to end.', html: n => S(n, 'top', `${run('Technology · APIs + build', 'Track A · Technical depth, AI & satellite data · 20', n)}
+add({ so: "Larper is the model we trained: it measures the ground pixel by pixel. Nemotron is NVIDIA's model: it reads those measurements and reasons about the decision. Everything else is free data, small scripts and a static site.", notes: 'Tech reference: the APIs we call, the libraries, and how the project is built and deployed, end to end.', html: n => S(n, 'top', `${run('Technology · APIs + build', 'Track A · Technical depth, AI & satellite data · 20', n)}
  <h2>APIs, libraries and how it is built.</h2>
  <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:18px;margin-top:14px;align-items:start">
-  <div>${T([['API', '34%'], ['Used for']], [
+  <div>${T([['API / model', '34%'], ['Used for']], [
+    ['<span style="color:var(--acc)">Larper (our model, no API)</span>', `Trained by us: Random Forest, ${met.params.rf.nEstimators} trees, depth ${met.params.rf.treeOptions.maxDepth}, on ${fmt(met.n_train)} WorldCover-labelled Sentinel-2 pixels; labels every 10 m pixel. Runs locally in Node.js`],
     ['NVIDIA NIM API (integrate.api.nvidia.com)', `Nemotron: ${NB.model.replace('nvidia/', '')} (briefs, fact-check, decisions) and super-vl-120b (vision audit)`],
     ['Element 84 Earth Search (STAC)', 'Find every Sentinel-2 scene over Jewar; direct band URLs'],
     ['Microsoft Planetary Computer (STAC)', 'Second Sentinel-2 catalogue for an 8-month gap'],
@@ -968,9 +969,15 @@ add({ so: "No servers to buy: Node.js scripts turn the data into JSON files, a s
     ['Nominatim (OpenStreetMap)', 'Place search in the viewer'],
   ], 12.5)}</div>
   <div class="grid" style="gap:10px">
-   <div class="card" style="padding:12px 16px"><h3 style="font-size:16px">Libraries</h3><p style="font-size:13.5px;margin-top:4px;line-height:1.45"><b>Pipeline (Node.js):</b> geotiff.js (read COGs), proj4 (map projections), ml-random-forest (Larper), pngjs, jpeg-js<br><b>Site:</b> globe.gl + three.js (3D globe), satellite.js (orbits from TLEs), Leaflet (maps)<br><b>Deck:</b> pptxgenjs, headless Edge</p></div>
-   <div class="card" style="padding:12px 16px"><h3 style="font-size:16px">Build and deploy</h3>${li(['<b>1 · Fetch + process:</b> node scripts in data/, a6/, c/, b3/, decisions/ write JSON and CSV outputs', '<b>2 · Pages:</b> generators write static HTML into docs/', '<b>3 · Host:</b> GitHub Pages serves docs/ on every push to main', '<b>4 · AI:</b> one Vercel serverless function (/api/analyst) holds the NVIDIA key and calls Nemotron', '<b>5 · Deck:</b> build.mjs reads the same outputs → HTML → PNG → pptx'])}</div>
-   <div class="black" style="padding:10px 16px;font-size:13.5px;color:#DCE3E8"><b style="color:var(--mint)">Cost:</b> ₹0 data, free hosting, a few NVIDIA API calls per decision. No Python, no GPU, one laptop.</div>
+   <div class="card" style="padding:10px 14px"><h3 style="font-size:16px">Two AI models, two jobs</h3>
+    <table style="margin-top:4px"><thead><tr><th style="width:22%"></th><th>Larper (ours)</th><th>Nemotron (NVIDIA)</th></tr></thead><tbody>
+     <tr><td style="font-size:12.5px;padding:4px 6px"><b>Who made it</b></td><td style="font-size:12.5px;padding:4px 6px">We trained it in this hackathon</td><td style="font-size:12.5px;padding:4px 6px">NVIDIA, pre-trained; we only prompt it</td></tr>
+     <tr><td style="font-size:12.5px;padding:4px 6px"><b>Type</b></td><td style="font-size:12.5px;padding:4px 6px">Random Forest classifier (supervised)</td><td style="font-size:12.5px;padding:4px 6px">Large language + vision model</td></tr>
+     <tr><td style="font-size:12.5px;padding:4px 6px"><b>Input → output</b></td><td style="font-size:12.5px;padding:4px 6px">10 numbers per pixel → built / bare / vegetation / water</td><td style="font-size:12.5px;padding:4px 6px">Our measurements → written decision, fact-check, map audit</td></tr>
+     <tr><td style="font-size:12.5px;padding:4px 6px"><b>Job</b></td><td style="font-size:12.5px;padding:4px 6px"><b>Measures</b> the ground</td><td style="font-size:12.5px;padding:4px 6px"><b>Reasons</b> about what to do</td></tr>
+    </tbody></table>
+    <p style="font-size:12px;margin-top:4px;color:var(--sub)">Libraries: geotiff.js, proj4, ml-random-forest (Node.js) · globe.gl, three.js, satellite.js, Leaflet (site)</p></div>
+   <div class="card" style="padding:12px 16px"><h3 style="font-size:16px">Build and deploy</h3>${li(['<b>1 · Process:</b> Node.js scripts fetch data, run Larper, write JSON', '<b>2 · Host:</b> static pages on GitHub Pages, published on every push', '<b>3 · AI:</b> one Vercel function holds the NVIDIA key and calls Nemotron', '<b>Cost:</b> ₹0 data, free hosting, one laptop, no GPU'])}</div>
   </div>
  </div>`) });
 
