@@ -66,8 +66,8 @@ let s = pres.addSlide({ masterName: 'DARK', sectionTitle: 'Opening' });
 s.addImage({ path: img('hires_2026-05-28.jpg'), x: 5.4, y: 0, w: 4.6, h: 5.625, sizing: { type: 'cover', w: 4.6, h: 5.625 }, altText: 'High-resolution satellite view of Noida International Airport, 2026 (Esri World Imagery Wayback)' });
 s.addText('NavContinuity', { placeholder: 'title', x: 0.5, y: 1.2, w: 4.8, h: 1.0 });
 T(s, 'When GPS fails around an airport, know which airports can take the diversions, then get every passenger to a confirmed outcome.', { x: 0.5, y: 2.3, w: 4.6, h: 1.0, fontSize: 15, color: HEX.lt2 });
-card(s, 0.5, 3.55, 4.6, 0.95, HEX.dk2, 'Track card');
-T(s, [{ text: 'Primary: Track A6 Infrastructure', options: { bold: true, color: HEX.accent1, breakLine: true } }, { text: 'Optional: Track B3 Positioning & sensing', options: { bold: true, color: HEX.accent2 } }], { x: 0.7, y: 3.65, w: 4.3, h: 0.75, fontSize: 15, valign: 'middle' });
+card(s, 0.5, 3.5, 4.6, 1.05, HEX.dk2, 'Track card');
+T(s, [{ text: 'Primary: Track A6 Infrastructure', options: { bold: true, color: HEX.accent1, breakLine: true } }, { text: 'Track C: GPS malfunction detection', options: { bold: true, color: HEX.accent3, breakLine: true } }, { text: 'Track B3: harder-to-jam positioning', options: { bold: true, color: HEX.accent2 } }], { x: 0.7, y: 3.6, w: 4.3, h: 0.85, fontSize: 14, valign: 'middle' });
 T(s, 'Orbit to Economy: AI in Space · with Boeing', { x: 0.5, y: 4.85, w: 4.6, h: 0.3, fontSize: 11, color: HEX.accent6 });
 s.addNotes('0:00-0:20. Name the team. One line: GPS interference is now routine around Indian airports; we use satellites to see which airports can absorb diversions, and to harden positioning itself. Primary Track A6, optional Track B3.');
 
@@ -95,7 +95,7 @@ s.addNotes('0:20-0:50. Three reported numbers, then Delhi 2025. Land on the ques
 // ---------- 2b. Evidence: real aircraft GPS-integrity reports ----------
 const gsum = rd('c/outputs/gnss_summary.json');
 s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Problem' });
-s.addText('Real aircraft data shows where GPS degrades', { placeholder: 'title' });
+s.addText('Track C: detecting where GPS is failing', { placeholder: 'title' });
 s.addImage({ path: path.join(__dirname, 'gnss_map.png'), x: 0.5, y: 1.1, w: 4.4, h: 3.85, altText: 'Map of South Asia: share of aircraft reporting degraded GPS integrity per 1-degree cell; red band along the India-Pakistan border and Myanmar; Delhi and Jewar in normal cells' });
 const leg = [['High: over 10% of aircraft degraded', HEX.accent4], ['Medium: 2-10%', HEX.accent1], ['Low: under 2%', HEX.accent3]];
 leg.forEach(([l, c], i) => { s.addShape(pres.shapes.RECTANGLE, { x: 5.2, y: 1.15 + i * 0.32, w: 0.22, h: 0.22, fill: { color: c }, line: { color: c } }); T(s, l, { x: 5.52, y: 1.13 + i * 0.32, w: 4, h: 0.26, fontSize: 12, color: HEX.dk2 }); });
@@ -108,7 +108,7 @@ ev.forEach(([n, l], i) => {
   T(s, l, { x: 6.75, y, w: 2.65, h: 0.7, fontSize: 11, color: i === 2 ? HEX.lt1 : HEX.dk2, valign: 'middle' });
 });
 T(s, `Source: ADS-B Exchange sample data, ${gsum.days.join(', ')} (${gsum.snapshots} snapshots), aircraft-reported navigation integrity. Derived; one day only. Protective monitoring, no individual tracking.`, { x: 0.5, y: 5.0, w: 9, h: 0.22, fontSize: 9, color: HEX.accent5 });
-s.addNotes('0:50-1:10. This is real data, not a model: aircraft broadcast how much they trust their own GPS. One day of reports already shows the interference band along the border. Jewar, 70 km from Delhi, sits in clean cells, which is why it matters as a diversion airport. This is context for the problem; the full GNSS monitoring product is our next step, not one of the tracks we are presenting.');
+s.addNotes('0:50-1:10. This is real data, not a model: aircraft broadcast how much they trust their own GPS. One day of reports already shows the interference band along the border. Jewar, 70 km from Delhi, sits in clean cells, which is why it matters as a diversion airport. This is Track C: protective monitoring of GPS malfunction. It feeds the chain: C says where GPS is failing, A6 says which airport can take the diversions, B3 is the long-term fix.');
 
 // ---------- 3. A6 real data ----------
 pres.addSection({ title: 'Track A6' });
@@ -207,7 +207,7 @@ s.addNotes('3:15-4:15. Physics first: inverse-square law gives LEO a 19 dB edge,
 pres.addSection({ title: 'Close' });
 s = pres.addSlide({ masterName: 'DARK', sectionTitle: 'Close' });
 s.addText('What we built in 12 hours', { placeholder: 'title', y: 0.35, h: 0.8 });
-const done = [['A6, real data', '79 Sentinel-2 scenes, baseline + Larper AI, inspect-or-release decision, live Site Monitor'], ['B3, simulation', 'Link budget, constellation sizing and cost, spoofing detection simulation, 3D globe'], ['Next steps', 'Track C GNSS Watch (prototype on real ADS-B integrity data), then the passenger recovery flow with an airline pilot']];
+const done = [['C + A6, real data', 'GPS malfunction map from 24,579 aircraft reports; Jewar watched in 79 Sentinel-2 scenes with Larper AI and an inspect-or-release decision'], ['B3, simulation', 'Link budget, constellation sizing and cost, spoofing detection simulation, 3D globe'], ['Next steps', 'More days of GPS data plus satellite GNSS sources, then the passenger recovery flow with an airline pilot']];
 done.forEach(([h, d], i) => {
   const y = 1.4 + i * 1.05;
   s.addShape(pres.shapes.OVAL, { x: 0.5, y: y + 0.05, w: 0.5, h: 0.5, fill: { color: i < 2 ? HEX.accent1 : HEX.accent2 }, line: { color: i < 2 ? HEX.accent1 : HEX.accent2 } });
@@ -217,7 +217,7 @@ done.forEach(([h, d], i) => {
 });
 T(s, 'Limits: land conversion is not completion · Larper is trained on WorldCover weak labels · all economics assumed · B3 is simulation, not hardware', { x: 0.5, y: 4.65, w: 9, h: 0.35, fontSize: 11, color: HEX.accent6 });
 T(s, 'mackathon-three.vercel.app', { x: 0.5, y: 5.05, w: 9, h: 0.3, fontSize: 12, bold: true, color: HEX.accent2 });
-s.addNotes('4:15-5:00. Say exactly what was built and what was not. Track C exists as a prototype but we present it only as a next step, per the one-optional-track rule. End on the live site URL and thank the judges.');
+s.addNotes('4:15-5:00. Say exactly what was built and what was not. Recap the chain: C finds where GPS fails, A6 finds where diversions can go, B3 hardens positioning. End on the live site URL and thank the judges.');
 
 (async () => {
   await pres.writeFile({ fileName: OUT });

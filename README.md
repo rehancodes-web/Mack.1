@@ -32,10 +32,11 @@ satellite evidence  →  GPS-risk warning  →  which airports can absorb divers
 | Track | Our part | Status |
 |---|---|---|
 | **A6 Infrastructure** (compulsory) | Sentinel-2 monitoring of **Jewar airport** 2020–2026, showing when it physically became a usable diversion and recovery airport. **Larper**, our Random Forest model, labels every 10 m pixel (built/paved, bare, vegetation, water). **NVIDIA Nemotron** audits Larper's maps against the photos and writes the analyst memo. Economic decision: inspect or release funding vs reported progress | **Working on real data** |
-| **B3 Positioning & sensing** (the one optional track) | Browser-based 3D simulation of four LEO satellites, including synthetic position-error correction and a close-approach risk screen near Jewar | Prototype |
+| **C GNSS resilience: GPS malfunction detection** | **GNSS Watch**: finds where GPS is failing from real aircraft integrity reports (ADS-B, one day, 24,579 reports). Hotspots on the India–Pakistan border and Myanmar; Jewar region normal, so it is a usable diversion airport. Protective monitoring only | **Working on real data** ([c.html](https://mackathon-three.vercel.app/c.html)) |
+| **B3 Positioning & sensing** (GPS fix) | Browser-based 3D simulation of four LEO satellites, including synthetic position-error correction and a close-approach risk screen near Jewar | Prototype |
 | **Customer experience** (who pays) | Passenger recovery flow: status, rebooking, care, bags. **Airlines pay**: a diversion costs €1,000–77,200 (EUROCONTROL), a block minute about $98 (A4A 2025) | Specified |
 
-Rules allow only one optional track, so our current choice is A6 + B3. Full rules: [RULES.md](RULES.md).
+The story is one GPS chain: **C detects where GPS is failing → A6 shows which airport can absorb diversions → B3 makes positioning harder to jam or spoof.** The organisers said to choose one of B or C; the team chose to present both, so confirm with an organiser if possible. Full rules: [RULES.md](RULES.md).
 
 ## What is built
 
