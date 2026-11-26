@@ -38,3 +38,6 @@ header.top .mods a:hover{color:#e8eef3 !important;background:#183041 !important}
 header.top .mods a[aria-current=page]{color:#e8eef3 !important;background:transparent !important;box-shadow:inset 0 -2px 0 #e05fd0 !important}
 header.top .src{margin-left:auto;font-size:12px;color:#97abba}
 @media (max-width:760px){header.top{height:auto !important;flex-wrap:wrap !important;gap:4px 16px !important;padding:8px 16px !important}}
+
+/* the airport viewer embedded in the globe pop-up has no header */
+.embed header.top{display:none !important}
