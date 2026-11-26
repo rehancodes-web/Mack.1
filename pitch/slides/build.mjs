@@ -380,8 +380,8 @@ const deck = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta n
 <title>NavContinuity Pitch Deck</title><meta name="description" content="NavContinuity hackathon pitch, structured on the Mach-A-Thon marking scheme.">
 <style>${CSS}
 html,body{height:100%;margin:0;background:#0b0f13;overflow:hidden}
-.stage{position:fixed;inset:0;display:grid;place-items:center}
-.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+.stage{position:fixed;inset:0;overflow:hidden}
+.deck{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center}
 .deck .slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .35s ease}
 .deck .slide.on{opacity:1;visibility:visible}
 @media (prefers-reduced-motion:reduce){.deck .slide{transition:none}}
@@ -400,7 +400,7 @@ html,body{height:100%;margin:0;background:#0b0f13;overflow:hidden}
  const NOTES=${JSON.stringify(slides.map(s => s.notes))};
  const deck=document.getElementById('deck'),S=[...deck.querySelectorAll('.slide')],bar=document.getElementById('bar'),idx=document.getElementById('idx'),nt=document.getElementById('notes'),nb=document.getElementById('nb');
  let i=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
- function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);deck.style.transform='scale('+s+')';}
+ function fit(){const s=Math.min(innerWidth/1280,(innerHeight-8)/720);deck.style.transform='translate(-50%,-50%) scale('+s+')';}
  function go(n){S[i].classList.remove('on');i=Math.max(0,Math.min(S.length-1,n));S[i].classList.add('on');idx.textContent=(i+1)+' / '+S.length;bar.style.width=((i+1)/S.length*100)+'%';nt.textContent=NOTES[i];history.replaceState(null,'','#'+(i+1));}
  addEventListener('resize',fit);fit();go(i);
  addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(i+1)}else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(i-1)}else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);else if(e.key==='n'){nb.click()}});
