@@ -136,7 +136,7 @@ async function mosaic(year,lat,lon,z){const [fx,fy]=tileXY(lat,lon,z),cx=Math.fl
 askB.onclick=async()=>{askB.disabled=true;ans.className='';ans.textContent='Fetching both years and asking Nemotron…';
  try{const c=map.getCenter(),z=Math.min(map.getZoom(),15),mpp=156543.03*Math.cos(c.lat*Math.PI/180)/2**z;
   const [ia,ib]=await Promise.all([mosaic(st.a,c.lat,c.lng,z),mosaic(st.b,c.lat,c.lng,z)]);
-  const r=await fetch('/api/analyst',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'earth',
+  const r=await fetch('https://mackathon-three.vercel.app/api/analyst',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'earth',
    question:'What changed between '+st.a+' and '+st.b+' in these two images of the same area?',
    context:{lat:+c.lat.toFixed(4),lon:+c.lng.toFixed(4),zoom:z,metres_per_pixel:+mpp.toFixed(1),image_width_km:+(mpp*768/1000).toFixed(1),years:[st.a,st.b]},
    images:[{label:'Year '+st.a+' (before)',mime:'image/jpeg',data:ia},{label:'Year '+st.b+' (after)',mime:'image/jpeg',data:ib}]})});
