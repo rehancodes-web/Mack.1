@@ -1,76 +1,124 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NavContinuity Overview</title><meta name="description" content="GPS failure around airports: detect it, absorb the diversions, harden positioning, recover passengers. Mach-A-Thon Aeromania 26.">
+<title>NavContinuity</title>
+<meta name="description" content="When GPS fails around an airport: find where it is failing, which airport can take the diverted flights, how to harden positioning, and how to get every passenger to a confirmed outcome.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23e05fd0' stroke-width='2.4'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23f2a93b'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="site.css"></head><body>
-<header class="top"><div class="brand">NavContinuity</div>
-<nav class="mods" aria-label="Sections">
+<header class="top"><div class="wrap">
+ <a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>NavContinuity</a>
+ <nav class="mods" aria-label="Sections">
   <a href="index.html" aria-current="page">Overview</a>
   <a href="a6.html">Jewar airport <small>Track A6</small></a>
   <a href="globe.html">Globe &amp; satellites <small>Track B3</small></a>
   <a href="c.html">GPS malfunction <small>Track C</small></a>
   <a href="passengers.html">Passenger impact</a>
-</nav></header>
-<main>
-<h1>When GPS fails around an airport, flights divert and passengers are stranded</h1>
-<p class="lead">GPS jamming and spoofing now hit Indian airspace routinely. We use satellites to see where GPS is failing, which airports can absorb the diverted flights, and how to make positioning harder to deny, so every passenger reaches a confirmed outcome.</p>
+ </nav>
+</div></header>
 
-<div class="stat" aria-label="The problem in numbers">
- <div><b>2,354</b><span>GPS interference incidents reported to India's Parliament, Nov 2023 – Dec 2025 <span class="ev">reported</span></span></div>
- <div><b>+500%</b><span>GPS spoofing reports, 2024 vs 2023 (IATA) <span class="ev">reported</span></span></div>
- <div><b>Delhi 2025</b><span>flights approaching IGI were spoofed; contingency procedures used <span class="ev">reported</span></span></div>
- <div><b>€1k–77k</b><span>cost of one diverted flight (EUROCONTROL, 2022 prices) <span class="ev">reported</span></span></div>
-</div>
+<section class="hero" aria-labelledby="hero-h"><div class="wrap">
+ <div>
+  <h1 id="hero-h">When GPS fails near Delhi, where do the flights go?</h1>
+  <p class="lede">GPS jamming and spoofing now hit Indian airspace every day. NavContinuity uses satellites to find where GPS is failing, confirm which airport can take the diverted flights, harden positioning itself, and get every passenger to a confirmed outcome.</p>
+  <div class="facts">
+   <div>2,354<span>GPS interference incidents reported to Parliament, Nov 2023 – Dec 2025</span></div>
+   <div class="c-caution">Delhi 2025<span>approaches to IGI Runway 10 spoofed; backup procedures used</span></div>
+   <div>€77,200<span>top-end cost of one diverted flight (EUROCONTROL)</span></div>
+  </div>
+ </div>
+ <figure class="nd" aria-label="Navigation display: GPS lost near Delhi, diversion route to Noida International Airport (Jewar)">
+  <img src="hires_2026-05-28.jpg" alt="">
+  <svg viewBox="0 0 400 400" aria-hidden="true">
+   <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#f2a93b" stroke-width="2" opacity=".55"/></pattern></defs>
+   <circle cx="200" cy="200" r="186" fill="none" stroke="#e8eef3" stroke-opacity=".5" stroke-width="1.2"/>
+   <g stroke="#e8eef3" stroke-opacity=".6">
+    <line x1="200" y1="14" x2="200" y2="30"/><line x1="386" y1="200" x2="370" y2="200"/><line x1="200" y1="386" x2="200" y2="370"/><line x1="14" y1="200" x2="30" y2="200"/>
+    <line x1="331" y1="69" x2="322" y2="78"/><line x1="331" y1="331" x2="322" y2="322"/><line x1="69" y1="331" x2="78" y2="322"/><line x1="69" y1="69" x2="78" y2="78"/>
+   </g>
+   <circle cx="200" cy="200" r="110" fill="none" stroke="#4fd1e0" stroke-opacity=".45" stroke-dasharray="3 6"/>
+   <ellipse cx="96" cy="104" rx="72" ry="52" fill="url(#hatch)" stroke="#f2a93b" stroke-width="1.5" stroke-dasharray="6 4"/>
+   <text x="44" y="170" fill="#f2a93b" font-family="B612" font-size="11">GPS degraded</text>
+   <path d="M84 96 Q 150 120 196 196" fill="none" stroke="#e05fd0" stroke-width="3.5" stroke-linecap="round"/>
+   <circle cx="84" cy="96" r="6" fill="none" stroke="#e8eef3" stroke-width="2"/>
+   <text x="60" y="84" fill="#e8eef3" font-family="B612" font-size="12" font-weight="700">Delhi IGI</text>
+   <path d="M196 184 l8 12 -8 12 -8 -12z" fill="#e05fd0"/>
+   <text x="212" y="190" fill="#e8eef3" font-family="B612" font-size="12" font-weight="700">Jewar</text>
+   <text x="212" y="206" fill="#5fd38d" font-family="B612" font-size="11">GPS normal · built</text>
+   <text x="200" y="370" fill="#e8eef3" fill-opacity=".7" font-family="B612" font-size="10" text-anchor="middle">70 km</text>
+  </svg>
+  <div class="annun" role="img" aria-label="Alert: GPS primary lost">GPS PRIMARY LOST</div>
+ </figure>
+</div></section>
 
-<h2>How it fits together</h2>
-<div class="chain" aria-label="The chain from GPS failure to passenger outcome">
- <div><b>1 · GPS fails</b>Jamming or spoofing near an airport</div>
- <div><b>2 · Detect</b>Track C finds where, from real aircraft reports</div>
- <div><b>3 · Absorb</b>Track A6 shows which nearby airport can take diversions</div>
- <div><b>4 · Harden</b>Track B3: a low-orbit layer that is harder to jam</div>
- <div><b>5 · Recover</b>Passengers: delays, rebooking, hotels, bags</div>
-</div>
+<section class="band" aria-labelledby="plan-h"><div class="wrap">
+ <h2 id="plan-h">The plan, leg by leg</h2>
+ <p class="intro">Each track of the challenge is one leg of the same flight: from the moment GPS fails to the moment the last passenger is looked after.</p>
+ <ol class="plan">
+  <li><span class="leg">1</span><span class="what c-caution">GPS fails</span><span>Jamming or spoofing degrades navigation near an airport. Crews switch to backup procedures; flights hold.</span><span class="trk c-dim">The problem</span></li>
+  <li><span class="leg">2</span><span class="what c-data">Detect</span><span>Map where GPS is failing from 24,579 real aircraft integrity reports.</span><span class="trk"><a class="c-data" href="c.html">Track C</a></span></li>
+  <li><span class="leg">3</span><span class="what c-route">Absorb</span><span>Confirm from orbit which nearby airport physically exists and can take the diversions.</span><span class="trk"><a class="c-route" href="a6.html">Track A6</a></span></li>
+  <li><span class="leg">4</span><span class="what c-normal">Harden</span><span>A low-orbit navigation layer that is 19 dB stronger and cross-checked by AI.</span><span class="trk"><a class="c-normal" href="globe.html">Track B3</a></span></li>
+  <li><span class="leg">5</span><span class="what">Recover</span><span>Rebook, book care in the right city and keep bags with their owners.</span><span class="trk"><a href="passengers.html">Passengers</a></span></li>
+ </ol>
+</div></section>
 
-<h2>The three tracks</h2>
-<div class="tracks">
- <section class="track A" aria-labelledby="tA">
-  <div class="id">TRACK A6 · INFRASTRUCTURE · COMPULSORY</div>
-  <h3 id="tA">Jewar airport, watched from orbit</h3>
-  <p>Can the new Noida International Airport (70 km from Delhi) actually take diverted flights? We measured its construction from space.</p>
-  <ul>
-   <li>79 monthly Sentinel-2 scenes, 2020–2026, plus sharp 2019 vs 2026 photos</li>
-   <li><b>80%</b> "complete" reported in Jan 2025 vs <b>41–51%</b> of land converted seen from orbit</li>
-   <li>Larper AI labels every 10 m pixel; 71% agreement with ESA WorldCover</li>
-   <li>Decision: release the next funding tranche, or inspect first</li>
-  </ul>
-  <a class="go" href="a6.html">Open Jewar airport →</a>
- </section>
- <section class="track B" aria-labelledby="tB">
-  <div class="id">TRACK B3 · POSITIONING &amp; SENSING</div>
-  <h3 id="tB">Harder-to-jam GPS from low orbit</h3>
-  <p>The long-term fix: navigation signals from 1,000 km instead of 20,200 km, cross-checked by AI.</p>
-  <ul>
-   <li><b>19 dB</b> stronger signal, so a jammer's reach covers <b>80×</b> less area <span class="ev">physics</span></li>
-   <li>Spoofed position error <b>50 m → 8 m</b>; spoofing detected <b>1.2% → 92%</b> <span class="ev">simulation</span></li>
-   <li><b>114</b> satellites, about <b>$445M</b> <span class="ev">assumed costs</span></li>
-  </ul>
-  <a class="go" href="globe.html">Open the 3D globe: satellites and airports →</a>
- </section>
- <section class="track C" aria-labelledby="tC">
-  <div class="id">TRACK C · GNSS RESILIENCE</div>
-  <h3 id="tC">Where GPS is malfunctioning right now</h3>
-  <p>Aircraft broadcast how much they trust their own GPS. We map those reports to find failing zones. Protective monitoring only.</p>
-  <ul>
-   <li><b>24,579</b> real aircraft reports in one day (ADS-B Exchange sample)</li>
-   <li><b>37</b> high-interference zones on the India–Pakistan border and Myanmar</li>
-   <li>Jewar region: <b>normal</b>, so it is a usable diversion airport</li>
-  </ul>
-  <a class="go" href="c.html">Open GPS malfunction →</a>
- </section>
-</div>
+<section class="band alt" aria-labelledby="a6-h"><div class="wrap">
+ <div class="track">
+  <div>
+   <div class="tag c-route">Track A6 · Infrastructure (compulsory)</div>
+   <h2 id="a6-h">Jewar airport, measured from space</h2>
+   <p>Noida International Airport sits 70 km from Delhi. If it is ready, it can take Delhi's diversions. We tracked its construction in 79 monthly Sentinel-2 scenes and trained Larper, a Random Forest that labels every 10 m of the site.</p>
+   <ul>
+    <li>In January 2025 the builder reported 80% complete; satellites saw 51% of the land converted</li>
+    <li>Larper agrees with ESA WorldCover on 71% of unseen pixels</li>
+    <li>The output is a decision: release the next funding tranche, or inspect first</li>
+   </ul>
+   <a class="go" href="a6.html">Open the Jewar monitor</a>
+  </div>
+  <div class="figure swipe">
+   <figure><img src="hires_2019-10-09.jpg" alt="Jewar site in 2019: farmland and villages" loading="lazy"><figcaption>2019</figcaption></figure>
+   <figure><img src="hires_2026-05-28.jpg" alt="Jewar site in 2026: runway, taxiways and terminal" loading="lazy"><figcaption>2026</figcaption></figure>
+  </div>
+ </div>
+</div></section>
 
-<h2>What passengers go through</h2>
-<p class="lead">Every GPS-driven delay or diversion lands on people in a terminal: repeated "15 more minutes", missed connections, bad automatic rebooking, hotel vouchers in the wrong city and bags on a different route.</p>
-<a class="cta" href="passengers.html">See the passenger impact →</a>
+<section class="band" aria-labelledby="c-h"><div class="wrap">
+ <div class="track flip">
+  <div>
+   <div class="tag c-data">Track C · GNSS resilience</div>
+   <h2 id="c-h">Where GPS is failing</h2>
+   <p>Every aircraft broadcasts how far it trusts its own position. One day of those reports, mapped in one-degree squares, shows a band of failing GPS along the India–Pakistan border and over Myanmar. The Jewar area reads normal, so it is a safe place to divert to.</p>
+   <p class="note">Protective monitoring of areas only. No individual aircraft or people are tracked.</p>
+   <a class="go" href="c.html">Open the GPS malfunction map</a>
+  </div>
+  <div class="readout" aria-label="Track C results">
+   <div><b class="c-data">24,579</b><span>aircraft reports in one day</span></div>
+   <div><b class="c-caution">37</b><span>high-interference zones</span></div>
+   <div><b class="c-normal">Normal</b><span>Jewar region, 1,092 aircraft</span></div>
+  </div>
+ </div>
+</div></section>
 
-<p class="note" style="margin-top:36px">Mach-A-Thon Aeromania '26 · Orbit to Economy: AI in Space · with Boeing. Labels: <b>reported</b> = published source, <b>derived</b> = computed from our data, <b>simulation / assumed</b> = modelled, not measured. Sources: research/ in the repository.</p>
-</main></body></html>
+<section class="band alt" aria-labelledby="b3-h"><div class="wrap">
+ <div class="track">
+  <div>
+   <div class="tag c-normal">Track B3 · Positioning &amp; sensing</div>
+   <h2 id="b3-h">Navigation that is harder to jam</h2>
+   <p>GPS signals travel 20,200 km and arrive weaker than background noise. A low-orbit layer at 1,000 km is 19 dB stronger, which shrinks a jammer's reach 80 times by area. In our simulation, adding NavIC and low-orbit satellites with an AI cross-check cut the spoofed position error from 50 m to 8 m.</p>
+   <a class="go" href="globe.html">Open the 3D globe</a>
+  </div>
+  <div class="readout" aria-label="Track B3 results">
+   <div><b class="c-normal">19 dB</b><span>stronger signal (physics)</span></div>
+   <div><b class="c-normal">50 → 8 m</b><span>spoofed error (simulation)</span></div>
+   <div><b>~$445M</b><span>114 satellites (assumed costs)</span></div>
+  </div>
+ </div>
+</div></section>
+
+<section class="band" aria-labelledby="p-h"><div class="wrap">
+ <h2 id="p-h">And the people in the terminal</h2>
+ <p class="intro">A GPS failure rarely makes the news as a crash. It shows up as "15 more minutes", missed connections, rebooking to the wrong city and bags on another route. NVIDIA Nemotron worked through four real GPS-failure cases as an airline operations controller; we checked every answer.</p>
+ <a class="go" href="passengers.html">See the passenger impact and Nemotron's decisions</a>
+</div></section>
+
+<footer><div class="wrap">Mach-A-Thon Aeromania '26, Orbit to Economy: AI in Space, with Boeing. Figures are labelled reported, derived, simulated or assumed on each page. Imagery: Copernicus Sentinel-2, Esri World Imagery Wayback. Code: <a href="https://github.com/rehancodes-web/Mack.1">github.com/rehancodes-web/Mack.1</a></div></footer>
+</body></html>
