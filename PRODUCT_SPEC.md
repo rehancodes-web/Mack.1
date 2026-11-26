@@ -1,4 +1,4 @@
-# NavContinuity product specification
+# FlyWithEase product specification
 
 Version 0.1 · 26 November 2026 · Concept and pilot design
 

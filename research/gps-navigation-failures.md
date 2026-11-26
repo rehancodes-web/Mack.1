@@ -1,6 +1,6 @@
 # Aviation Navigation Failures: Safety Risks, Economic Impact and an AI-Based Monitoring Proposal
 
-**Project:** NavContinuity — AI-powered satellite-navigation integrity and aviation risk monitoring
+**Project:** FlyWithEase — AI-powered satellite-navigation integrity and aviation risk monitoring
 **Document type:** Research report / background study
 **Scope:** Types of navigation failure, real-world data (global and India), fatal accident case studies, economic costs, Boeing's response, technical improvements, and the proposed system design.
 
@@ -644,4 +644,4 @@ A historical hotspot should **not** automatically be treated as currently danger
 
 ---
 
-*Final recommendation:* Build NavContinuity around multi-source navigation verification, AI-based anomaly detection and geographical risk prediction. This is more defensible and technically meaningful than claiming to create a completely error-free GPS system, and it positions the project as a complementary early-warning layer rather than a replacement for existing manufacturer technology.
+*Final recommendation:* Build FlyWithEase around multi-source navigation verification, AI-based anomaly detection and geographical risk prediction. This is more defensible and technically meaningful than claiming to create a completely error-free GPS system, and it positions the project as a complementary early-warning layer rather than a replacement for existing manufacturer technology.

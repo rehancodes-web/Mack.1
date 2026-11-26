@@ -1,4 +1,4 @@
-// NavContinuity hackathon deck, structured on the judges' marking scheme.
+// FlyWithEase hackathon deck, structured on the judges' marking scheme.
 // Style follows the team's earlier decks (SAP HigherUp.AI, CropTwin): off-white slides, dark cover/close,
 // running header with section + slide count, stat cards with sources, dark callouts, numbered columns.
 // Outputs: pitch/slides/html/NN.html (for PNG render -> pptx) and docs/deck.html (interactive, keyboard/touch).
@@ -68,17 +68,17 @@ ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px
 `;
 const slides = [];
 const add = (o) => slides.push(o);
-const run = (sec, rub, n, k = '') => `<div class="run ${k}"><span class="sec">${sec}</span><span class="rub">${rub}</span><span>NavContinuity&nbsp;&nbsp;${String(n).padStart(2, '0')} / %TOTAL%</span></div>`;
+const run = (sec, rub, n, k = '') => `<div class="run ${k}"><span class="sec">${sec}</span><span class="rub">${rub}</span><span>FlyWithEase&nbsp;&nbsp;${String(n).padStart(2, '0')} / %TOTAL%</span></div>`;
 const S = (n, cls, inner) => `<section class="slide ${cls}" aria-label="Slide ${n}">${inner}</section>`;
 
 // ---------- 1 COVER ----------
-add({ notes: '0:00–0:15. GPS jamming hits Indian airspace daily. NavContinuity finds where GPS is failing, confirms from orbit which airport can take the diverted flights, hardens positioning and protects passengers. Primary Track A6, additional Track C, with B3 as the long-term layer.', html: n => S(n, 'dark', `
+add({ notes: '0:00–0:15. GPS jamming hits Indian airspace daily. FlyWithEase finds where GPS is failing, confirms from orbit which airport can take the diverted flights, hardens positioning and protects passengers. Primary Track A6, additional Track C, with B3 as the long-term layer.', html: n => S(n, 'dark', `
  <img src="${img('after')}" alt="" style="position:absolute;right:0;top:0;width:640px;height:720px;object-fit:cover;opacity:.85">
  <div style="position:absolute;right:0;top:0;width:640px;height:720px;background:linear-gradient(90deg,#0F1419 0%,rgba(15,20,25,.35) 40%,rgba(15,20,25,.1))"></div>
  <div style="position:absolute;right:250px;top:46px;font-family:var(--N);font-weight:700;font-size:15px;color:#F2A93B;border:2px solid #F2A93B;padding:5px 14px;border-radius:5px;background:#0F1419">GPS PRIMARY LOST</div>
  <div class="run" style="color:#7E8A95"><span>Mach-A-Thon Aeromania '26 · Orbit to Economy: AI in Space</span><span></span><span>with Boeing</span></div>
  <div style="position:absolute;left:72px;top:150px;width:600px">
-  <h1 style="font-size:84px;font-weight:800;letter-spacing:-.03em;line-height:.95;font-variation-settings:'wdth' 110">NavContinuity</h1>
+  <h1 style="font-size:84px;font-weight:800;letter-spacing:-.03em;line-height:.95;font-variation-settings:'wdth' 110">FlyWithEase</h1>
   <p style="font-size:26px;line-height:1.3;margin-top:22px;color:#C9D3DB;font-family:var(--H);font-weight:600">When GPS fails near an airport, flights divert. We make sure there is somewhere ready to go, and that no passenger is stranded.</p>
   <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px">
    ${[['Track A6', 'Infrastructure from orbit', '#E46BC5', 'Primary · 65 marks'], ['Track C', 'GPS malfunction detection', '#3FC6D1', 'Additional · 25 marks'], ['Track B3', 'Harder-to-jam positioning', '#4CC38A', 'Long-term layer']].map(([a, b, c, d]) => `<div style="border-top:3px solid ${c};padding-top:10px"><div style="font-family:var(--H);font-weight:800;font-size:18px;color:${c}">${a}</div><div style="font-size:14.5px;margin-top:4px">${b}</div><div style="font-size:12px;color:#7E8A95;margin-top:6px">${d}</div></div>`).join('')}
@@ -104,7 +104,7 @@ add({ notes: '0:15–0:35. The problem, with sources. GPS interference is routin
 add({ notes: '0:35–0:55. Intended users and economic value. Four users, each with a decision and a cost. Airlines pay for diversions, lenders for infrastructure risk, regulators for national resilience.', html: n => S(n, 'k-am', `${run('Who it serves', 'Track A · Problem understanding & economic impact · 20', n)}
  <h2>Four users, four decisions, real money on each.</h2>
  <table style="margin-top:22px">
-  <thead><tr><th style="width:19%">User</th><th style="width:27%">Decision they make</th><th style="width:28%">What it costs today</th><th>What NavContinuity gives them</th></tr></thead>
+  <thead><tr><th style="width:19%">User</th><th style="width:27%">Decision they make</th><th style="width:28%">What it costs today</th><th>What FlyWithEase gives them</th></tr></thead>
   <tbody>
    <tr><td><b>Airline operations</b></td><td>Where to divert when Delhi's GPS degrades</td><td>€1,000–77,200 per diverted flight; $98 per block minute</td><td>A diversion airport that is built, in clean GPS airspace, with rebooking started early</td></tr>
    <tr><td><b>Infrastructure lenders</b></td><td>Release the next construction tranche, or inspect first</td><td>Paying against optimistic progress reports (Jewar: 80% claimed)</td><td>Independent progress from orbit: ${dec.satellite_observed_pct}% seen. Inspect for $15k instead of risking $112k</td></tr>
@@ -326,7 +326,7 @@ add({ notes: '4:05–4:20. Innovation and originality. Detection exists, rebooki
  <h2>Others solve parts of this.<span class="s">Nobody closes the loop.</span></h2>
  <table style="margin-top:18px"><thead><tr><th style="width:44%">Who</th><th style="text-align:center">Detects GPS failure</th><th style="text-align:center">Verifies diversion airport</th><th style="text-align:center">Recovers passengers</th><th style="text-align:center">Connects all three</th></tr></thead>
   <tbody>${players.map(([a, b, v]) => `<tr><td><b>${a}</b> <span class="small">· ${b}</span></td>${v.map(x => `<td style="text-align:center">${D(x)}</td>`).join('')}<td style="text-align:center">${D(0)}</td></tr>`).join('')}
-  <tr style="background:#FBEFF8"><td><b style="color:var(--a6);font-family:var(--H);font-size:17px">NavContinuity</b></td><td style="text-align:center">${D(1)}</td><td style="text-align:center">${D(1)}</td><td style="text-align:center">${D(.5)}</td><td style="text-align:center"><span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--a6)"></span></td></tr></tbody></table>
+  <tr style="background:#FBEFF8"><td><b style="color:var(--a6);font-family:var(--H);font-size:17px">FlyWithEase</b></td><td style="text-align:center">${D(1)}</td><td style="text-align:center">${D(1)}</td><td style="text-align:center">${D(.5)}</td><td style="text-align:center"><span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--a6)"></span></td></tr></tbody></table>
  <div class="black" style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
   ${[['Satellite-verified capacity', 'Nobody checks from orbit that the diversion airport is actually built.'], ['Interference + capacity in one decision', 'GPS health and airport readiness feed one Nemotron brief.'], ['Self-checking AI', 'A second Nemotron pass fact-checks every brief before a person sees it.']].map(([a, b]) => `<div><div style="font-family:var(--H);font-weight:800;color:#E46BC5;font-size:16px">${a}</div><p style="color:#C3CCD4;font-size:14px;margin-top:4px">${b}</p></div>`).join('')}
  </div>
@@ -348,7 +348,7 @@ add({ notes: '4:20–4:40. Practical feasibility: what runs today, what a pilot 
 
 // ---------- 16 ROADMAP / CLOSE ----------
 add({ notes: '4:40–5:00. Roadmap and close. Now a working prototype; three months a shadow-mode pilot with one airline at Delhi; six months more hubs and a continuous GPS feed; twelve months a regulator dashboard and the B3 layer with partners. Thank the judges.', html: n => S(n, 'dark', `
- <div class="run" style="color:#7E8A95"><span>Roadmap</span><span></span><span>NavContinuity&nbsp;&nbsp;${String(n).padStart(2, '0')} / %TOTAL%</span></div>
+ <div class="run" style="color:#7E8A95"><span>Roadmap</span><span></span><span>FlyWithEase&nbsp;&nbsp;${String(n).padStart(2, '0')} / %TOTAL%</span></div>
  <h2 style="font-size:46px;color:#EEF2F5;max-width:980px">GPS will keep failing.<span class="s" style="color:#9AA6B0">Passengers shouldn't pay for it.</span></h2>
  <div style="position:relative;margin-top:44px">
   <div style="position:absolute;left:0;right:0;top:14px;height:3px;background:linear-gradient(90deg,#4CC38A,#F2A93B 50%,#E46BC5)"></div>
@@ -377,7 +377,7 @@ fileSlides.forEach((h, i) => fs.writeFileSync(path.join(OUT, `${String(i + 1).pa
 WEB = true;
 const webSlides = render();
 const deck = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NavContinuity Pitch Deck</title><meta name="description" content="NavContinuity hackathon pitch, structured on the Mach-A-Thon marking scheme.">
+<title>FlyWithEase Pitch Deck</title><meta name="description" content="FlyWithEase hackathon pitch, structured on the Mach-A-Thon marking scheme.">
 <style>${CSS}
 html,body{height:100%;margin:0;background:#0b0f13;overflow:hidden}
 .stage{position:fixed;inset:0;overflow:hidden}
@@ -392,7 +392,7 @@ html,body{height:100%;margin:0;background:#0b0f13;overflow:hidden}
 .notes{position:fixed;left:14px;right:180px;bottom:12px;background:#1A222Bee;color:#EEF2F5;border:1px solid #2A3540;border-radius:8px;padding:10px 12px;font:15px/1.4 system-ui;display:none}
 .notes.on{display:block}
 </style></head><body>
-<main class="stage" aria-roledescription="carousel" aria-label="NavContinuity pitch deck"><div class="deck" id="deck">${webSlides.map((h, i) => h.replace('class="slide', `class="slide${i ? '' : ' on'}`)).join('')}</div></main>
+<main class="stage" aria-roledescription="carousel" aria-label="FlyWithEase pitch deck"><div class="deck" id="deck">${webSlides.map((h, i) => h.replace('class="slide', `class="slide${i ? '' : ' on'}`)).join('')}</div></main>
 <div class="bar" id="bar"></div><div class="notes" id="notes" aria-live="polite"></div>
 <nav class="ctl" aria-label="Deck controls"><button id="prev" aria-label="Previous slide">‹</button><span id="idx">1 / ${TOTAL}</span><button id="next" aria-label="Next slide">›</button><button id="nb" aria-pressed="false">Notes</button><a href="index.html" style="color:#9AA6B0;margin-left:6px">Site</a></nav>
 <script>

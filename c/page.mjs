@@ -1,4 +1,4 @@
-// Builds ../docs/c.html: the "GNSS Watch" module (Track C) of the NavContinuity console.
+// Builds ../docs/c.html: the "GNSS Watch" module (Track C) of the FlyWithEase console.
 // Inputs: outputs/gnss_cells.json, outputs/gnss_summary.json. Country outlines: world-atlas 2.0.2 (Natural Earth, public domain).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -43,7 +43,7 @@ const statusTxt = { normal: 'Normal', degraded: 'Degraded', unknown: 'Unknown' }
 const hot = S.hotspots.map(c => `<tr><td>${c.lat}–${c.lat + 1}°N, ${c.lon}–${c.lon + 1}°E</td><td>${c.aircraft}</td><td><b>${Math.round(c.share * 100)}%</b></td><td><span class="r ${c.rating}">${c.rating}</span></td></tr>`).join('');
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NavContinuity GNSS Watch</title>
+<title>FlyWithEase GNSS Watch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
 <style>
@@ -76,7 +76,7 @@ svg{width:100%;height:auto;display:block;border-radius:6px}
 @media (max-width:900px){.top{flex-wrap:wrap;height:auto;padding:10px 14px}.mods{flex-wrap:wrap}.mods a{padding:6px 8px}.grid{grid-template-columns:1fr}}
 </style><link rel="stylesheet" href="nd-theme.css"></head><body>
 <header class="top">
- <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
+ <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>FlyWithEase</div>
  <nav class="mods" aria-label="Modules">
   <a href="index.html">Overview</a>
   <a href="a6.html">Jewar <small>A6</small></a>

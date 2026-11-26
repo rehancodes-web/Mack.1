@@ -15,7 +15,7 @@ const DATA = {
   track_c_cells_around_delhi_and_jewar: near,
   track_c_jewar_region: gs.jewar_region,
   track_c_hotspots: gs.hotspots.slice(0, 5),
-  track_a6_jewar: { conversion_start: rd.satellite.conversion_start_month, peak: rd.satellite.peak_month, peak_frac: rd.satellite.peak_frac, physically_present: rd.recovery_capacity.physically_present, operational_status: rd.recovery_capacity.operational_status, usable: rd.recovery_capacity.usable_for_navcontinuity },
+  track_a6_jewar: { conversion_start: rd.satellite.conversion_start_month, peak: rd.satellite.peak_month, peak_frac: rd.satellite.peak_frac, physically_present: rd.recovery_capacity.physically_present, operational_status: rd.recovery_capacity.operational_status, usable: rd.recovery_capacity.usable_for_flywithease },
   a6_lender_check: { reported_pct: dec.report.reported_pct, satellite_pct: dec.satellite_observed_pct, decision: dec.scenarios[1].action },
   costs_reported: { diversion_eur: '1,000-77,200 (EUROCONTROL)', block_minute_usd: 98.41 },
   limits: ['Track C is one day of ADS-B integrity data (1 Nov 2026), not live', 'Satellite cannot confirm runway certification, ATC or slots', 'No individual aircraft are tracked'],

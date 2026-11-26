@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Passenger Impact</title><meta name="description" content="How GPS failure turns into delays, diversions and stranded passengers, what it costs airlines, and how NavContinuity recovers each passenger.">
+<title>Passenger Impact</title><meta name="description" content="How GPS failure turns into delays, diversions and stranded passengers, what it costs airlines, and how FlyWithEase recovers each passenger.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23e05fd0' stroke-width='2.4'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23f2a93b'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="site.css"></head><body>
-<header class="top"><div class="wrap"><a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>NavContinuity</a>
+<header class="top"><div class="wrap"><a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>FlyWithEase</a>
 <nav class="mods" aria-label="Sections">
   <a href="index.html">Overview</a>
   <a href="a6.html">Jewar <small>A6</small></a>
@@ -32,7 +32,7 @@
 
 <h2>What passengers face</h2>
 <table>
- <thead><tr><th>Problem at the airport</th><th>What it looks like</th><th>Example <span class="ev">self-reported</span></th><th>What NavContinuity does</th></tr></thead>
+ <thead><tr><th>Problem at the airport</th><th>What it looks like</th><th>Example <span class="ev">self-reported</span></th><th>What FlyWithEase does</th></tr></thead>
  <tbody>
   <tr><td><b>Endless delay updates</b></td><td>"15 more minutes", repeated for hours, then a cancellation</td><td><a href="https://www.reddit.com/r/americanairlines/comments/1uaepgh/flight_delayed_13_hours_and_counting_have_a_great/">13-hour delay thread</a></td><td>Honest range and the next decision time, not false precision</td></tr>
   <tr><td><b>Missed connections</b></td><td>The diverted or late flight lands after the onward flight leaves</td><td><a href="https://ja.reddit.com/r/jetblue/comments/1r7hgo9/stranded_at_msy_during_mardi_gras_delay_mixed/">Stranded with mixed messages</a></td><td>Detect the risk early and protect a feasible onward seat</td></tr>
@@ -65,7 +65,7 @@
   <tr><th>Turnaround impact</th><td>Late inbound from diversion; receiver reset/maintenance check adds 30+ minutes ground time before next rotation.</td></tr>
   <tr><th>Passengers</th><td>Delayed departure; rebooking to alternate airport; baggage misrouting risk from disrupted ground ops.</td></tr>
   <tr><th>Nemotron decision</th><td>Divert to Noida International Airport (Jewar) using Track A6 confirmed capability; runway 10 ILS unavailable, RNP spoofed, Jewar has one runway ready for diversion.</td></tr>
-  <tr><th>Fix</th><td><ol><li>Activate NavContinuity Track C GPS integrity warnings for crew awareness</li><li>Use Track A6 to confirm Jewar airport diversion availability and runway status</li><li>Deploy passenger recovery flow to rebook affected passengers to correct city and track bags</li></ol></td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate FlyWithEase Track C GPS integrity warnings for crew awareness</li><li>Use Track A6 to confirm Jewar airport diversion availability and runway status</li><li>Deploy passenger recovery flow to rebook affected passengers to correct city and track bags</li></ol></td></tr>
   <tr><th>Human check <span class="ev">corrected</span></th><td>Facts say ILS stayed available on other runway directions and movements were unaffected. First move: switch arrivals to an ILS runway at IGI; divert to Jewar only if that runway is saturated.<br><b>Final call:</b> Move arrivals to an ILS runway at IGI; Jewar is the fallback, confirmed by Track A6.</td></tr>
  </tbody></table>
 </section>
@@ -89,7 +89,7 @@
   <tr><th>Turnaround impact</th><td>Late inbound arrival delays turnaround; receiver reset and maintenance check add 30+ minutes ground time before next rotation.</td></tr>
   <tr><th>Passengers</th><td>Passengers experience diversions, delays, missed connections, and overnight stays at alternate airports.</td></tr>
   <tr><th>Nemotron decision</th><td>Diversion to Jewar airport as nearest alternate with runway capacity for GPS-based approach.</td></tr>
-  <tr><th>Fix</th><td><ol><li>Activate NavContinuity Track C GPS integrity warnings for crew awareness</li><li>Coordinate with ATC for Jewar runway availability and approach clearance</li><li>Use passenger recovery flow to rebook affected passengers to next available flights</li></ol></td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate FlyWithEase Track C GPS integrity warnings for crew awareness</li><li>Coordinate with ATC for Jewar runway availability and approach clearance</li><li>Use passenger recovery flow to rebook affected passengers to next available flights</li></ol></td></tr>
   <tr><th>Human check <span class="ev">agreed, with a correction</span></th><td>Diversion is right. Jewar must have a non-GPS approach (ILS) for this to work; check before naming it as the alternate.<br><b>Final call:</b> Divert to the nearest alternate with a non-GPS approach (Delhi IGI ILS, or Jewar if confirmed); start passenger rebooking before landing.</td></tr>
  </tbody></table>
 </section>
@@ -101,14 +101,14 @@
   <tr><th>Turnaround impact</th><td>Late inbound aircraft cannot execute the approach; receiver reset and maintenance checks add delay before the next rotation can begin.</td></tr>
   <tr><th>Passengers</th><td>Passengers face rerouting via Tallinn by road, causing delays and additional ground transport costs.</td></tr>
   <tr><th>Nemotron decision</th><td>Choose diversion to Tallinn Airport because it is unaffected by the interference and ensures safe approach without receiver reset delays.</td></tr>
-  <tr><th>Fix</th><td><ol><li>Activate NavContinuity Track C warnings to monitor interference extent</li><li>Diversion to Tallinn Airport using established procedures</li><li>Implement passenger recovery flow to rebook onto Tallinn-bound flights</li></ol></td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate FlyWithEase Track C warnings to monitor interference extent</li><li>Diversion to Tallinn Airport using established procedures</li><li>Implement passenger recovery flow to rebook onto Tallinn-bound flights</li></ol></td></tr>
   <tr><th>Human check <span class="ev">agreed</span></th><td>Matches what actually happened: flights stopped at Tartu and passengers went via Tallinn. Our addition: start the rebooking and coach transfer before departure, not after.<br><b>Final call:</b> Operate to Tallinn and pre-book the road transfer and rebookings before departure.</td></tr>
  </tbody></table>
 </section>
 <p class="note">AI decision support on reported cases, not an operational instruction. Generated 2026-11-26 01:03 UTC by decisions/run.mjs; review notes in decisions/page.mjs.</p>
 <!-- NEMOTRON:END -->
 
-<h2>How NavContinuity recovers each passenger</h2>
+<h2>How FlyWithEase recovers each passenger</h2>
 <div class="chain" style="grid-template-columns:repeat(4,1fr)">
  <div><b>Warn</b>Track C flags GPS failing near the airport</div>
  <div><b>Route</b>Track A6 knows which nearby airport can take the flight (Jewar for Delhi)</div>

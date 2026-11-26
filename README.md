@@ -1,4 +1,4 @@
-# NavContinuity
+# FlyWithEase
 
 **When GPS fails around an airport, get every passenger to a confirmed outcome.**
 

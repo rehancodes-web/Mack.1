@@ -1,11 +1,11 @@
-// NavContinuity A6 analyst backend on Vercel: proxies the demo page to NVIDIA Nemotron (build.nvidia.com).
+// FlyWithEase A6 analyst backend on Vercel: proxies the demo page to NVIDIA Nemotron (build.nvidia.com).
 // The key lives ONLY in the Vercel environment variable NEMOTRON_API_KEY (never in the repo or the page).
 const ALLOWED_ORIGINS = ['https://mackathon-three.vercel.app', 'http://localhost:8080'];
 const NV_DEFAULT = 'nvidia/nemotron-3.5-lightning-30b-a3b';     // text: Q&A and memo (override with NEMOTRON_MODEL)
 const NV_VL_DEFAULT = 'nvidia/nemotron-3.5-super-vl-120b-a12b'; // vision: RF map cross-check (override with NEMOTRON_VL_MODEL)
 const MAX_Q = 600, MAX_CTX = 12000;
 
-const SYSTEM = `You are the project-monitoring analyst inside NavContinuity's Track A6 demo.
+const SYSTEM = `You are the project-monitoring analyst inside FlyWithEase's Track A6 demo.
 Asset: Noida International Airport (Jewar), monitored with Sentinel-2 satellite imagery 2020-2026.
 Rules:
 - Answer ONLY from the CONTEXT JSON supplied. If the answer is not in it, say you don't know.
@@ -17,7 +17,7 @@ Rules:
 - Be concise: at most 150 words unless asked for a memo. Memos: max 250 words, headings Evidence / Decision / Caveats.`;
 
 // Collision mode: a real predicted close approach between two tracked objects (CelesTrak elements, SGP4).
-const SYSTEM_COLLISION = `You are the collision-avoidance assistant in NavContinuity's orbital view (hackathon Track B).
+const SYSTEM_COLLISION = `You are the collision-avoidance assistant in FlyWithEase's orbital view (hackathon Track B).
 The CONTEXT holds a close approach computed in the browser from public CelesTrak orbital elements with SGP4, plus a
 physics estimate of an along-track avoidance burn for each object. Rules:
 - Use ONLY the numbers in CONTEXT. Never invent distances, burns, probabilities or times.
@@ -28,7 +28,7 @@ physics estimate of an along-track avoidance burn for each object. Rules:
 - At most 130 words.`;
 
 // Earth Viewer mode: describe change at any location from two Sentinel-2 cloudless yearly mosaics.
-const SYSTEM_EARTH = `You compare two satellite images of the same place for NavContinuity's Earth Viewer.
+const SYSTEM_EARTH = `You compare two satellite images of the same place for FlyWithEase's Earth Viewer.
 Images: Sentinel-2 cloudless yearly mosaics (EOX), about 10 m per pixel, same area, labelled with their years.
 Rules:
 - Describe only what is visible: new or removed buildings, roads, runways, clearing, farmland, water, mining, flooding.

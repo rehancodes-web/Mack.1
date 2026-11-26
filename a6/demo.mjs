@@ -60,7 +60,7 @@ const CTX = {
   decision: { report_pct: dec.report.reported_pct, satellite_pct: dec.satellite_observed_pct, gap_pts: dec.gap_pts, scenarios: dec.scenarios, assumed_parameters: dec.parameters, caveat: dec.caveat },
   readiness: rdy,
   nemotron_review: rev ? { curve: rev.curve?.finding, vision: rev.vision.map(v => [v.month, v.finding]) } : null,
-  product: 'NavContinuity: GPS failure -> diversion capacity -> confirmed passenger recovery. A6 output = recovery capacity + region for Track C GNSS check.',
+  product: 'FlyWithEase: GPS failure -> diversion capacity -> confirmed passenger recovery. A6 output = recovery capacity + region for Track C GNSS check.',
 };
 
 // ---------- chart (direct labels, no legend) ----------
@@ -100,7 +100,7 @@ const reviewItems = rev ? [
 ].join('') : '';
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NavContinuity Site Monitor</title>
+<title>FlyWithEase Site Monitor</title>
 <meta name="description" content="Lender's site monitor: Sentinel-2 and the Larper model check Jewar airport's construction claims; NVIDIA Nemotron reviews the evidence.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
@@ -205,7 +205,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
 </style><link rel="stylesheet" href="nd-theme.css"></head><body>
 <div class="app">
 <header class="top">
- <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
+ <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>FlyWithEase</div>
  <nav class="mods" aria-label="Modules">
   <a href="index.html">Overview</a>
   <a href="a6.html" aria-current="page">Jewar <small>A6</small></a>
@@ -225,7 +225,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  <h2>Assets</h2>
  <button class="asset" aria-current="true">Noida International Airport<span>Jewar, Uttar Pradesh · 1,333 ha</span><em class="pill inspect">Inspect before paying</em></button>
  <button class="asset" disabled>Navi Mumbai International<span>Backup site · not yet monitored</span><em class="pill idle">Add to monitor</em></button>
- <p class="tracks">Site Monitor tells lenders whether a project's progress claims match what satellites see, and tells NavContinuity which airports are ready to take diverted flights.</p>
+ <p class="tracks">Site Monitor tells lenders whether a project's progress claims match what satellites see, and tells FlyWithEase which airports are ready to take diverted flights.</p>
 </aside>
 
 <main class="main" id="main">
@@ -305,7 +305,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  </div>
 
  <section class="panel" aria-labelledby="h-flow">
-  <h2 id="h-flow">How this feeds NavContinuity</h2>
+  <h2 id="h-flow">How this feeds FlyWithEase</h2>
   <div class="flow">
    <div class="live"><small>Live · Track A6</small><b>Is the airport real?</b>${rdy ? `Land conversion from ${monthName(rdy.satellite.conversion_start_month)}, levelled off ${monthName(rdy.satellite.plateau_month)}.` : ''} Counts as diversion capacity only once an airline confirms slots.</div>
    <div class="live"><small>Live · Track C</small><b>Is GPS degraded nearby?</b>${gn ? `Within ${gn.jewar_region.radius_km} km: <b style="display:inline">${gn.jewar_region.status}</b> (${gn.jewar_region.aircraft_seen.toLocaleString('en-US')} aircraft, ${gn.days.join(', ')}). Hotspots sit on the India–Pakistan border. <a href="c.html">Open GNSS Watch</a>` : 'Aircraft GPS-integrity reports within 50 km. No data reads "unknown", never "safe".'}</div>

@@ -1,6 +1,6 @@
 # A6: Jewar airport from orbit
 
-Track A6 (Infrastructure), the compulsory part of NavContinuity. It shows when Noida International Airport (Jewar), about 70 km from Delhi IGI, physically became usable as a **diversion and recovery airport** for the GPS-failure story. It also drives the Track A economic decision. Built from real Sentinel-2 L2A data, Node.js only.
+Track A6 (Infrastructure), the compulsory part of FlyWithEase. It shows when Noida International Airport (Jewar), about 70 km from Delhi IGI, physically became usable as a **diversion and recovery airport** for the GPS-failure story. It also drives the Track A economic decision. Built from real Sentinel-2 L2A data, Node.js only.
 
 ## Pipeline
 

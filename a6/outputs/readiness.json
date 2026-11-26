@@ -56,7 +56,7 @@
  "recovery_capacity": {
   "physically_present": "yes (derived: land conversion plateaued 2024-12)",
   "operational_status": "reported operational from 2026 (inauguration 28 Mar 2026); satellite cannot confirm runway certification or ATC readiness",
-  "usable_for_navcontinuity": "candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures",
+  "usable_for_flywithease": "candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures",
   "origin": "derived + reported"
  },
  "params": {

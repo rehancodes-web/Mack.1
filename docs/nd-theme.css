@@ -1,4 +1,4 @@
-/* NavContinuity navigation-display theme, loaded AFTER each page's own styles.
+/* FlyWithEase navigation-display theme, loaded AFTER each page's own styles.
    Re-maps the shared design tokens of a6.html, c.html, globe.html and earth.html to the site palette:
    magenta = our model/route, amber = caution/claims, cyan = data, green = normal. Type: B612 + Source Sans 3. */
 @import url('https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap');

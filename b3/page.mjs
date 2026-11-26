@@ -1,4 +1,4 @@
-// Builds ../docs/b3.html: the "Nav Integrity" module (Track B3) of the NavContinuity console.
+// Builds ../docs/b3.html: the "Nav Integrity" module (Track B3) of the FlyWithEase console.
 // Inputs: outputs/b3_physics.json, outputs/b3_sim.json. Usage: node physics.mjs && node simulate.mjs && node page.mjs
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,7 +23,7 @@ const jam = `<svg viewBox="0 0 340 340" role="img" aria-label="Area a 10 W jamme
 const rows = Object.entries(R).map(([k, r]) => `<tr${k.includes('LEO') ? ' class="hi"' : ''}><td>${k}</td><td>${pc(r.detection_rate)}</td><td>${pc(r.raim_detection_rate)}</td><td>${r.spoofed_median_error_m_uncorrected} m</td><td><b>${r.spoofed_median_error_m_ai_corrected} m</b></td><td>${r.clean_median_error_m} m</td></tr>`).join('');
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NavContinuity Nav Integrity</title>
+<title>FlyWithEase Nav Integrity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
 <style>
@@ -55,7 +55,7 @@ ul{margin:6px 0 0;padding-left:18px}
 @media (max-width:820px){.top{flex-wrap:wrap;height:auto;padding:10px 14px}.mods{flex-wrap:wrap}.mods a{padding:6px 8px}.tiles{grid-template-columns:1fr 1fr}.two,.arch{grid-template-columns:1fr}}
 </style></head><body>
 <header class="top">
- <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
+ <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>FlyWithEase</div>
  <nav class="mods" aria-label="Modules">
   <a href="globe.html">Globe <small>all tracks</small></a>
   <a href="index.html">Site Monitor <small>Track A6</small></a>
@@ -81,7 +81,7 @@ ul{margin:6px 0 0;padding-left:18px}
  <div><b>1 · LEO layer</b>${ph.constellation.satellites_needed} smallsats at ${ph.constellation.altitude_km} km broadcast ranging signals plus correction and authentication messages over Indian airspace.</div>
  <div><b>2 · Receiver</b>Aircraft use GPS, NavIC and LEO together; three independent sources are hard to fake at once.</div>
  <div><b>3 · Onboard check</b>A small model compares the constellations every second; if GPS disagrees, it is dropped and the fix comes from NavIC + LEO.</div>
- <div><b>4 · Insights down</b>Satellites and aircraft report "GPS faked here" events, not raw signals, to NavContinuity's GNSS map and passenger recovery.</div>
+ <div><b>4 · Insights down</b>Satellites and aircraft report "GPS faked here" events, not raw signals, to FlyWithEase's GNSS map and passenger recovery.</div>
 </div></section>
 
 <div class="two">

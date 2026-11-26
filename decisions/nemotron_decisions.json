@@ -4,7 +4,7 @@
  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
  "evidence_type": "AI decision support (Nemotron) on reported cases; not an operational instruction",
  "context": {
-  "product": "NavContinuity: Track C detects where GPS is failing from aircraft integrity reports; Track A6 confirms which nearby airport can absorb diversions (Noida International Airport, Jewar, ~70 km from Delhi IGI, phase 1 inaugurated 28 Mar 2026, one runway); Track B3 proposes a LEO navigation layer (19 dB stronger, simulated spoofed error 50 m -> 8 m); passenger recovery flow rebooks, books care at the right city and tracks bags.",
+  "product": "FlyWithEase: Track C detects where GPS is failing from aircraft integrity reports; Track A6 confirms which nearby airport can absorb diversions (Noida International Airport, Jewar, ~70 km from Delhi IGI, phase 1 inaugurated 28 Mar 2026, one runway); Track B3 proposes a LEO navigation layer (19 dB stronger, simulated spoofed error 50 m -> 8 m); passenger recovery flow rebooks, books care at the right city and tracks bags.",
   "track_c_today": {
    "day": "2026-11-01",
    "reports": 24579,
@@ -45,12 +45,12 @@
       "action": "Hold and use conventional ILS",
       "pro": "Maintains schedule; no equipment change",
       "con": "Not available for Runway 10; increases runway occupancy time",
-      "decision": "Use conventional ILS for Runway 10 if available; otherwise divert to Noida International Airport (Jewar) with NavContinuity Track A6 monitoring."
+      "decision": "Use conventional ILS for Runway 10 if available; otherwise divert to Noida International Airport (Jewar) with FlyWithEase Track A6 monitoring."
      }
     ],
     "decision": "Divert to Noida International Airport (Jewar) using Track A6 confirmed capability; runway 10 ILS unavailable, RNP spoofed, Jewar has one runway ready for diversion.",
     "fix": [
-     "Activate NavContinuity Track C GPS integrity warnings for crew awareness",
+     "Activate FlyWithEase Track C GPS integrity warnings for crew awareness",
      "Use Track A6 to confirm Jewar airport diversion availability and runway status",
      "Deploy passenger recovery flow to rebook affected passengers to correct city and track bags"
     ],
@@ -134,7 +134,7 @@
     ],
     "decision": "Diversion to Jewar airport as nearest alternate with runway capacity for GPS-based approach.",
     "fix": [
-     "Activate NavContinuity Track C GPS integrity warnings for crew awareness",
+     "Activate FlyWithEase Track C GPS integrity warnings for crew awareness",
      "Coordinate with ATC for Jewar runway availability and approach clearance",
      "Use passenger recovery flow to rebook affected passengers to next available flights"
     ],
@@ -163,7 +163,7 @@
     ],
     "decision": "Choose diversion to Tallinn Airport because it is unaffected by the interference and ensures safe approach without receiver reset delays.",
     "fix": [
-     "Activate NavContinuity Track C warnings to monitor interference extent",
+     "Activate FlyWithEase Track C warnings to monitor interference extent",
      "Diversion to Tallinn Airport using established procedures",
      "Implement passenger recovery flow to rebook onto Tallinn-bound flights"
     ],

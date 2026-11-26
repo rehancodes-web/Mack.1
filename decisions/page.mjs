@@ -47,6 +47,6 @@ const P = path.join(HERE, '..', 'docs', 'passengers.html');
 let html = fs.readFileSync(P, 'utf8');
 html = html.includes('<!-- NEMOTRON:START -->')
   ? html.replace(/<!-- NEMOTRON:START -->[\s\S]*<!-- NEMOTRON:END -->/, block)
-  : html.replace('<h2>How NavContinuity recovers each passenger</h2>', `${block}\n\n<h2>How NavContinuity recovers each passenger</h2>`);
+  : html.replace('<h2>How FlyWithEase recovers each passenger</h2>', `${block}\n\n<h2>How FlyWithEase recovers each passenger</h2>`);
 fs.writeFileSync(P, html);
 console.log('rendered', D.cases.length, 'cases into docs/passengers.html');

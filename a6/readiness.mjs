@@ -1,4 +1,4 @@
-// A6 -> NavContinuity hand-off: one asset record saying whether this airport can serve as recovery capacity
+// A6 -> FlyWithEase hand-off: one asset record saying whether this airport can serve as recovery capacity
 // (diversions, rebooked passengers), when satellite evidence says it physically took shape, and how that
 // compares with reported dates. Track C reads `region` from here.
 // Usage: node readiness.mjs   -> outputs/readiness.json
@@ -47,7 +47,7 @@ const out = {
   recovery_capacity: {
     physically_present: plateau ? 'yes (derived: land conversion plateaued ' + plateau.month + ')' : 'unknown',
     operational_status: 'reported operational from 2026 (inauguration 28 Mar 2026); satellite cannot confirm runway certification or ATC readiness',
-    usable_for_navcontinuity: 'candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures',
+    usable_for_flywithease: 'candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures',
     origin: 'derived + reported',
   },
   params: P,

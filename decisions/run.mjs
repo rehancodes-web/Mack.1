@@ -11,7 +11,7 @@ const R = f => JSON.parse(fs.readFileSync(path.join(HERE, '..', f), 'utf8'));
 const gn = R('c/outputs/gnss_summary.json');
 
 const CONTEXT = {
-  product: 'NavContinuity: Track C detects where GPS is failing from aircraft integrity reports; Track A6 confirms which nearby airport can absorb diversions (Noida International Airport, Jewar, ~70 km from Delhi IGI, phase 1 inaugurated 28 Mar 2026, one runway); Track B3 proposes a LEO navigation layer (19 dB stronger, simulated spoofed error 50 m -> 8 m); passenger recovery flow rebooks, books care at the right city and tracks bags.',
+  product: 'FlyWithEase: Track C detects where GPS is failing from aircraft integrity reports; Track A6 confirms which nearby airport can absorb diversions (Noida International Airport, Jewar, ~70 km from Delhi IGI, phase 1 inaugurated 28 Mar 2026, one runway); Track B3 proposes a LEO navigation layer (19 dB stronger, simulated spoofed error 50 m -> 8 m); passenger recovery flow rebooks, books care at the right city and tracks bags.',
   track_c_today: { day: gn.days[0], reports: gn.reports, high_cells: gn.cells_high, hotspots: 'India-Pakistan border (Amritsar/Jammu) and Myanmar', jewar_region: gn.jewar_region.status },
   india_reported: { incidents_nov2023_dec2025: 2354, impacts_2025: { loss_of_gps: '71%', loss_of_ads: '54%', egpws_alerts: '19%', complete_outage: '10%', loss_of_gnss_landing: '6%' }, northwest_india_2025: 276, delhi_vicinity_2025: 64 },
   costs_reported: { diversion_eur: '1,000-77,200 (EUROCONTROL 2022)', block_minute_usd: 98.41, note: 'general costs, not proven GPS-caused' },
@@ -34,7 +34,7 @@ You are the airline operations decision-maker. Using ONLY the case facts and CON
 "passengers": one sentence, what passengers at the airport experience;
 "options": array of exactly 3 objects {"action": short, "pro": short, "con": short} the airline could take;
 "decision": one sentence naming the option you choose and why;
-"fix": array of exactly 3 short concrete steps that solve it, at least one using NavContinuity (Track C warning, A6 diversion airport, B3 LEO backup, or passenger recovery);
+"fix": array of exactly 3 short concrete steps that solve it, at least one using FlyWithEase (Track C warning, A6 diversion airport, B3 LEO backup, or passenger recovery);
 "confidence": "high" | "medium" | "low" with a 6-word reason.
 Keep every string under 30 words. Do not invent numbers that are not in the facts or context.`;
 

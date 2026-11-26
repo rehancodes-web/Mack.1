@@ -20,13 +20,13 @@ const head = (title, desc, cur) => `<!doctype html>
 <link rel="stylesheet" href="site.css">
 <style>.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.box{background:var(--panel-2);border:1px solid var(--rule);border-radius:var(--r-m);padding:18px 20px}.box h3{margin-bottom:8px}.box ul{margin:0;padding-left:18px}.box li{margin:5px 0}.quote{border-left:3px solid var(--route);padding:8px 14px;background:var(--panel-2);border-radius:0 var(--r-m) var(--r-m) 0;margin:10px 0;font-size:15.5px}.tag{font-family:var(--head);font-size:12px;color:var(--dim)}@media(max-width:860px){.grid3,.grid2{grid-template-columns:1fr}}</style>
 </head><body>
-<header class="top"><div class="wrap"><a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>NavContinuity</a>
+<header class="top"><div class="wrap"><a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>FlyWithEase</a>
 <nav class="mods" aria-label="Sections"><a href="index.html">Overview</a></nav></div></header>
 <main class="page">`;
 const foot = `</main><footer><div class="wrap">Mach-A-Thon Aeromania '26 · numbers generated from the repository outputs by site_pages.mjs · labels: reported, derived, simulated, assumed. Code: <a href="https://github.com/rehancodes-web/Mack.1">github.com/rehancodes-web/Mack.1</a></div></footer></body></html>`;
 
 // ---------------- TECH ----------------
-const tech = head('Technology', 'Data, pipeline and the Larper model behind NavContinuity.', 'tech.html') + `
+const tech = head('Technology', 'Data, pipeline and the Larper model behind FlyWithEase.', 'tech.html') + `
 <h1>Technology</h1>
 <p class="lead">Seven free satellite and aviation datasets, a Node.js pipeline that reads only the pixels it needs, and Larper, a Random Forest that labels every 10 m of the airport. Rubric: <b>Track A · Technical depth, AI &amp; satellite data (20)</b>.</p>
 
@@ -74,7 +74,7 @@ ${met.per_class.map(c => `<tr><td>${c.class.replace('_', ' / ')}</td><td>${fmt(c
 
 // ---------------- AI ----------------
 const b = NB.brief || {}, f = NB.fact_check || { issues: [] };
-const ai = head('AI and Nemotron', 'Where NVIDIA Nemotron and the Larper model work inside NavContinuity, with real outputs.', 'ai.html') + `
+const ai = head('AI and Nemotron', 'Where NVIDIA Nemotron and the Larper model work inside FlyWithEase, with real outputs.', 'ai.html') + `
 <h1>AI and NVIDIA Nemotron</h1>
 <p class="lead">Two kinds of AI: <b>Larper</b> measures the ground from satellite pixels; <b>NVIDIA Nemotron</b> reasons over those measurements and the GPS map to make decisions, then checks its own work. Every output on this page is real and saved in the repository.</p>
 
@@ -168,7 +168,7 @@ const R = [
   ]],
 ];
 const card = { 'index.html': 'Overview', 'passengers.html': 'Passengers', 'tech.html': 'Technology', 'ai.html': 'AI', 'feasibility.html': 'Feasibility', 'a6.html': 'Jewar (A6)', 'deck.html': 'Deck', 'c.html': 'GPS map (C)', 'globe.html': 'Globe (B3)' };
-const score = head('Scorecard', 'How NavContinuity addresses each line of the Mach-A-Thon marking scheme.', 'scorecard.html') + `
+const score = head('Scorecard', 'How FlyWithEase addresses each line of the Mach-A-Thon marking scheme.', 'scorecard.html') + `
 <h1>Scorecard</h1>
 <p class="lead">Each line of the judges' marking scheme, what they look for, and where we show it. Judging priority: Track A quality first.</p>
 ${R.map(([sec, marks, rows]) => `<h2>${sec} <span class="tag">${marks} marks</span></h2>
