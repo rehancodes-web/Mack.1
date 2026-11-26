@@ -47,6 +47,61 @@
 </div>
 <p class="note">General delay and diversion costs, not costs proven to be caused by GPS failures. Hotels, meals, rebooking and compensation come on top.</p>
 
+<!-- NEMOTRON:START -->
+<h2>Nemotron decisions: four real GPS-failure cases</h2>
+<p class="lead">For each reported case, NVIDIA Nemotron (nvidia/nemotron-3.5-lightning-30b-a3b) was asked as the airline's operations decision-maker: what fails, how it hits the aircraft turnaround, what passengers face, which option to take and how to fix it. The team then checked every answer against the facts.</p>
+<style>.dcase{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:16px;margin:14px 0}.dcase h3{margin:0 0 6px}.dcase th{width:190px}.dcase ol{margin:0;padding-left:18px}</style>
+<section class="dcase">
+ <h3>Delhi IGI: GPS spoofing on Runway 10 approaches (2025)</h3>
+ <p class="note"><b>Reported facts:</b> Flights on GPS-based (RNP) approaches to Runway 10 were spoofed. Contingency procedures were used; conventional aids (ILS) remained available for other runway directions; government reported no effect on movements; DGCA introduced real-time spoofing reporting.</p>
+ <table><tbody>
+  <tr><th>What fails</th><td>GPS spoofing on RNP approaches to Runway 10 at Delhi IGI causes lateral deviation, forcing diversion to alternate airport.</td></tr>
+  <tr><th>Turnaround impact</th><td>Late inbound from diversion; receiver reset/maintenance check adds 30+ minutes ground time before next rotation.</td></tr>
+  <tr><th>Passengers</th><td>Delayed departure; rebooking to alternate airport; baggage misrouting risk from disrupted ground ops.</td></tr>
+  <tr><th>Nemotron decision</th><td>Divert to Noida International Airport (Jewar) using Track A6 confirmed capability; runway 10 ILS unavailable, RNP spoofed, Jewar has one runway ready for diversion.</td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate NavContinuity Track C GPS integrity warnings for crew awareness</li><li>Use Track A6 to confirm Jewar airport diversion availability and runway status</li><li>Deploy passenger recovery flow to rebook affected passengers to correct city and track bags</li></ol></td></tr>
+  <tr><th>Human check <span class="ev">corrected</span></th><td>Facts say ILS stayed available on other runway directions and movements were unaffected. First move: switch arrivals to an ILS runway at IGI; divert to Jewar only if that runway is saturated.<br><b>Final call:</b> Move arrivals to an ILS runway at IGI; Jewar is the fallback, confirmed by Track A6.</td></tr>
+ </tbody></table>
+</section>
+<section class="dcase">
+ <h3>Amritsar / Jammu: persistent jamming near the border</h3>
+ <p class="note"><b>Reported facts:</b> 276 reported incidents in north-western India in 2025; Track C shows a band of high-interference cells along the India-Pakistan border. Aircraft lose GPS en route and on approach; some arrive with receivers that do not recover before the next departure.</p>
+ <table><tbody>
+  <tr><th>What fails</th><td>GPS jamming in north-western India causes aircraft to lose GPS en route and on approach to Amritsar/Jammu, compromising safe landing and missed approach capability.</td></tr>
+  <tr><th>Turnaround impact</th><td>Inbound aircraft delayed by receiver reset/maintenance checks after jamming; crew duty limits may be exceeded before next rotation can begin.</td></tr>
+  <tr><th>Passengers</th><td>Passengers experience flight diversions, delays, or cancellations; baggage may be mishandled during rebooking to alternative airports.</td></tr>
+  <tr><th>Nemotron decision</th><td>Diversion to Noida International Airport using Track A6 confirmed capability; avoids persistent jamming and leverages new runway capacity.</td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate Track C jamming warning for all aircraft in sector</li><li>File diversion plan to Noida International Airport with ATC</li><li>Use B3 LEO backup receiver during final approach phase</li></ol></td></tr>
+  <tr><th>Human check <span class="ev">agreed, with a correction</span></th><td>Diverting away from the jamming band is sound. "CAT III" at Jewar is not in our data, so check Jewar's approach aids before dispatch. B3 is a future system, not available today.<br><b>Final call:</b> Divert away from the jamming band (Jewar or Delhi), after checking approach aids; use Track C to warn every flight in the sector.</td></tr>
+ </tbody></table>
+</section>
+<section class="dcase">
+ <h3>Complete GPS outage at an airport with GPS-only approaches</h3>
+ <p class="note"><b>Reported facts:</b> 10% of reported Indian incidents were complete outages and 6% lost GNSS-based landing capability. Scenario: an evening bank of arrivals into an airport whose only instrument approach is GPS-based, poor visibility, nearest alternates Delhi IGI and Jewar.</p>
+ <table><tbody>
+  <tr><th>What fails</th><td>GPS-only approach fails in poor visibility, preventing landing and forcing diversion to alternate airports.</td></tr>
+  <tr><th>Turnaround impact</th><td>Late inbound arrival delays turnaround; receiver reset and maintenance check add 30+ minutes ground time before next rotation.</td></tr>
+  <tr><th>Passengers</th><td>Passengers experience diversions, delays, missed connections, and overnight stays at alternate airports.</td></tr>
+  <tr><th>Nemotron decision</th><td>Diversion to Jewar airport as nearest alternate with runway capacity for GPS-based approach.</td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate NavContinuity Track C GPS integrity warnings for crew awareness</li><li>Coordinate with ATC for Jewar runway availability and approach clearance</li><li>Use passenger recovery flow to rebook affected passengers to next available flights</li></ol></td></tr>
+  <tr><th>Human check <span class="ev">agreed, with a correction</span></th><td>Diversion is right. Jewar must have a non-GPS approach (ILS) for this to work; check before naming it as the alternate.<br><b>Final call:</b> Divert to the nearest alternate with a non-GPS approach (Delhi IGI ILS, or Jewar if confirmed); start passenger rebooking before landing.</td></tr>
+ </tbody></table>
+</section>
+<section class="dcase">
+ <h3>Tartu, Estonia: route suspended (Apr-May 2024)</h3>
+ <p class="note"><b>Reported facts:</b> Finnair suspended Helsinki-Tartu flights from 29 April to 31 May 2024 because GPS interference made the GPS-based approach unusable; Tallinn Airport was unaffected. Passengers had to reroute via Tallinn by road.</p>
+ <table><tbody>
+  <tr><th>What fails</th><td>GPS interference disables the GPS-based approach at Tartu Airport, making the approach unusable for aircraft relying on satellite navigation.</td></tr>
+  <tr><th>Turnaround impact</th><td>Late inbound aircraft cannot execute the approach; receiver reset and maintenance checks add delay before the next rotation can begin.</td></tr>
+  <tr><th>Passengers</th><td>Passengers face rerouting via Tallinn by road, causing delays and additional ground transport costs.</td></tr>
+  <tr><th>Nemotron decision</th><td>Choose diversion to Tallinn Airport because it is unaffected by the interference and ensures safe approach without receiver reset delays.</td></tr>
+  <tr><th>Fix</th><td><ol><li>Activate NavContinuity Track C warnings to monitor interference extent</li><li>Diversion to Tallinn Airport using established procedures</li><li>Implement passenger recovery flow to rebook onto Tallinn-bound flights</li></ol></td></tr>
+  <tr><th>Human check <span class="ev">agreed</span></th><td>Matches what actually happened: flights stopped at Tartu and passengers went via Tallinn. Our addition: start the rebooking and coach transfer before departure, not after.<br><b>Final call:</b> Operate to Tallinn and pre-book the road transfer and rebookings before departure.</td></tr>
+ </tbody></table>
+</section>
+<p class="note">AI decision support on reported cases, not an operational instruction. Generated 2026-11-26 01:03 UTC by decisions/run.mjs; review notes in decisions/page.mjs.</p>
+<!-- NEMOTRON:END -->
+
 <h2>How NavContinuity recovers each passenger</h2>
 <div class="chain" style="grid-template-columns:repeat(4,1fr)">
  <div><b>Warn</b>Track C flags GPS failing near the airport</div>

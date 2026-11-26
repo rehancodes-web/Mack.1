@@ -1,0 +1,180 @@
+{
+ "schema_version": "1.0",
+ "generated_utc": "2026-11-26T01:03:12.807Z",
+ "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+ "evidence_type": "AI decision support (Nemotron) on reported cases; not an operational instruction",
+ "context": {
+  "product": "NavContinuity: Track C detects where GPS is failing from aircraft integrity reports; Track A6 confirms which nearby airport can absorb diversions (Noida International Airport, Jewar, ~70 km from Delhi IGI, phase 1 inaugurated 28 Mar 2026, one runway); Track B3 proposes a LEO navigation layer (19 dB stronger, simulated spoofed error 50 m -> 8 m); passenger recovery flow rebooks, books care at the right city and tracks bags.",
+  "track_c_today": {
+   "day": "2026-11-01",
+   "reports": 24579,
+   "high_cells": 37,
+   "hotspots": "India-Pakistan border (Amritsar/Jammu) and Myanmar",
+   "jewar_region": "normal"
+  },
+  "india_reported": {
+   "incidents_nov2023_dec2025": 2354,
+   "impacts_2025": {
+    "loss_of_gps": "71%",
+    "loss_of_ads": "54%",
+    "egpws_alerts": "19%",
+    "complete_outage": "10%",
+    "loss_of_gnss_landing": "6%"
+   },
+   "northwest_india_2025": 276,
+   "delhi_vicinity_2025": 64
+  },
+  "costs_reported": {
+   "diversion_eur": "1,000-77,200 (EUROCONTROL 2022)",
+   "block_minute_usd": 98.41,
+   "note": "general costs, not proven GPS-caused"
+  },
+  "airline_finding_reported": "ICAO-hosted airline presentation: some receivers need a ground maintenance reset after interference; IATA: receiver recovery can exceed 30 minutes in a significant number of cases."
+ },
+ "cases": [
+  {
+   "id": "delhi",
+   "title": "Delhi IGI: GPS spoofing on Runway 10 approaches (2025)",
+   "facts": "Flights on GPS-based (RNP) approaches to Runway 10 were spoofed. Contingency procedures were used; conventional aids (ILS) remained available for other runway directions; government reported no effect on movements; DGCA introduced real-time spoofing reporting.",
+   "nemotron": {
+    "fails": "GPS spoofing on RNP approaches to Runway 10 at Delhi IGI causes lateral deviation, forcing diversion to alternate airport.",
+    "turnaround": "Late inbound from diversion; receiver reset/maintenance check adds 30+ minutes ground time before next rotation.",
+    "passengers": "Delayed departure; rebooking to alternate airport; baggage misrouting risk from disrupted ground ops.",
+    "options": [
+     {
+      "action": "Hold and use conventional ILS",
+      "pro": "Maintains schedule; no equipment change",
+      "con": "Not available for Runway 10; increases runway occupancy time",
+      "decision": "Use conventional ILS for Runway 10 if available; otherwise divert to Noida International Airport (Jewar) with NavContinuity Track A6 monitoring."
+     }
+    ],
+    "decision": "Divert to Noida International Airport (Jewar) using Track A6 confirmed capability; runway 10 ILS unavailable, RNP spoofed, Jewar has one runway ready for diversion.",
+    "fix": [
+     "Activate NavContinuity Track C GPS integrity warnings for crew awareness",
+     "Use Track A6 to confirm Jewar airport diversion availability and runway status",
+     "Deploy passenger recovery flow to rebook affected passengers to correct city and track bags"
+    ],
+    "confidence": "medium"
+   },
+   "human_review": {
+    "verdict": "corrected",
+    "note": "Facts say ILS stayed available on other runway directions and movements were unaffected. First move: switch arrivals to an ILS runway at IGI; divert to Jewar only if that runway is saturated.",
+    "final": "Move arrivals to an ILS runway at IGI; Jewar is the fallback, confirmed by Track A6."
+   }
+  },
+  {
+   "id": "northwest",
+   "title": "Amritsar / Jammu: persistent jamming near the border",
+   "facts": "276 reported incidents in north-western India in 2025; Track C shows a band of high-interference cells along the India-Pakistan border. Aircraft lose GPS en route and on approach; some arrive with receivers that do not recover before the next departure.",
+   "nemotron": {
+    "fails": "GPS jamming in north-western India causes aircraft to lose GPS en route and on approach to Amritsar/Jammu, compromising safe landing and missed approach capability.",
+    "turnaround": "Inbound aircraft delayed by receiver reset/maintenance checks after jamming; crew duty limits may be exceeded before next rotation can begin.",
+    "passengers": "Passengers experience flight diversions, delays, or cancellations; baggage may be mishandled during rebooking to alternative airports.",
+    "options": [
+     {
+      "action": "Hold at alternate airport",
+      "pro": "Avoids jamming zone; uses proven runway",
+      "con": "Increases fuel burn and crew duty time",
+      "id": "opt1"
+     },
+     {
+      "action": "Attempt approach with GPS override",
+      "pro": "May allow landing at origin airport",
+      "con": "Risk of missed approach if receivers do not recover; safety critical",
+      "id": "opt2"
+     },
+     {
+      "action": "Diversion to Noida International Airport",
+      "pro": "New runway designed for CAT III operations; outside jamming zone",
+      "con": "Longer ground transit for passengers; slot availability uncertainty",
+      "id": "opt3"
+     }
+    ],
+    "decision": "Diversion to Noida International Airport using Track A6 confirmed capability; avoids persistent jamming and leverages new runway capacity.",
+    "fix": [
+     "Activate Track C jamming warning for all aircraft in sector",
+     "File diversion plan to Noida International Airport with ATC",
+     "Use B3 LEO backup receiver during final approach phase"
+    ],
+    "confidence": "medium Three-step fix relies on untested LEO backup performance"
+   },
+   "human_review": {
+    "verdict": "agreed, with a correction",
+    "note": "Diverting away from the jamming band is sound. \"CAT III\" at Jewar is not in our data, so check Jewar's approach aids before dispatch. B3 is a future system, not available today.",
+    "final": "Divert away from the jamming band (Jewar or Delhi), after checking approach aids; use Track C to warn every flight in the sector."
+   }
+  },
+  {
+   "id": "outage",
+   "title": "Complete GPS outage at an airport with GPS-only approaches",
+   "facts": "10% of reported Indian incidents were complete outages and 6% lost GNSS-based landing capability. Scenario: an evening bank of arrivals into an airport whose only instrument approach is GPS-based, poor visibility, nearest alternates Delhi IGI and Jewar.",
+   "nemotron": {
+    "fails": "GPS-only approach fails in poor visibility, preventing landing and forcing diversion to alternate airports.",
+    "turnaround": "Late inbound arrival delays turnaround; receiver reset and maintenance check add 30+ minutes ground time before next rotation.",
+    "passengers": "Passengers experience diversions, delays, missed connections, and overnight stays at alternate airports.",
+    "options": [
+     {
+      "action": "Diversion to Jewar airport",
+      "pro": "Nearest viable alternate with runway capacity",
+      "con": "Requires runway availability and ATC clearance not guaranteed",
+      "confidence": "medium"
+     },
+     {
+      "action": "Holding pattern until GPS restores",
+      "pro": "Keeps aircraft in controlled airspace",
+      "con": "Fuel exhaustion risk, crew duty limit breach",
+      "confidence": "medium"
+     },
+     {
+      "action": "Proceed to Delhi IGI with manual backup",
+      "pro": "Larger airport with multiple approach types",
+      "con": "70 km distance, possible slot loss, ATC workload",
+      "confidence": "medium"
+     }
+    ],
+    "decision": "Diversion to Jewar airport as nearest alternate with runway capacity for GPS-based approach.",
+    "fix": [
+     "Activate NavContinuity Track C GPS integrity warnings for crew awareness",
+     "Coordinate with ATC for Jewar runway availability and approach clearance",
+     "Use passenger recovery flow to rebook affected passengers to next available flights"
+    ],
+    "confidence": "medium"
+   },
+   "human_review": {
+    "verdict": "agreed, with a correction",
+    "note": "Diversion is right. Jewar must have a non-GPS approach (ILS) for this to work; check before naming it as the alternate.",
+    "final": "Divert to the nearest alternate with a non-GPS approach (Delhi IGI ILS, or Jewar if confirmed); start passenger rebooking before landing."
+   }
+  },
+  {
+   "id": "tartu",
+   "title": "Tartu, Estonia: route suspended (Apr-May 2024)",
+   "facts": "Finnair suspended Helsinki-Tartu flights from 29 April to 31 May 2024 because GPS interference made the GPS-based approach unusable; Tallinn Airport was unaffected. Passengers had to reroute via Tallinn by road.",
+   "nemotron": {
+    "fails": "GPS interference disables the GPS-based approach at Tartu Airport, making the approach unusable for aircraft relying on satellite navigation.",
+    "turnaround": "Late inbound aircraft cannot execute the approach; receiver reset and maintenance checks add delay before the next rotation can begin.",
+    "passengers": "Passengers face rerouting via Tallinn by road, causing delays and additional ground transport costs.",
+    "options": [
+     {
+      "action": "Use B3 LEO backup for approach guidance",
+      "pro": "8 m simulated error improves reliability",
+      "con": "Requires receiver compatibility and certification"
+     }
+    ],
+    "decision": "Choose diversion to Tallinn Airport because it is unaffected by the interference and ensures safe approach without receiver reset delays.",
+    "fix": [
+     "Activate NavContinuity Track C warnings to monitor interference extent",
+     "Diversion to Tallinn Airport using established procedures",
+     "Implement passenger recovery flow to rebook onto Tallinn-bound flights"
+    ],
+    "confidence": "medium"
+   },
+   "human_review": {
+    "verdict": "agreed",
+    "note": "Matches what actually happened: flights stopped at Tartu and passengers went via Tallinn. Our addition: start the rebooking and coach transfer before departure, not after.",
+    "final": "Operate to Tallinn and pre-book the road transfer and rebookings before departure."
+   }
+  }
+ ],
+ "review_note": "Each Nemotron decision was checked by the team against the reported facts; corrections are shown next to the AI output."
+}

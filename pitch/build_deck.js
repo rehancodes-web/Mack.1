@@ -1,4 +1,4 @@
-// Builds pitch/NavContinuity_MachAThon.pptx (9 slides, ~5 min). Usage: cd pitch && node gnss_map.js && node build_deck.js
+// Builds pitch/NavContinuity_MachAThon.pptx (10 slides, ~5 min). Usage: cd pitch && node gnss_map.js && node build_deck.js
 const fs = require('fs');
 const path = require('path');
 const pptxgen = require('pptxgenjs');
@@ -135,6 +135,18 @@ cost.forEach(([n, l], i) => {
 });
 T(s, 'Airlines pay for every diversion and stranded passenger, so they are the buyer for faster, confirmed recovery.', { x: 0.5, y: 4.75, w: 3.95, h: 0.45, fontSize: 11, color: HEX.accent5 });
 s.addNotes('Passenger impact, about 25 seconds. GPS failure rarely makes the news as a crash; it shows up as holding, delays and diversions, and those land on people in the terminal. Name two of the five problems. Costs are published industry figures, not costs proven to come from GPS failures. Airlines pay for all of this, so they are the customer.');
+
+// ---------- 2d. Nemotron decisions on real GPS-failure cases ----------
+const ND = rd('decisions/nemotron_decisions.json');
+s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Problem' });
+s.addText('Nemotron decides: four real GPS-failure cases', { placeholder: 'title' });
+const short = { delhi: 'Delhi IGI 2025: spoofed Runway 10 approaches', northwest: 'Amritsar / Jammu: border jamming', outage: 'Complete GPS outage, GPS-only approach', tartu: 'Tartu 2024: route suspended' };
+const dh = ['Case', 'Turnaround hit', 'Decision (after human check)'].map(t => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk1 } } }));
+const drows = ND.cases.map(c => [short[c.id] || c.title, (c.nemotron?.turnaround || '').replace(/\.$/, ''), c.human_review.final].map((t, i) => ({ text: t, options: { color: HEX.dk1, fill: { color: i === 2 ? 'FCEFD9' : HEX.lt1 }, bold: i === 0 } })));
+s.addTable([dh, ...drows], { x: 0.5, y: 1.05, w: 9, colW: [2.2, 3.1, 3.7], fontSize: 10, fontFace: THEME.bodyFontFace, border: { type: 'solid', color: HEX.lt2, pt: 1 }, rowH: [0.3, 0.8, 0.8, 0.8, 0.8], valign: 'middle' });
+T(s, `Model: ${ND.model}. Asked as the airline ops decision-maker: what fails, turnaround impact, passengers, options, decision, fix. The team checked every answer; Nemotron got Delhi wrong (ILS was available on other runways) and we corrected it.`, { x: 0.5, y: 4.6, w: 9, h: 0.5, fontSize: 10, color: HEX.accent5 });
+tag(s, 8.55, 0.8, 'AI + HUMAN', HEX.accent2);
+s.addNotes('About 40 seconds. We gave Nemotron four real cases from our research and asked it to act as the airline\'s operations controller. The common pattern: the aircraft arrives late, its GPS receiver may need a reset, so the next rotation slips; passengers miss connections. Decisions: divert to an airport with a non-GPS approach, which is exactly what Track A6 confirms for Jewar, and start rebooking before landing. Be honest that Nemotron made one factual mistake on Delhi and we corrected it: AI proposes, people decide.');
 
 // ---------- 3. A6 real data ----------
 pres.addSection({ title: 'Track A6' });
