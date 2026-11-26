@@ -376,12 +376,8 @@ async function ask(shown,question,images){
  add('me','',shown);const w=add('bot','Nemotron','Working on it…');btns().forEach(b=>b.disabled=true);
  const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},nemotron_live_visual_check:visualCheck};
  try{const res=await fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,context:ctx,images:images||[]})});const j=await res.json();
-  if(j.answer){fmtInto(w.lastChild,j.answer);return j.answer;}if(SAVED[shown]){fmtInto(w.lastChild,SAVED[shown]+'
-
-(Saved Nemotron answer; live analyst offline.)');return SAVED[shown];}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
- catch(err){if(SAVED[shown]){fmtInto(w.lastChild,SAVED[shown]+'
-
-(Saved Nemotron answer; live analyst offline.)');return SAVED[shown];}w.className='msg err';w.lastChild.textContent='The analyst is unreachable ('+err.message+'). The panels on the left are unaffected.';return null;}
+  if(j.answer){fmtInto(w.lastChild,j.answer);return j.answer;}if(SAVED[shown]){fmtInto(w.lastChild,SAVED[shown]+' (Saved Nemotron answer; live analyst offline.)');return SAVED[shown];}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
+ catch(err){if(SAVED[shown]){fmtInto(w.lastChild,SAVED[shown]+' (Saved Nemotron answer; live analyst offline.)');return SAVED[shown];}w.className='msg err';w.lastChild.textContent='The analyst is unreachable ('+err.message+'). The panels on the left are unaffected.';return null;}
  finally{btns().forEach(b=>b.disabled=false);feed.scrollTop=feed.scrollHeight;}}
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=async()=>{const q=b.dataset.q;
  if(q==='memo')return ask('Write lender memo','Write a short lender memo: release the next tranche on the contractor report, or commission an inspection first, using the current slider values. Headings: Evidence / Decision / Caveats.');
