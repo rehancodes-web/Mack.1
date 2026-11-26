@@ -1,4 +1,4 @@
-// Builds pitch/NavContinuity_MachAThon.pptx (7 slides, ~5 min). Usage: cd pitch && node build_deck.js
+// Builds pitch/NavContinuity_MachAThon.pptx (8 slides, ~5 min). Usage: cd pitch && node gnss_map.js && node build_deck.js
 const fs = require('fs');
 const path = require('path');
 const pptxgen = require('pptxgenjs');
@@ -92,6 +92,24 @@ T(s, [
 ], { x: 0.75, y: 3.45, w: 8.5, h: 1.4, fontSize: 15, valign: 'middle', paraSpaceAfter: 6 });
 s.addNotes('0:20-0:50. Three reported numbers, then Delhi 2025. Land on the question: when Delhi degrades, which airports can absorb diversions? Noida International (Jewar), about 70 km away, is the new one. Did it physically exist yet? Satellites answer that.');
 
+// ---------- 2b. Evidence: real aircraft GPS-integrity reports ----------
+const gsum = rd('c/outputs/gnss_summary.json');
+s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Problem' });
+s.addText('Real aircraft data shows where GPS degrades', { placeholder: 'title' });
+s.addImage({ path: path.join(__dirname, 'gnss_map.png'), x: 0.5, y: 1.1, w: 4.4, h: 3.85, altText: 'Map of South Asia: share of aircraft reporting degraded GPS integrity per 1-degree cell; red band along the India-Pakistan border and Myanmar; Delhi and Jewar in normal cells' });
+const leg = [['High: over 10% of aircraft degraded', HEX.accent4], ['Medium: 2-10%', HEX.accent1], ['Low: under 2%', HEX.accent3]];
+leg.forEach(([l, c], i) => { s.addShape(pres.shapes.RECTANGLE, { x: 5.2, y: 1.15 + i * 0.32, w: 0.22, h: 0.22, fill: { color: c }, line: { color: c } }); T(s, l, { x: 5.52, y: 1.13 + i * 0.32, w: 4, h: 0.26, fontSize: 12, color: HEX.dk2 }); });
+T(s, [{ text: 'White ring: Delhi IGI · blue dot: Jewar', options: {} }], { x: 5.2, y: 2.12, w: 4.3, h: 0.26, fontSize: 12, color: HEX.dk2 });
+const ev = [[gsum.reports.toLocaleString('en-US'), 'aircraft position reports with integrity flags, one day'], [String(gsum.cells_high), 'cells rated high, clustered on the India-Pakistan border and Myanmar'], [gsum.jewar_region.status.toUpperCase(), `Jewar region (${gsum.jewar_region.aircraft_seen.toLocaleString('en-US')} aircraft): a usable diversion airport when Delhi-side GPS degrades`]];
+ev.forEach(([n, l], i) => {
+  const y = 2.55 + i * 0.8;
+  card(s, 5.2, y, 4.3, 0.7, i === 2 ? HEX.dk1 : HEX.lt2, `Evidence ${i + 1}`);
+  T(s, n, { x: 5.35, y, w: 1.4, h: 0.7, fontSize: 20, bold: true, color: i === 2 ? HEX.accent3 : HEX.dk1, valign: 'middle', fontFace: THEME.headFontFace });
+  T(s, l, { x: 6.75, y, w: 2.65, h: 0.7, fontSize: 11, color: i === 2 ? HEX.lt1 : HEX.dk2, valign: 'middle' });
+});
+T(s, `Source: ADS-B Exchange sample data, ${gsum.days.join(', ')} (${gsum.snapshots} snapshots), aircraft-reported navigation integrity. Derived; one day only. Protective monitoring, no individual tracking.`, { x: 0.5, y: 5.0, w: 9, h: 0.22, fontSize: 9, color: HEX.accent5 });
+s.addNotes('0:50-1:10. This is real data, not a model: aircraft broadcast how much they trust their own GPS. One day of reports already shows the interference band along the border. Jewar, 70 km from Delhi, sits in clean cells, which is why it matters as a diversion airport. This is context for the problem; the full GNSS monitoring product is our next step, not one of the tracks we are presenting.');
+
 // ---------- 3. A6 real data ----------
 pres.addSection({ title: 'Track A6' });
 s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Track A6' });
@@ -116,7 +134,7 @@ steps.forEach(([h, d], i) => {
   T(s, h, { x: x + 0.55, y: 3.73, w: 2.3, h: 0.32, fontSize: 15, bold: true, color: HEX.dk1 });
   T(s, d, { x: x + 0.55, y: 4.05, w: 2.35, h: 0.75, fontSize: 12, color: HEX.dk2 });
 });
-s.addNotes('0:50-1:30. Show the before/after (or switch to the live Site Monitor). 79 real scenes, every one traceable to a Sentinel-2 file. Larper is our pixel classifier. The output feeds a money decision.');
+s.addNotes('1:10-1:40. Show the before/after (or switch to the live Site Monitor). 79 real scenes, every one traceable to a Sentinel-2 file. Larper is our pixel classifier. The output feeds a money decision.');
 
 // ---------- 4. A6 results ----------
 s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Track A6' });
@@ -141,7 +159,7 @@ T(s, [
   { text: `Larper agrees with ESA WorldCover on ${Math.round(met.overall_accuracy * 100)}% of held-out pixels; built/paved recall ${Math.round(met.per_class.find(c => c.class === 'built_paved').recall * 100)}%.`, options: { breakLine: true } },
   { text: 'Conversion starts mid-2023, not at the 2021 groundbreaking. Land conversion is not completion.' },
 ], { x: 6.75, y: 3.7, w: 2.75, h: 1.35, fontSize: 11, color: HEX.dk2, paraSpaceAfter: 4 });
-s.addNotes('1:30-2:30. The key slide. Baseline and AI agree on the shape: nothing until mid-2023, peak in 2025. In January 2025 the contractor reported 80% complete; satellites saw roughly half the land converted. That gap is not proof of anything, but it is exactly when a lender should look. AI vs baseline: Larper is trained on WorldCover labels outside the airport, tested on a separate block of land.');
+s.addNotes('1:40-2:30. The key slide. Baseline and AI agree on the shape: nothing until mid-2023, peak in 2025. In January 2025 the contractor reported 80% complete; satellites saw roughly half the land converted. That gap is not proof of anything, but it is exactly when a lender should look. AI vs baseline: Larper is trained on WorldCover labels outside the airport, tested on a separate block of land.');
 
 // ---------- 5. Decision + who pays ----------
 s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Track A6' });
