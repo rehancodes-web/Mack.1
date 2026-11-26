@@ -238,7 +238,7 @@ b3.forEach(([n, d, lab], i) => {
   T(s, d, { x: x + 0.2, y: 2.35, w: 2.45, h: 1.4, fontSize: 12, color: i === 1 ? HEX.lt1 : HEX.dk2 });
 });
 card(s, 0.5, 4.05, 9, 0.95, HEX.lt2, 'B3 flow');
-T(s, [{ text: 'Link to A6: ', options: { bold: true, color: HEX.dk1 } }, { text: 'A6 tells you which airports can absorb diversions when GPS degrades; B3 makes positioning around them harder to deny in the first place. Live 3D simulation: rehancodes-web.github.io/Mack.1/b3.html', options: { color: HEX.dk2 } }], { x: 0.7, y: 4.1, w: 8.6, h: 0.85, fontSize: 13, valign: 'middle' });
+T(s, [{ text: 'Link to A6: ', options: { bold: true, color: HEX.dk1 } }, { text: 'A6 tells you which airports can absorb diversions when GPS degrades; B3 makes positioning around them harder to deny in the first place. Live 3D globe: rehancodes-web.github.io/Mack.1/globe.html', options: { color: HEX.dk2 } }], { x: 0.7, y: 4.1, w: 8.6, h: 0.85, fontSize: 13, valign: 'middle' });
 s.addNotes('3:15-4:15. Physics first: inverse-square law gives LEO a 19 dB edge, which shrinks a 10 W jammer\'s reach 80x in area. Simulation: GPS alone barely detects spoofing; adding NavIC and LEO with a learned cross-check catches 92% and pulls the spoofed error from 50 m to 8 m. Cost is a back-of-envelope with assumed inputs. Optionally open the 3D globe.');
 
 // ---------- 7. Close ----------
