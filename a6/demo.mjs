@@ -31,7 +31,7 @@ if (ai.some(r => r.converted_12m != null)) ai.forEach(r => { r.converted_smooth 
 const preFloor = (() => { const w = ai.filter(r => r.month < '2023-01' && r.converted_smooth != null).map(r => r.converted_smooth).sort((a, b) => a - b); return w.length ? w[Math.floor(w.length / 2)] : null; })();
 const met = opt('classifier_metrics.json');
 const rev = opt('nemotron_review.json');
-const AI_ENDPOINT = process.env.AI_ENDPOINT ?? '/api/analyst';
+const AI_ENDPOINT = process.env.AI_ENDPOINT ?? 'https://mackathon-three.vercel.app/api/analyst';
 const P0 = DEFAULTS;
 
 const SHOTS = ['2020-03', '2022-05', '2024-03', '2025-01', '2026-03'].filter(m => has(`quicklook_${m}.png`));

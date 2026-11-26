@@ -1,6 +1,6 @@
 // FlyWithEase A6 analyst backend on Vercel: proxies the demo page to NVIDIA Nemotron (build.nvidia.com).
 // The key lives ONLY in the Vercel environment variable NEMOTRON_API_KEY (never in the repo or the page).
-const ALLOWED_ORIGINS = ['https://mackathon-three.vercel.app', 'http://localhost:8080'];
+const ALLOWED_ORIGINS = ['https://mackathon-three.vercel.app', 'https://rehancodes-web.github.io', 'http://localhost:8080'];
 const NV_DEFAULT = 'nvidia/nemotron-3.5-lightning-30b-a3b';     // text: Q&A and memo (override with NEMOTRON_MODEL)
 const NV_VL_DEFAULT = 'nvidia/nemotron-3.5-super-vl-120b-a12b'; // vision: RF map cross-check (override with NEMOTRON_VL_MODEL)
 const MAX_Q = 600, MAX_CTX = 12000;

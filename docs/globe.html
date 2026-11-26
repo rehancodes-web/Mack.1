@@ -323,7 +323,7 @@ async function ask(){const b=found,I=b.info;b.asking=true;b.ai=null;b.reasoning=
  const ctx={encounter:{time_utc:new Date(b.t).toISOString(),minutes_from_now:Math.round((b.t-Date.now())/60000),miss_distance_km:+b.d.toFixed(3),relative_speed_km_s:+I.vr.toFixed(2),altitude_km:Math.round(I.ga.h)},
   objects:I.opts.map(o=>o.can_manoeuvre?o:{name:o.name,norad:o.norad,can_manoeuvre:false,altitude_km:o.altitude_km}),
   source:'CelesTrak public orbital elements, SGP4 in the browser; each burn is sized from the real orbits so the miss distance reaches '+I.target+' km'};
- try{const r=await fetch('/api/analyst',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'collision',question:'Which object should temporarily change trajectory, and how? Think it through, then speak to that satellite\'s operations team.',context:ctx})});
+ try{const r=await fetch('https://mackathon-three.vercel.app/api/analyst',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'collision',question:'Which object should temporarily change trajectory, and how? Think it through, then speak to that satellite\'s operations team.',context:ctx})});
   const j=await r.json();b.ai=j.answer||('Error: '+(j.error||r.status));b.aiErr=!j.answer;b.reasoning=j.reasoning||'';b.aiModel=j.model||'';}
  catch(e){b.ai='Could not reach Nemotron: '+e.message;b.aiErr=true;}
  clearInterval(tm);b.asking=false;b.fresh=true;
