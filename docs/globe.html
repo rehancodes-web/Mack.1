@@ -148,7 +148,7 @@ window.NC_GLOBE=G; // handle for debugging in the console
 const atip=document.createElement('div');atip.className='tip';atip.style.cssText='position:fixed;pointer-events:none;z-index:30;display:none';document.body.appendChild(atip);
 el.addEventListener('mousemove',e=>{hovAp=null;
  if(show.airports){const b=el.getBoundingClientRect(),c=G.toGlobeCoords(e.clientX-b.left,e.clientY-b.top);
-  if(c){const alt=G.pointOfView().altitude,thr=Math.max(.06,Math.min(1.2,alt*.35)),k=Math.PI/180;let bd=1e9,best=null;
+  if(c){const alt=G.pointOfView().altitude,thr=Math.max(.3,Math.min(2,alt*.9)),k=Math.PI/180;let bd=1e9,best=null;
    for(const a of aps){const d=Math.acos(Math.min(1,Math.sin(c.lat*k)*Math.sin(a.lat*k)+Math.cos(c.lat*k)*Math.cos(a.lat*k)*Math.cos((c.lng-a.lng)*k)))/k;if(d<bd){bd=d;best=a;}}
    if(best&&bd<=thr)hovAp=best;}}
  document.body.classList.toggle('aphov',!!hovAp);
