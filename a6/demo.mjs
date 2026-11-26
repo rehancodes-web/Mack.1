@@ -207,12 +207,11 @@ input[type=range]{width:100%;accent-color:var(--larper)}
 <header class="top">
  <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
  <nav class="mods" aria-label="Modules">
-  <a href="globe.html">Globe <small>all tracks</small></a>
-  <a href="index.html" aria-current="page">Site Monitor <small>Track A6</small></a>
-  <a href="earth.html">Earth Viewer <small>any place</small></a>
-  <a href="c.html">GNSS Watch <small>Track C</small></a>
-  <a href="b3.html">Nav Integrity <small>Track B3</small></a>
-  <a class="soon" aria-disabled="true">Passenger Recovery <small>next</small></a>
+  <a href="index.html">Overview</a>
+  <a href="a6.html" aria-current="page">Jewar airport <small>Track A6</small></a>
+  <a href="b3.html">Harder-to-jam GPS <small>Track B3</small></a>
+  <a href="c.html">GPS malfunction <small>Track C</small></a>
+  <a href="passengers.html">Passenger impact</a>
  </nav>
  <div class="src">Sentinel-2 · ${base.length} monthly scenes · latest ${monthName(base[base.length - 1].month)}</div>
 </header>

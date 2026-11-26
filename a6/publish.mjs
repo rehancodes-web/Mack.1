@@ -12,6 +12,6 @@ for (const f of imgs) fs.copyFileSync(path.join(OUT, f), path.join(DOCS, f));
 const b3 = path.join(HERE, '..', 'spacecraft', 'b3.html');
 fs.copyFileSync(b3, path.join(DOCS, 'b3.html'));
 // B3 is linked from the top navigation ("Nav Integrity"); no floating button (it covered the layer switch).
-fs.writeFileSync(path.join(DOCS, 'index.html'), html);
+fs.writeFileSync(path.join(DOCS, 'a6.html'), html); // index.html is the hand-written overview
 fs.writeFileSync(path.join(DOCS, '.nojekyll'), '');
-console.log(`docs/index.html + docs/b3.html + ${imgs.length} images`);
+console.log(`docs/a6.html + docs/b3.html + ${imgs.length} images`);

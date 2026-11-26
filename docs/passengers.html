@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Passenger Impact</title><meta name="description" content="How GPS failure turns into delays, diversions and stranded passengers, what it costs airlines, and how NavContinuity recovers each passenger.">
+<link rel="stylesheet" href="site.css"></head><body>
+<header class="top"><div class="brand">NavContinuity</div>
+<nav class="mods" aria-label="Sections">
+ <a href="index.html">Overview</a>
+ <a href="a6.html">Jewar airport <small>Track A6</small></a>
+ <a href="b3.html">Harder-to-jam GPS <small>Track B3</small></a>
+ <a href="c.html">GPS malfunction <small>Track C</small></a>
+ <a href="passengers.html" aria-current="page">Passenger impact</a>
+</nav></header>
+<main>
+<h1>From a GPS failure to a stranded passenger</h1>
+<p class="lead">GPS interference rarely makes headlines as a crash. It shows up as delays, holding, diversions and cancellations, and every one of those lands on passengers in a terminal.</p>
+
+<h2>How a GPS failure reaches the passenger</h2>
+<div class="chain">
+ <div><b>1 · Interference</b>Jamming or spoofing near the airport degrades GPS</div>
+ <div><b>2 · Precautions</b>Crews and ATC switch to backup procedures; spacing increases</div>
+ <div><b>3 · Holding</b>Aircraft wait for a usable approach; fuel runs down</div>
+ <div><b>4 · Divert or delay</b>Flights divert to another airport, or departures are held</div>
+ <div><b>5 · Passengers</b>Missed connections, rebooking, hotels, lost bags</div>
+</div>
+<p class="note">Sequence as described by ICAO and EUROCONTROL guidance on GNSS interference (see research/gps-navigation-failures.md). Not every interference event causes a delay.</p>
+
+<h2>What passengers face</h2>
+<table>
+ <thead><tr><th>Problem at the airport</th><th>What it looks like</th><th>Example <span class="ev">self-reported</span></th><th>What NavContinuity does</th></tr></thead>
+ <tbody>
+  <tr><td><b>Endless delay updates</b></td><td>"15 more minutes", repeated for hours, then a cancellation</td><td><a href="https://www.reddit.com/r/americanairlines/comments/1uaepgh/flight_delayed_13_hours_and_counting_have_a_great/">13-hour delay thread</a></td><td>Honest range and the next decision time, not false precision</td></tr>
+  <tr><td><b>Missed connections</b></td><td>The diverted or late flight lands after the onward flight leaves</td><td><a href="https://ja.reddit.com/r/jetblue/comments/1r7hgo9/stranded_at_msy_during_mardi_gras_delay_mixed/">Stranded with mixed messages</a></td><td>Detect the risk early and protect a feasible onward seat</td></tr>
+  <tr><td><b>Bad automatic rebooking</b></td><td>Rebooked to the wrong city, or a far worse option than an agent finds</td><td><a href="https://www.reddit.com/r/americanairlines/comments/1w091a0/flight_from_dfw_was_cancelled_autorebooked_on_a/">Wrong-city auto-rebooking</a></td><td>Check destination, nearby airports, groups and live inventory</td></tr>
+  <tr><td><b>Hotel in the wrong place</b></td><td>Care voucher issued for a city the passenger is not in</td><td><a href="https://www.reddit.com/r/unitedairlines/comments/1sjle5v/flight_from_amsterdam_cancelled_hotel_vouchers/">Amsterdam/Houston voucher mix-up</a></td><td>Book care at the actual stranding airport, with real rooms</td></tr>
+  <tr><td><b>Bags on a different route</b></td><td>The passenger is rebooked; the bag follows the old plan</td><td><a href="https://www.reddit.com/r/americanairlines/comments/1d95ufs">Cancelled-flight bag report</a></td><td>Show the last confirmed scan and tie the bag to the new route</td></tr>
+  <tr><td><b>Overloaded help channels</b></td><td>App, phone line and desk queue all at once, each saying something different</td><td><a href="https://www.reddit.com/r/americanairlines/comments/1uawytz/rebooking_and_the_app/">App vs phone vs queue</a></td><td>One shared case across app, agent and contact centre</td></tr>
+ </tbody>
+</table>
+<p class="note">Examples are individual public posts: they show real failure modes, not how often they happen. Measuring frequency needs airline data.</p>
+
+<h2>What it costs airlines</h2>
+<div class="stat">
+ <div><b>€1,000–77,200</b><span>per diverted flight, regional to intercontinental (EUROCONTROL, 2022 prices) <span class="ev">reported</span></span></div>
+ <div><b>$98.41</b><span>direct operating cost per block minute, US airlines (A4A, 2025) <span class="ev">reported</span></span></div>
+ <div><b>≈ $4,430</b><span>direct cost of a 45-minute delay at that rate, before passenger care <span class="ev">derived</span></span></div>
+ <div><b>2,354</b><span>GPS interference incidents reported in India, Nov 2023 – Dec 2025 <span class="ev">reported</span></span></div>
+</div>
+<p class="note">General delay and diversion costs, not costs proven to be caused by GPS failures. Hotels, meals, rebooking and compensation come on top.</p>
+
+<h2>How NavContinuity recovers each passenger</h2>
+<div class="chain" style="grid-template-columns:repeat(4,1fr)">
+ <div><b>Warn</b>Track C flags GPS failing near the airport</div>
+ <div><b>Route</b>Track A6 knows which nearby airport can take the flight (Jewar for Delhi)</div>
+ <div><b>Rebook</b>Rank options; confirm a real seat, not a suggestion</div>
+ <div><b>Care</b>Hotel at the right city, bag tied to the new route, one case record</div>
+</div>
+<p class="note"><b>Status:</b> warning and diversion capacity run on real data (Tracks C and A6). The passenger recovery flow is specified (PRODUCT_SPEC.md), not built: a live version needs an airline's booking, seat and baggage systems. <b>Who pays:</b> airlines, because every confirmed rebooking and avoided wrong-city hotel cuts the cost of a disruption.</p>
+</main></body></html>

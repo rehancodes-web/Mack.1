@@ -1,308 +1,76 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NavContinuity Site Monitor</title>
-<meta name="description" content="Lender's site monitor: Sentinel-2 and the Larper model check Jewar airport's construction claims; NVIDIA Nemotron reviews the evidence.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#E9EDEC;--panel:#FFFFFF;--rail:#17232C;--railfg:#C9D3D8;--ink:#17232C;--mut:#5A6870;--rule:#D3DAD9;--larper:#2C55C9;--veg:#3F7A35;--claim:#B26E12;--claimbg:#FBEFD9;--ok:#2E7D4F;--focus:#2C55C9}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F171C;--panel:#17222A;--rail:#0B1216;--railfg:#AEBBC1;--ink:#E4EBEA;--mut:#93A2A9;--rule:#2A3840;--larper:#86A3FF;--veg:#8BC06B;--claim:#E6A84A;--claimbg:#33270F;--ok:#6CC08F;--focus:#86A3FF}}
-:root[data-theme="dark"]{--bg:#0F171C;--panel:#17222A;--rail:#0B1216;--railfg:#AEBBC1;--ink:#E4EBEA;--mut:#93A2A9;--rule:#2A3840;--larper:#86A3FF;--veg:#8BC06B;--claim:#E6A84A;--claimbg:#33270F;--ok:#6CC08F;--focus:#86A3FF}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Archivo,system-ui,sans-serif}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-button,select,input[type=text]{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:6px 10px}
-button{cursor:pointer;font-weight:650}button.primary{background:var(--larper);border-color:var(--larper);color:#fff}button:disabled{opacity:.55;cursor:progress}
-.app{display:grid;grid-template-columns:220px minmax(0,1fr) 340px;grid-template-rows:54px 1fr;min-height:100vh}
-.top{grid-column:1/-1;display:flex;align-items:center;gap:22px;padding:0 18px;background:var(--rail);color:var(--railfg);border-bottom:1px solid #000}
-.brand{font-weight:800;font-variation-settings:"wdth" 118;color:#fff;font-size:17px;letter-spacing:.01em;display:flex;align-items:center;gap:9px}
-.brand svg{width:22px;height:22px}
-.mods{display:flex;gap:4px;height:100%}
-.mods a{display:flex;align-items:center;gap:7px;padding:0 12px;color:var(--railfg);text-decoration:none;border-bottom:2px solid transparent;font-weight:600}
-.mods a[aria-current]{color:#fff;border-bottom-color:#86A3FF}
-.mods a.soon{opacity:.55;cursor:default}.mods small{font-size:11px;font-weight:600;border:1px solid currentColor;border-radius:4px;padding:0 5px}
-.top .src{margin-left:auto;font-size:12px}
-.side{background:var(--rail);color:var(--railfg);padding:16px 12px}
-.side h2{font-size:12px;font-weight:650;color:#8796A0;margin:6px 6px 8px}
-.asset{display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;color:var(--railfg);border-radius:8px;padding:10px;margin-bottom:6px}
-.asset[aria-current]{background:#22313B;border-color:#33454F;color:#fff}
-.asset span{display:block;font-size:12px;color:#8796A0;font-weight:500}
-.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:5px}
-.pill.inspect{background:var(--claimbg);color:var(--claim)}.pill.idle{background:#22313B;color:#8796A0}
-.side .add{color:#8796A0;border:1px dashed #33454F;background:transparent;width:100%;margin-top:6px}
-.side .tracks{margin-top:26px;font-size:12px;line-height:1.5;color:#8796A0;padding:0 6px}
-.main{padding:18px 20px 40px;min-width:0}
-.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 24px;margin-bottom:14px}
-.head h1{font-size:26px;line-height:1.1;margin:0;font-weight:800;font-variation-settings:"wdth" 112}
-.head p{margin:2px 0 0;color:var(--mut)}
-.alert{margin-left:auto;display:flex;align-items:center;gap:12px;background:var(--claimbg);color:var(--claim);border-radius:8px;padding:9px 14px;font-weight:700}
-.alert small{display:block;font-weight:500;color:var(--ink);opacity:.8}
-.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.tile{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px}
-.tile .k{color:var(--mut);font-size:12.5px}
-.tile .v{font-size:30px;line-height:1.1;font-weight:800;font-variation-settings:"wdth" 75;margin:3px 0 2px;font-variant-numeric:tabular-nums}
-.tile .s{font-size:12px;color:var(--mut)}
-.tile.claim .v{color:var(--claim)}.tile.orbit .v{color:var(--veg)}.tile.larp .v{color:var(--larper)}
-.ev{font-size:11px;font-weight:650;border:1px solid currentColor;border-radius:4px;padding:0 5px;margin-left:4px}
-.ev.rep{color:var(--claim)}.ev.der{color:var(--veg)}.ev.ass{color:var(--mut)}.ev.ai{color:var(--larper)}
-.panel{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin-bottom:14px}
-.panel h2{font-size:15px;margin:0 0 10px;font-weight:750;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.panel h2 .tools{margin-left:auto;display:flex;gap:6px;font-weight:500}
-.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}.seg button{border:0;border-radius:0;padding:4px 10px;font-weight:600}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
-.viewer{position:relative;border-radius:6px;overflow:hidden;aspect-ratio:816/473;background:#000;user-select:none}
-.viewer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.viewer .clip{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
-.viewer .handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.35);pointer-events:none}
-.viewer .handle::after{content:"";position:absolute;top:50%;left:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
-.viewer input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
-.viewer:focus-within{outline:3px solid var(--focus);outline-offset:2px}
-.tag{position:absolute;top:10px;font-size:12px;font-weight:700;color:#fff;background:rgba(10,20,25,.66);padding:2px 8px;border-radius:4px;pointer-events:none}.tag.l{left:10px}.tag.r{right:10px}
-.scrub{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px;font-size:13px;color:var(--mut)}
-.legend i,.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.dot.built_paved,.legend .b{background:#dc3c3c}.dot.bare,.legend .a{background:#e6c878}.dot.vegetation,.legend .g{background:#3c8c3c}.dot.water,.legend .w{background:#3c78dc}
-.legend{display:flex;gap:12px;flex-wrap:wrap}.legend[hidden]{display:none}
-.lcard{margin-top:10px;border:1px solid var(--rule,#2A3840);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.45}.lcard[hidden]{display:none}
-.lcard table{width:100%;border-collapse:collapse;margin:4px 0 8px}.lcard th,.lcard td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--rule,#2A3840);vertical-align:top}
-.lcard td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.lcard th.n{text-align:right}
-.lcard details{margin-top:4px}.lcard summary{cursor:pointer;font-weight:600}.lcard ul{margin:6px 0 4px 18px;padding:0}.lcard li{margin:3px 0}
-.two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
-svg{width:100%;height:auto;display:block}
-.g{stroke:var(--rule)}.ax{fill:var(--mut);font-size:12px}.gap{fill:var(--rule);opacity:.55}
-.ln{fill:none;stroke-width:2.6;stroke-linejoin:round}.ln.base{stroke:var(--veg)}.ln.larper{stroke:var(--larper)}
-.el{font-size:13px;font-weight:700}.el.base{fill:var(--veg)}.el.larper{fill:var(--larper)}.el.claimt{fill:var(--claim)}
-.claim{fill:var(--claim)}.obs{fill:var(--veg)}.gapline{stroke:var(--claim);stroke-width:2;stroke-dasharray:3 3}
-.tbl{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
-.tbl th,.tbl td{border-bottom:1px solid var(--rule);padding:6px 6px;text-align:left}.tbl th{font-weight:650;color:var(--mut)}.tbl tr.hi td{background:var(--claimbg)}
-.wrap{overflow-x:auto}
-.big{font-size:34px;font-weight:800;font-variation-settings:"wdth" 75;line-height:1}
-.note{color:var(--mut);font-size:12.5px;margin:8px 0 0}
-.wait{color:var(--mut);border-left:3px solid var(--rule);padding:4px 0 4px 10px;margin:0}
-.ctl{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;margin-bottom:10px}
-.ctl label{font-size:13px;color:var(--mut)}.ctl output{font-weight:700;color:var(--ink)}
-input[type=range]{width:100%;accent-color:var(--larper)}
-.verdict{display:flex;align-items:center;gap:14px;border-radius:8px;padding:10px 14px;margin:4px 0 10px}
-.verdict.inspect{background:var(--claimbg);color:var(--claim)}.verdict.release{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
-.verdict b{font-size:19px;font-variation-settings:"wdth" 92}.verdict span{color:var(--ink);font-size:13px}
-.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.flow div{border:1px solid var(--rule);border-radius:8px;padding:10px 12px}.flow b{display:block;margin-bottom:2px}.flow .live{border-color:var(--larper)}
-.flow small{font-size:11px;font-weight:700;color:var(--larper)}.flow .nx small{color:var(--mut)}
-.co{background:var(--panel);border-left:1px solid var(--rule);display:flex;flex-direction:column;min-height:0;position:sticky;top:0;height:100vh}
-.co header{padding:14px 16px 10px;border-bottom:1px solid var(--rule)}
-.co header h2{margin:0;font-size:15px;font-weight:750}.co header p{margin:2px 0 0;font-size:12px;color:var(--mut)}
-.feed{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.msg{border-radius:8px;padding:9px 11px;white-space:pre-wrap;font-size:13px;line-height:1.5}
-.msg b{display:block;margin-bottom:3px}
-.msg.bot{background:color-mix(in srgb,var(--larper) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--larper) 22%,var(--rule))}
-.msg.me{background:var(--bg);align-self:flex-end;max-width:88%}
-.msg.err{border:1px solid var(--claim);color:var(--ink)}
-.hc{display:block;margin-top:8px;padding:7px 9px;border-left:3px solid var(--claim);background:var(--claimbg);color:var(--ink)}
-.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}.chips button{font-size:12px;padding:4px 9px;border-radius:14px;font-weight:600}
-.composer{display:flex;gap:6px;padding:10px 14px 14px;border-top:1px solid var(--rule)}.composer input{flex:1;min-width:0}
-@media (max-width:1180px){.app{grid-template-columns:200px minmax(0,1fr)}.co{grid-column:1/-1;position:static;height:auto;border-left:0;border-top:1px solid var(--rule)}.feed{max-height:420px}}
-@media (max-width:820px){.app{grid-template-columns:1fr;grid-template-rows:auto}.top{flex-wrap:wrap;padding:10px 14px;height:auto}.mods{height:auto;flex-wrap:wrap}.mods a{padding:6px 8px}.top .src{margin-left:0}.side{display:flex;gap:8px;overflow-x:auto;padding:10px}.side h2,.side .tracks,.side .add{display:none}.asset{min-width:200px;margin:0}.tiles{grid-template-columns:1fr 1fr}.two,.ctl,.flow{grid-template-columns:1fr}.alert{margin-left:0}}
-@media (prefers-reduced-motion:no-preference){.viewer.intro .clip{transition:clip-path .9s cubic-bezier(.3,.7,.2,1)}.viewer.intro .handle{transition:left .9s cubic-bezier(.3,.7,.2,1)}}
-</style></head><body>
-<div class="app">
-<header class="top">
- <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
- <nav class="mods" aria-label="Modules">
-  <a href="globe.html">Globe <small>all tracks</small></a>
-  <a href="index.html" aria-current="page">Site Monitor <small>Track A6</small></a>
-  <a href="earth.html">Earth Viewer <small>any place</small></a>
-  <a href="c.html">GNSS Watch <small>Track C</small></a>
-  <a href="b3.html">Nav Integrity <small>Track B3</small></a>
-  <a class="soon" aria-disabled="true">Passenger Recovery <small>next</small></a>
- </nav>
- <div class="src">Sentinel-2 · 79 monthly scenes · latest Nov 2026</div>
-</header>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NavContinuity Overview</title><meta name="description" content="GPS failure around airports: detect it, absorb the diversions, harden positioning, recover passengers. Mach-A-Thon Aeromania 26.">
+<link rel="stylesheet" href="site.css"></head><body>
+<header class="top"><div class="brand">NavContinuity</div>
+<nav class="mods" aria-label="Sections">
+ <a href="index.html" aria-current="page">Overview</a>
+ <a href="a6.html">Jewar airport <small>Track A6</small></a>
+ <a href="b3.html">Harder-to-jam GPS <small>Track B3</small></a>
+ <a href="c.html">GPS malfunction <small>Track C</small></a>
+ <a href="passengers.html">Passenger impact</a>
+</nav></header>
+<main>
+<h1>When GPS fails around an airport, flights divert and passengers are stranded</h1>
+<p class="lead">GPS jamming and spoofing now hit Indian airspace routinely. We use satellites to see where GPS is failing, which airports can absorb the diverted flights, and how to make positioning harder to deny, so every passenger reaches a confirmed outcome.</p>
 
-<aside class="side" aria-label="Monitored assets">
- <h2>Assets</h2>
- <button class="asset" aria-current="true">Noida International Airport<span>Jewar, Uttar Pradesh · 1,333 ha</span><em class="pill inspect">Inspect before paying</em></button>
- <button class="asset" disabled>Navi Mumbai International<span>Backup site · not yet monitored</span><em class="pill idle">Add to monitor</em></button>
- <p class="tracks">Site Monitor tells lenders whether a project's progress claims match what satellites see, and tells NavContinuity which airports are ready to take diverted flights.</p>
-</aside>
-
-<main class="main" id="main">
- <div class="head">
-  <div><h1>Noida International Airport, Jewar</h1><p>Greenfield airport · foundation stone 25 Nov 2021 · phase 1 opened 28 Mar 2026 (reported)</p></div>
-  <div class="alert" role="status">Satellite progress lags the builder's claim by 29 points<small>Recommended: inspect before releasing the next tranche</small></div>
- </div>
-
- <section class="tiles" aria-label="Key figures for January 2025">
-  <div class="tile claim"><div class="k">Builder's claim, Jan 2025 <span class="ev rep">reported</span></div><div class="v">80%</div><div class="s">"work complete" (Business Standard)</div></div>
-  <div class="tile orbit"><div class="k">Seen from orbit, Jan 2025 <span class="ev der">derived</span></div><div class="v">51%</div><div class="s">land converted, Sentinel-2</div></div>
-  <div class="tile larp"><div class="k">Larper: converted land <span class="ev ai">AI</span></div><div class="v">41%</div><div class="s">Jan 2025, 12-month median (farmland reads 4%)</div></div>
-  <div class="tile"><div class="k">Larper accuracy <span class="ev ai">AI</span></div><div class="v">71%</div><div class="s">agreement with ESA WorldCover on unseen land</div></div>
- </section>
-
- <section class="panel" aria-labelledby="h-view">
-  <h2 id="h-view">Site imagery<span class="tools"><span class="seg" role="group" aria-label="Layer"><button id="lyHi" aria-pressed="false">High-res photo</button><button id="lyPhoto" aria-pressed="true">Sentinel-2</button><button id="lyLarper" aria-pressed="false">Larper layer</button></span></span></h2>
-  <div class="viewer" id="viewer" style="--pos:50%">
-   <img id="imgB" src="quicklook_2026-03.png" alt="Site, Mar 2026">
-   <div class="clip"><img id="imgA" src="quicklook_2020-03.png" alt="Site, Mar 2020"></div>
-   <div class="handle" aria-hidden="true"></div>
-   <span class="tag l" id="tagA">Mar 2020</span><span class="tag r" id="tagB">Mar 2026</span>
-   <input type="range" id="swipeR" min="0" max="100" value="50" aria-label="Drag to compare the two dates">
-  </div>
-  <div class="scrub">
-   <label>Left <select id="selA"><option value="2020-03" selected>Mar 2020</option><option value="2022-05">May 2022</option><option value="2024-03">Mar 2024</option><option value="2025-01">Jan 2025</option><option value="2026-03">Mar 2026</option></select></label>
-   <label>Right <select id="selB"><option value="2020-03">Mar 2020</option><option value="2022-05">May 2022</option><option value="2024-03">Mar 2024</option><option value="2025-01">Jan 2025</option><option value="2026-03" selected>Mar 2026</option></select></label>
-   <span>Yellow: airport boundary (OSM)</span>
-   <span id="credit" hidden>Photos: Esri World Imagery Wayback (Maxar, Earthstar Geographics); capture on or before the release date</span>
-   <span class="legend" id="legend" hidden><span><i class="b"></i>built / paved</span><span><i class="a"></i>bare</span><span><i class="g"></i>vegetation</span><span><i class="w"></i>water</span></span>
-  </div>
-  <div class="lcard" id="lcard" hidden aria-live="polite">
-   <b>Larper map legend</b> · each 10 m square of the airport is labelled by Larper, our AI model <span class="ev ai">AI</span>
-   <table><thead><tr><th>Colour</th><th>Means</th><th class="n" id="lhA">Left</th><th class="n" id="lhB">Right</th></tr></thead><tbody>
-    <tr><td><i class="dot built_paved"></i>Red</td><td><b>Built or paved</b>: runway, terminal, roads, aprons</td><td class="n" id="lA1"></td><td class="n" id="lB1"></td></tr>
-    <tr><td><i class="dot bare"></i>Sand</td><td><b>Bare earth</b>: cleared land, earthworks</td><td class="n" id="lA2"></td><td class="n" id="lB2"></td></tr>
-    <tr><td><i class="dot vegetation"></i>Green</td><td><b>Vegetation</b>: crops, grass, trees</td><td class="n" id="lA0"></td><td class="n" id="lB0"></td></tr>
-    <tr><td><i class="dot water"></i>Blue</td><td><b>Water</b>: ponds, wet ground</td><td class="n" id="lA3"></td><td class="n" id="lB3"></td></tr>
-    <tr><td>Dark</td><td>Outside the airport boundary, or hidden by cloud</td><td></td><td></td></tr>
-   </tbody></table>
-   <details open><summary>What Larper is</summary><ul>
-    <li><b>Our own AI model</b>: a Random Forest of 20 decision trees that votes on a label for every 10 m square, every month 2020–2026. A classic, explainable method, not a chatbot.</li>
-    <li><b>Input</b>: the colour and infrared values Sentinel-2 records for each square (6 bands) plus 4 indices for greenness, built-up surfaces and bare soil.</li>
-    <li><b>Teacher</b>: ESA WorldCover 2021, learnt from land <i>around</i> the airport only, so the airport is new to it.</li>
-    <li><b>Accuracy</b>: agrees with WorldCover on <b>71%</b> of test land it never saw (built/paved 88%, bare earth 31%). WorldCover is itself a model, so this is agreement, not ground truth.</li>
-    <li><b>Clean-up rule for the progress curve</b>: a square counts as converted only if Larper calls it built or bare in at least 75% of its clear, non-monsoon looks over 12 months, so dry fields or a hazy day don't read as construction. Single-month maps like these are not cleaned up.</li>
-    <li><b>Why we need it</b>: the vegetation index can't tell a runway from a bare mud field, and it dips when grass regrows on finished ground. Larper separates them: about <b>41%</b> of the site converted in Jan 2025, about <b>10%</b> paved by Nov 2026.</li>
-    <li><b>Where it fits</b>: it backs the lender check (builder's "80% complete" vs what orbit shows), it dates when Jewar became usable as a diversion airport for GPS trouble around Delhi, and Nemotron's vision model audits these maps against the photos.</li>
-   </ul></details>
-  </div>
- </section>
-
- <section class="panel" aria-labelledby="h-prog">
-  <h2 id="h-prog">Progress over time <span class="ev der">derived</span></h2>
-  <svg viewBox="0 0 960 360" role="img" aria-labelledby="chartTitle chartDesc">
-<title id="chartTitle">Construction progress at Jewar airport, 2020 to 2026</title>
-<desc id="chartDesc">Land cleared all year (NDVI baseline) and Larper built or paved share, with the reported 80% claim in January 2025.</desc>
-<line class="g" x1="44" x2="810" y1="320" y2="320"/><text class="ax" x="36" y="324" text-anchor="end">0%</text><line class="g" x1="44" x2="810" y1="244.5" y2="244.5"/><text class="ax" x="36" y="248.5" text-anchor="end">25%</text><line class="g" x1="44" x2="810" y1="169" y2="169"/><text class="ax" x="36" y="173" text-anchor="end">50%</text><line class="g" x1="44" x2="810" y1="93.5" y2="93.5"/><text class="ax" x="36" y="97.5" text-anchor="end">75%</text><line class="g" x1="44" x2="810" y1="18" y2="18"/><text class="ax" x="36" y="22" text-anchor="end">100%</text><text class="ax" x="98.54303599374022" y="342" text-anchor="middle">2020</text><text class="ax" x="207.92879499217528" y="342" text-anchor="middle">2021</text><text class="ax" x="317.3145539906103" y="342" text-anchor="middle">2022</text><text class="ax" x="426.70031298904536" y="342" text-anchor="middle">2023</text><text class="ax" x="536.385758998435" y="342" text-anchor="middle">2024</text><text class="ax" x="645.7715179968701" y="342" text-anchor="middle">2025</text><text class="ax" x="755.1572769953052" y="342" text-anchor="middle">2026</text><rect class="gap" x="557.660406885759" y="18" width="6" height="302"><title>2024-09: cloud gap</title></rect>
-<path class="ln base" d="M82.7,296.7L94.6,298.0L99.1,298.0L108.1,298.0L120.1,298.0L130.6,310.0L144.1,310.3L147.1,310.3L159.1,310.3L165.1,310.6L177.1,297.0L181.6,296.7L196.5,302.2L199.5,304.3L222.0,304.3L228.0,304.3L240.0,313.1L249.0,314.0L258.0,313.7L271.5,313.7L276.0,313.7L286.4,313.4L295.4,313.1L304.4,313.1L308.9,312.1L319.4,312.1L334.4,312.1L337.4,312.1L349.4,315.2L362.9,312.1L365.9,312.1L377.9,312.4L382.3,312.1L392.8,306.7L401.8,306.1L413.8,306.1L419.8,285.9L427.3,285.9L443.8,285.9L445.3,285.9L455.8,255.4L469.3,252.1L473.8,232.1L490.2,231.8L497.7,228.5L503.7,221.2L511.2,210.4L523.2,209.8L530.7,203.4L554.7,203.4M572.6,177.5L581.6,180.8L584.6,162.4L599.6,165.1L604.1,165.4L616.1,156.6L620.6,150.6L634.1,152.7L640.1,152.7L671.5,152.7L678.1,176.9L691.0,174.4L698.5,173.5L706.0,172.6L715.0,174.7L720.1,173.8L734.5,178.7L741.1,178.7L751.0,179.6L758.5,179.6L770.4,179.6L782.4,179.6L783.9,207.1L798.9,219.4"/>
-<path class="ln larper" d="M82.7,304.9L94.6,308.5L99.1,308.5L108.1,308.5L120.1,308.5L130.6,313.4L144.1,311.8L147.1,314.3L159.1,313.7L165.1,313.4L177.1,312.4L181.6,311.2L196.5,310.0L199.5,309.7L222.0,309.7L228.0,309.7L240.0,308.8L249.0,305.8L258.0,297.0L271.5,297.0L276.0,284.4L286.4,296.1L295.4,301.6L304.4,303.4L308.9,300.1L319.4,300.1L334.4,300.1L337.4,300.1L349.4,298.9L362.9,300.1L365.9,307.3L377.9,310.6L382.3,311.8L392.8,308.5L401.8,292.2L413.8,279.8L419.8,266.5L427.3,266.5L443.8,266.5L445.3,266.5L455.8,258.4L469.3,248.7L473.8,241.5L490.2,232.1L497.7,224.0L503.7,216.7L511.2,206.1L523.2,191.6L530.7,178.4L554.7,178.4M572.6,174.4L581.6,182.3L584.6,188.9L599.6,196.8L604.1,194.1L616.1,189.2L620.6,190.4L634.1,188.3L640.1,185.0L671.5,185.0L678.1,183.5L691.0,183.8L698.5,189.5L706.0,182.0L715.0,184.1L720.1,183.8L734.5,183.5L741.1,186.5L751.0,191.6L758.5,191.6L770.4,191.6L782.4,191.6L783.9,193.2L798.9,201.3"/>
-<text class="el base" x="806.9115805946792" y="223.434">Cleared land 33%</text>
-<text class="el larper" x="806.9115805946792" y="205.314">Larper: converted 39%</text>
-<line class="gapline" x1="599.6197183098592" x2="599.6197183098592" y1="78.39999999999998" y2="165.98"/>
-<circle class="claim" cx="599.6197183098592" cy="78.39999999999998" r="6"/><text class="el claimt" x="589.6197183098592" y="66.39999999999998" text-anchor="end">Reported: 80% complete</text>
-<circle class="obs" cx="599.6197183098592" cy="165.98" r="5"/><text class="el base" x="609.6197183098592" y="183.98">Seen from orbit: 51%</text>
-</svg>
-  <p class="note">Green: land free of vegetation all year (crop cycles never count). Blue: Larper converted land (built or paved plus bare earth), as a 12-month median like the green line, so hazy scenes and harvest-season bare fields drop out. Before construction it sits near 4%, which is Larper's false-alarm floor on farmland. Unlike the green line, it does not dip after 2025. Grey: too cloudy to measure. The green line dips after 2025 because grass regrows on finished, unpaved ground.</p>
- </section>
-
- <div class="two">
-  <section class="panel" aria-labelledby="h-dec">
-   <h2 id="h-dec">Tranche decision <span class="ev ass">assumed costs</span></h2>
-   <div class="ctl">
-    <label for="c">Inspection cost <output id="cv"></output><input id="c" type="range" min="2000" max="60000" step="1000" value="15000"></label>
-    <label for="p">Chance report is optimistic <output id="pv"></output><input id="p" type="range" min="0" max="0.6" step="0.005" value="0.375"></label>
-   </div>
-   <div class="verdict" id="verdict" aria-live="polite"></div>
-   <div class="wrap"><table class="tbl"><tr><th scope="col">Evidence</th><th scope="col">Chance</th><th scope="col">If released</th><th scope="col">If inspected</th><th scope="col">Do</th></tr><tr><td>No satellite evidence (prior)</td><td>0.10</td><td>$30,000</td><td>$18,000</td><td><b>Inspect</b></td></tr><tr class="hi"><td>Satellite: 51% converted vs 80% reported (gap 29 pts)</td><td>0.38</td><td>$112,500</td><td>$26,250</td><td><b>Inspect</b></td></tr><tr><td>Counterfactual: satellite agrees with report</td><td>0.03</td><td>$9,000</td><td>$15,900</td><td><b>Release</b></td></tr></table></div>
-   <p class="note">$300,000 at risk, inspection 90% effective (assumed). Inspect when the chance exceeds 5.6%.</p>
-  </section>
-  <section class="panel" aria-labelledby="h-model">
-   <h2 id="h-model">Larper model <span class="ev ai">AI</span></h2>
-   <p style="margin:0 0 8px">Random Forest, 20 trees, 10 spectral features. Trained on ESA WorldCover labels around the airport, tested on a separate block of land (8,585 pixels).</p>
-   <table class="tbl"><tr><th scope="col">Class</th><th scope="col">Found</th><th scope="col">Right when it says so</th></tr><tr><td><i class="dot vegetation"></i>vegetation</td><td>78%</td><td>88%</td></tr><tr><td><i class="dot built_paved"></i>built / paved</td><td>88%</td><td>61%</td></tr><tr><td><i class="dot bare"></i>bare</td><td>31%</td><td>79%</td></tr><tr><td><i class="dot water"></i>water</td><td>70%</td><td>39%</td></tr></table>
-   <p class="note">Measured against WorldCover, itself a model; bare earth had few training examples.</p>
-  </section>
- </div>
-
- <section class="panel" aria-labelledby="h-flow">
-  <h2 id="h-flow">How this feeds NavContinuity</h2>
-  <div class="flow">
-   <div class="live"><small>Live · Track A6</small><b>Is the airport real?</b>Land conversion from Jun 2023, levelled off Dec 2024. Counts as diversion capacity only once an airline confirms slots.</div>
-   <div class="live"><small>Live · Track C</small><b>Is GPS degraded nearby?</b>Within 50 km: <b style="display:inline">normal</b> (1,092 aircraft, 2026-11-01). Hotspots sit on the India–Pakistan border. <a href="c.html">Open GNSS Watch</a></div>
-   <div class="nx"><small>Next</small><b>Are passengers recovered?</b>Diverted travellers get a confirmed rebooking, care at the right airport, and their bags tracked.</div>
-  </div>
-  <p class="note">Who pays: lenders and project-monitoring cells (per-asset fee); airlines for passenger recovery. Pricing not yet validated.</p>
- </section>
- <p class="note">Sentinel-2 L2A (ESA Copernicus via Element 84) · boundary © OpenStreetMap (ODbL) · labels ESA WorldCover 2021 · milestones from news reports · economics illustrative · code: github.com/rehancodes-web/Mack.1</p>
-</main>
-
-<aside class="co" aria-label="Nemotron analyst">
- <header><h2>Analyst <span class="ev ai">NVIDIA Nemotron</span></h2><p>Answers from this site's evidence only. It can be wrong: check against the panels.</p></header>
- <div class="feed" id="feed" aria-live="polite">
-  <div class="msg bot"><b>Ready</b>I can explain the progress gap, write a lender memo from the current slider values, or check Larper's map against the satellite photo.</div>
-  <div class="msg bot"><b>Review: Larper vs baseline</b>- <strong>Construction start</strong>: Larper built/paved first exceeds 0.1 in 2021-01 (0.937), while baseline_cleared_12m first exceeds 0.1 in 2021-03 (0.076→0.077). Larper signals activity ~2 months earlier.
-- <strong>Baseline dip after 2025</strong>: Larper built/paved and bare series continue rising/fluctuating through 2025‑12 and 2026, showing no dip. The baseline_cleared_12m declines from ~0.56 in mid‑2025 to ~0.33 by end‑2026, reflecting its 12‑month clearing window.
-- <strong>Suspicious months</strong>: 2020‑04 (built/paved 0.071 with bare 0.192), 2021‑08 (built/paved 0.027, bare 0.016), 2023‑11 (built/paved 0.519, bare 0.301) and 2024‑06 (built/paved 0.034, bare 0.417) show high bare/low built that may indicate cloud or seasonal misclassification.
-- <strong>Lender reliance</strong>: The baseline_cleared_12m is the smoother, physically anchored indicator of actual land conversion; Larper’s built/paved series is useful for early detection but should be cross‑checked with the baseline for due‑diligence.<span class="hc"><b>Human check</b>Checked against the data: Jan 2021 is a single hazy winter scene that Larper read as 94% built (Dec 2020: 7%, Feb 2021: 17%), not the start of construction. The baseline stays under 10% until mid-2023, so construction starts mid-2023 in both series. The chart now uses a 3-month median for Larper. The recommendation to rely on the baseline, cross-checked with Larper, stands.</span></div><div class="msg bot"><b>Map check, Mar 2020</b>- Looks right: Larper’s green-dominated map matches the satellite photo’s mostly vegetated footprint; scattered red built/paved patches align with visible settlements and cleared strips.
-- Looks wrong: Larper marks large areas red that appear as green fields or bare earth in the photo; bare fraction (0.01) seems too low given visible bare patches; small blue water specks may be misclassified.
-- Trust level: medium — AI visual check; Larper’s built/paved precision is only 0.61 and bare recall 0.308 per context metrics.</div><div class="msg bot"><b>Map check, May 2022</b>- Looks right: Larper's green-dominated map matches the satellite photo's mostly brown/tan agricultural interior; scattered red built/paved patches align with visible settlements and linear features near the footprint edges.
-- Looks wrong: Larper marks large interior areas as built/paved (red) that appear as bare fields in the photo; the map shows no water (blue) though some photo areas look like possible water bodies; Larper's bare fraction (0.089) seems low given the extensive exposed soil visible.
-- Trust level: medium — Larper captures the overall non-vegetated vs vegetated split but visibly over-classifies built/paved inside the footprint; per-class metrics show weak bare recall (0.308) and poor water precision (0.393). AI visual check.</div><div class="msg bot"><b>Map check, Mar 2024</b>- Looks right: runway/taxiway strip and terminal apron areas are red (built/paved); surrounding fields are green (vegetation); large cleared earthworks are sand/bare.
-- Looks wrong: Larper under-maps built/paved — many paved roads, taxiways and terminal pads inside the footprint appear sand/bare or vegetation in the class map; scattered blue water pixels inside the footprint are likely misclassified bare/built areas (reported water frac 0.002 is implausibly low given visible water bodies).
-- Trust level: medium — Larper’s reported built/paved precision is only 0.61 and bare recall 0.308 (reported metrics), so the map directionally matches the photo but misclassifies specific paved and water areas (AI visual check).</div><div class="msg bot"><b>Map check, Mar 2026</b>- Looks right: runway/taxiway strip and terminal apron appear red (built/paved); large green vegetated blocks match fields inside the footprint; blue patches align with visible water bodies.
-- Looks wrong: extensive tan bare earth inside the footprint is mapped green (vegetation) in places; some green field edges are mapped red (built/paved); scattered blue specks in built areas likely false water.
-- Trust level: medium — Larper captures major infrastructure and broad land cover, but bare vs. vegetation confusion and low water precision (0.393) reduce confidence; built/paved precision is only 0.61. AI visual check.</div>
- </div>
- <div class="chips">
-  <button data-q="memo" class="primary">Write lender memo</button>
-  <button data-q="verify">Check Larper's map</button>
-  <button data-q="Why does the green line fall after 2025?">Why the dip after 2025?</button>
-  <button data-q="Can this airport take diverted flights today?">Diversion-ready?</button>
- </div>
- <form class="composer" id="composer"><input type="text" id="q" maxlength="600" placeholder="Ask about this site…" aria-label="Your question"><button type="submit">Ask</button></form>
-</aside>
+<div class="stat" aria-label="The problem in numbers">
+ <div><b>2,354</b><span>GPS interference incidents reported to India's Parliament, Nov 2023 – Dec 2025 <span class="ev">reported</span></span></div>
+ <div><b>+500%</b><span>GPS spoofing reports, 2024 vs 2023 (IATA) <span class="ev">reported</span></span></div>
+ <div><b>Delhi 2025</b><span>flights approaching IGI were spoofed; contingency procedures used <span class="ev">reported</span></span></div>
+ <div><b>€1k–77k</b><span>cost of one diverted flight (EUROCONTROL, 2022 prices) <span class="ev">reported</span></span></div>
 </div>
-<script>
-(function(){
-const MAPS=["2020-03","2022-05","2024-03","2026-03"];
-const v=document.getElementById('viewer'),r=document.getElementById('swipeR'),A=document.getElementById('imgA'),B=document.getElementById('imgB'),sa=document.getElementById('selA'),sb=document.getElementById('selB'),ta=document.getElementById('tagA'),tb=document.getElementById('tagB');
-let layer='quicklook';
-const HI=[["2019-10","2019-10-09","Oct 2019"],["2023-08","2023-08-31","Aug 2023"],["2026-05","2026-05-28","May 2026"]],SH=[["2020-03","Mar 2020"],["2022-05","May 2022"],["2024-03","Mar 2024"],["2025-01","Jan 2025"],["2026-03","Mar 2026"]];
-const hiFile=m=>{const h=HI.find(x=>x[0]===m);return h?'hires_'+h[1]+'.jpg':null;};
-function setOpts(list,first,last){for(const [s,val] of [[sa,first],[sb,last]]){s.innerHTML=list.map(o=>'<option value="'+o[0]+'">'+o[o.length-1]+'</option>').join('');s.value=val;}}
-const pos=x=>v.style.setProperty('--pos',x+'%');
-r.addEventListener('input',()=>{v.classList.remove('intro');pos(r.value);});
-const lbl=s=>s.options[s.selectedIndex].text;
-function src(m){if(layer==='hires')return hiFile(m);return (layer==='classmap'&&MAPS.includes(m)?'classmap_':'quicklook_')+m+'.png';}
-function paint(){A.src=src(sa.value);B.src=src(sb.value);A.alt='Site, '+lbl(sa)+(layer==='classmap'?' (Larper layer)':'');B.alt='Site, '+lbl(sb)+(layer==='classmap'?' (Larper layer)':'');ta.textContent=lbl(sa);tb.textContent=lbl(sb);}
-sa.onchange=sb.onchange=()=>{paint();if(typeof fillLegend==='function')fillLegend();};
-const bP=document.getElementById('lyPhoto'),bL=document.getElementById('lyLarper'),lg=document.getElementById('legend'),lc=document.getElementById('lcard');
-const SHARE={"2020-01":[0.673,0.307,0.017,0.002],"2020-02":[0.722,0.254,0.022,0.002],"2020-03":[0.729,0.259,0.01,0.003],"2020-04":[0.734,0.071,0.192,0.003],"2020-05":[0.554,0.047,0.398,0.001],"2020-06":[0.539,0.042,0.419,0.001],"2020-07":[0.111,0.388,0.501,0],"2020-08":[0.741,0.197,0.062,0.001],"2020-09":[0.922,0.064,0.012,0.002],"2020-10":[0.93,0.062,0.006,0.001],"2020-11":[0.933,0.058,0.008,0.002],"2020-12":[0.924,0.06,0.015,0.002],"2021-01":[0.049,0.937,0.012,0.002],"2021-02":[0.826,0.124,0.045,0.005],"2021-03":[0.667,0.269,0.064,0],"2021-04":[0.832,0.064,0.103,0.001],"2021-05":[0.368,0.602,0.03,0],"2021-06":[0.816,0.078,0.105,0],"2021-08":[0.956,0.027,0.016,0.001],"2021-09":[0.618,0.238,0.084,0.061],"2021-10":[0.687,0.27,0.015,0.028],"2021-11":[0.582,0.382,0.009,0.026],"2021-12":[0.094,0.841,0.059,0.006],"2022-01":[0.064,0.155,0.781,0],"2022-02":[0.091,0.154,0.755,0],"2022-03":[0.869,0.1,0.03,0.001],"2022-04":[0.939,0.006,0.055,0],"2022-05":[0.737,0.174,0.089,0],"2022-06":[0.815,0.112,0.072,0],"2022-07":[0.867,0.1,0.031,0.001],"2022-08":[0.887,0.08,0.033,0],"2022-09":[0.727,0.219,0.054,0],"2022-10":[0.624,0.269,0.039,0.067],"2022-11":[0.637,0.258,0.089,0.016],"2022-12":[0.766,0.113,0.114,0.007],"2023-01":[0.651,0.142,0.195,0.012],"2023-02":[0.633,0.158,0.2,0.008],"2023-03":[0.635,0.15,0.213,0.001],"2023-04":[0.54,0.177,0.283,0],"2023-05":[0.567,0.052,0.381,0],"2023-06":[0.545,0.038,0.417,0],"2023-07":[0.031,0.536,0.429,0.005],"2023-08":[0.588,0.144,0.268,0],"2023-09":[0.486,0.204,0.31,0],"2023-10":[0.502,0.25,0.243,0.004],"2023-11":[0.179,0.519,0.301,0.001],"2023-12":[0.585,0.166,0.246,0.004],"2024-01":[0.097,0.416,0.483,0.005],"2024-02":[0.385,0.252,0.36,0.003],"2024-03":[0.453,0.151,0.394,0.002],"2024-04":[0.384,0.108,0.508,0.001],"2024-05":[0.317,0.064,0.619,0],"2024-06":[0.214,0.034,0.751,0],"2024-08":[0.316,0.368,0.312,0.004],"2024-10":[0.45,0.171,0.325,0.055],"2024-11":[0.372,0.315,0.257,0.056],"2024-12":[0.492,0.229,0.228,0.051],"2025-01":[0.372,0.312,0.276,0.04],"2025-02":[0.255,0.43,0.283,0.032],"2025-03":[0.378,0.199,0.396,0.026],"2025-04":[0.457,0.083,0.452,0.009],"2025-05":[0.267,0.292,0.441,0],"2025-06":[0.032,0.504,0.465,0],"2025-09":[0.451,0.24,0.248,0.061],"2025-10":[0.429,0.296,0.199,0.076],"2025-11":[0.333,0.319,0.278,0.071],"2025-12":[0.374,0.346,0.205,0.075],"2026-01":[0.055,0.654,0.251,0.039],"2026-02":[0.293,0.367,0.28,0.059],"2026-03":[0.419,0.21,0.318,0.053],"2026-04":[0.512,0.118,0.365,0.005],"2026-05":[0.4,0.232,0.363,0.004],"2026-06":[0.373,0.209,0.417,0.001],"2026-07":[0.519,0.155,0.326,0],"2026-08":[0.661,0.218,0.11,0.01],"2026-09":[0.628,0.255,0.096,0.02],"2026-10":[0.574,0.3,0.104,0.022],"2026-11":[0.548,0.343,0.071,0.038]};
-function fillLegend(){const pc=v=>v==null?'–':Math.round(v*100)+'%';const a=SHARE[sa.value],b=SHARE[sb.value];
- document.getElementById('lhA').textContent=lbl(sa);document.getElementById('lhB').textContent=lbl(sb);
- for(let k=0;k<4;k++){document.getElementById('lA'+k).textContent=a?pc(a[k]):'–';document.getElementById('lB'+k).textContent=b?pc(b[k]):'–';}}
-const bH=document.getElementById('lyHi'),cr=document.getElementById('credit');
-function setLayer(l){const was=layer;layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');if(bH)bH.setAttribute('aria-pressed',l==='hires');lg.hidden=l!=='classmap';lc.hidden=l!=='classmap';cr.hidden=l!=='hires';
- if(l==='hires'){setOpts(HI,HI[0][0],HI[HI.length-1][0]);paint();return;}
- if(was==='hires')setOpts(SH,SH[0][0],SH[SH.length-1][0]);
- if(l==='classmap'){for(const s of [sa,sb])for(const o of s.options)o.disabled=!MAPS.includes(o.value);if(!MAPS.includes(sa.value))sa.value=MAPS[0];if(!MAPS.includes(sb.value))sb.value=MAPS[MAPS.length-1];}
- else for(const s of [sa,sb])for(const o of s.options)o.disabled=false;paint();}
-bP.onclick=()=>setLayer('quicklook');bL.addEventListener('click',()=>fillLegend());bL.onclick=()=>{if(MAPS.length)setLayer('classmap');};
-if(bH){bH.onclick=()=>setLayer('hires');setLayer('hires');}
-v.classList.add('intro');pos(86);setTimeout(()=>{pos(50);r.value=50;},400);
 
-const L=300000,e=0.9;
-const c=document.getElementById('c'),p=document.getElementById('p'),fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
-function upd(){const C=+c.value,P=+p.value,rel=P*L,ins=C+P*(1-e)*L,insp=ins<rel,vd=document.getElementById('verdict');
- document.getElementById('cv').textContent=fmt(C);document.getElementById('pv').textContent=(P*100).toFixed(1).replace(/\.0$/,'')+'%';
- vd.className='verdict '+(insp?'inspect':'release');vd.innerHTML='<b>'+(insp?'Inspect before paying':'Release the payment')+'</b><span>Expected cost: release '+fmt(rel)+', inspect '+fmt(ins)+'</span>';}
-c.oninput=p.oninput=upd;upd();
+<h2>How it fits together</h2>
+<div class="chain" aria-label="The chain from GPS failure to passenger outcome">
+ <div><b>1 · GPS fails</b>Jamming or spoofing near an airport</div>
+ <div><b>2 · Detect</b>Track C finds where, from real aircraft reports</div>
+ <div><b>3 · Absorb</b>Track A6 shows which nearby airport can take diversions</div>
+ <div><b>4 · Harden</b>Track B3: a low-orbit layer that is harder to jam</div>
+ <div><b>5 · Recover</b>Passengers: delays, rebooking, hotels, bags</div>
+</div>
 
-const EP="/api/analyst",CTX={"asset":"Noida International Airport (Jewar), footprint ~1333 ha, Sentinel-2 2020-2026","reported":[["2021-11-25","Foundation stone"],["2025-01-28","\"80% work complete\""],["2026-03-28","Phase 1 inaugurated"]],"derived_baseline_cleared_12m":[["2020-07",0.073],["2020-10",0.033],["2021-01",0.032],["2021-04",0.077],["2021-10",0.023],["2022-01",0.021],["2022-04",0.023],["2022-07",0.026],["2022-10",0.016],["2023-01",0.025],["2023-04",0.046],["2023-07",0.113],["2023-10",0.214],["2024-01",0.292],["2024-04",0.363],["2024-10",0.472],["2025-01",0.513],["2025-04",0.561],["2025-10",0.474],["2026-01",0.488],["2026-04",0.468],["2026-07",0.465],["2026-10",0.374]],"derived_larper_all":[["2020-01",0.307,0.017,0.673],["2020-02",0.254,0.022,0.722],["2020-03",0.259,0.01,0.729],["2020-04",0.071,0.192,0.734],["2020-05",0.047,0.398,0.554],["2020-06",0.042,0.419,0.539],["2020-07",0.388,0.501,0.111],["2020-08",0.197,0.062,0.741],["2020-09",0.064,0.012,0.922],["2020-10",0.062,0.006,0.93],["2020-11",0.058,0.008,0.933],["2020-12",0.06,0.015,0.924],["2021-01",0.937,0.012,0.049],["2021-02",0.124,0.045,0.826],["2021-03",0.269,0.064,0.667],["2021-04",0.064,0.103,0.832],["2021-05",0.602,0.03,0.368],["2021-06",0.078,0.105,0.816],["2021-08",0.027,0.016,0.956],["2021-09",0.238,0.084,0.618],["2021-10",0.27,0.015,0.687],["2021-11",0.382,0.009,0.582],["2021-12",0.841,0.059,0.094],["2022-01",0.155,0.781,0.064],["2022-02",0.154,0.755,0.091],["2022-03",0.1,0.03,0.869],["2022-04",0.006,0.055,0.939],["2022-05",0.174,0.089,0.737],["2022-06",0.112,0.072,0.815],["2022-07",0.1,0.031,0.867],["2022-08",0.08,0.033,0.887],["2022-09",0.219,0.054,0.727],["2022-10",0.269,0.039,0.624],["2022-11",0.258,0.089,0.637],["2022-12",0.113,0.114,0.766],["2023-01",0.142,0.195,0.651],["2023-02",0.158,0.2,0.633],["2023-03",0.15,0.213,0.635],["2023-04",0.177,0.283,0.54],["2023-05",0.052,0.381,0.567],["2023-06",0.038,0.417,0.545],["2023-07",0.536,0.429,0.031],["2023-08",0.144,0.268,0.588],["2023-09",0.204,0.31,0.486],["2023-10",0.25,0.243,0.502],["2023-11",0.519,0.301,0.179],["2023-12",0.166,0.246,0.585],["2024-01",0.416,0.483,0.097],["2024-02",0.252,0.36,0.385],["2024-03",0.151,0.394,0.453],["2024-04",0.108,0.508,0.384],["2024-05",0.064,0.619,0.317],["2024-06",0.034,0.751,0.214],["2024-08",0.368,0.312,0.316],["2024-10",0.171,0.325,0.45],["2024-11",0.315,0.257,0.372],["2024-12",0.229,0.228,0.492],["2025-01",0.312,0.276,0.372],["2025-02",0.43,0.283,0.255],["2025-03",0.199,0.396,0.378],["2025-04",0.083,0.452,0.457],["2025-05",0.292,0.441,0.267],["2025-06",0.504,0.465,0.032],["2025-09",0.24,0.248,0.451],["2025-10",0.296,0.199,0.429],["2025-11",0.319,0.278,0.333],["2025-12",0.346,0.205,0.374],["2026-01",0.654,0.251,0.055],["2026-02",0.367,0.28,0.293],["2026-03",0.21,0.318,0.419],["2026-04",0.118,0.365,0.512],["2026-05",0.232,0.363,0.4],["2026-06",0.209,0.417,0.373],["2026-07",0.155,0.326,0.519],["2026-08",0.218,0.11,0.661],["2026-09",0.255,0.096,0.628],["2026-10",0.3,0.104,0.574],["2026-11",0.343,0.071,0.548]],"larper_metrics":{"overall_agreement_with_worldcover":0.714,"per_class":[{"class":"vegetation","support":3806,"recall":0.779,"precision":0.877},{"class":"built_paved","support":2727,"recall":0.879,"precision":0.61},{"class":"bare","support":1708,"recall":0.308,"precision":0.787},{"class":"water","support":344,"recall":0.698,"precision":0.393}],"caveat":"WorldCover is itself a model product (~75-80% global accuracy); this measures agreement with it, not ground truth"},"decision":{"report_pct":80,"satellite_pct":51,"gap_pts":29,"scenarios":[{"name":"No satellite evidence (prior)","p":0.1,"release":30000,"inspect":18000,"action":"inspect","break_even_p":0.05555555555555555},{"name":"Satellite: 51% converted vs 80% reported (gap 29 pts)","p":0.375,"release":112500,"inspect":26250,"action":"inspect","break_even_p":0.05555555555555555},{"name":"Counterfactual: satellite agrees with report","p":0.03,"release":9000,"inspect":15900,"action":"release","break_even_p":0.05555555555555555}],"assumed_parameters":{"currency":"USD","loss_if_optimistic":{"value":300000,"origin":"assumed"},"inspection_cost":{"value":15000,"origin":"assumed"},"inspection_effectiveness":{"value":0.9,"origin":"assumed"},"prior_p":{"value":0.1,"origin":"assumed"},"gap_to_p":{"value":[[-100,0.03],[10,0.03],[20,0.15],[30,0.4],[100,0.4]],"origin":"assumed"}},"caveat":"Land conversion is not construction completion; a gap raises the case for inspection, it does not prove the report false."},"readiness":{"schema_version":"1.0","generated_utc":"2026-11-25T23:43:47.701Z","asset":{"name":"Noida International Airport (Jewar)","type":"airport","footprint_ha":1333,"footprint_source":"OSM way 1089989191"},"region":{"centre":{"lon":77.6082,"lat":28.1709},"radius_km":50,"origin":"assumed","note":"Track C evaluates GNSS evidence inside this circle; no coverage = unknown, not safe"},"reported":[{"date":"2021-11-25","event":"Foundation stone","origin":"reported"},{"date":"2025-01-28","event":"\"80% work complete\"","origin":"reported"},{"date":"2026-03-28","event":"Phase 1 inaugurated","origin":"reported"},{"date":"2026-06-15","event":"Commercial flights (sources disagree on date)","origin":"reported"}],"satellite":{"origin":"derived","metric":"fp_cleared_12m (land conversion, not completion)","conversion_start_month":"2023-06","peak_month":"2025-04","peak_frac":0.561,"plateau_month":"2024-12","ai_classifier":{"status":"derived","latest_month":"2026-11","latest_built_paved_frac":0.343,"built_paved_2025_01":0.312,"built_paved_2026_03":0.21}},"recovery_capacity":{"physically_present":"yes (derived: land conversion plateaued 2024-12)","operational_status":"reported operational from 2026 (inauguration 28 Mar 2026); satellite cannot confirm runway certification or ATC readiness","usable_for_navcontinuity":"candidate diversion / rebooking airport only after airline confirms slots, ground handling and approach procedures","origin":"derived + reported"},"params":{"start_excess":0.05,"plateau_share_of_peak":0.9,"region_radius_km":50}},"nemotron_review":{"curve":"- **Construction start**: Larper built/paved first exceeds 0.1 in 2021-01 (0.937), while baseline_cleared_12m first exceeds 0.1 in 2021-03 (0.076→0.077). Larper signals activity ~2 months earlier.\n- **Baseline dip after 2025**: Larper built/paved and bare series continue rising/fluctuating through 2025‑12 and 2026, showing no dip. The baseline_cleared_12m declines from ~0.56 in mid‑2025 to ~0.33 by end‑2026, reflecting its 12‑month clearing window.\n- **Suspicious months**: 2020‑04 (built/paved 0.071 with bare 0.192), 2021‑08 (built/paved 0.027, bare 0.016), 2023‑11 (built/paved 0.519, bare 0.301) and 2024‑06 (built/paved 0.034, bare 0.417) show high bare/low built that may indicate cloud or seasonal misclassification.\n- **Lender reliance**: The baseline_cleared_12m is the smoother, physically anchored indicator of actual land conversion; Larper’s built/paved series is useful for early detection but should be cross‑checked with the baseline for due‑diligence.","vision":[["2020-03","- Looks right: Larper’s green-dominated map matches the satellite photo’s mostly vegetated footprint; scattered red built/paved patches align with visible settlements and cleared strips.\n- Looks wrong: Larper marks large areas red that appear as green fields or bare earth in the photo; bare fraction (0.01) seems too low given visible bare patches; small blue water specks may be misclassified.\n- Trust level: medium — AI visual check; Larper’s built/paved precision is only 0.61 and bare recall 0.308 per context metrics."],["2022-05","- Looks right: Larper's green-dominated map matches the satellite photo's mostly brown/tan agricultural interior; scattered red built/paved patches align with visible settlements and linear features near the footprint edges.\n- Looks wrong: Larper marks large interior areas as built/paved (red) that appear as bare fields in the photo; the map shows no water (blue) though some photo areas look like possible water bodies; Larper's bare fraction (0.089) seems low given the extensive exposed soil visible.\n- Trust level: medium — Larper captures the overall non-vegetated vs vegetated split but visibly over-classifies built/paved inside the footprint; per-class metrics show weak bare recall (0.308) and poor water precision (0.393). AI visual check."],["2024-03","- Looks right: runway/taxiway strip and terminal apron areas are red (built/paved); surrounding fields are green (vegetation); large cleared earthworks are sand/bare.\n- Looks wrong: Larper under-maps built/paved — many paved roads, taxiways and terminal pads inside the footprint appear sand/bare or vegetation in the class map; scattered blue water pixels inside the footprint are likely misclassified bare/built areas (reported water frac 0.002 is implausibly low given visible water bodies).\n- Trust level: medium — Larper’s reported built/paved precision is only 0.61 and bare recall 0.308 (reported metrics), so the map directionally matches the photo but misclassifies specific paved and water areas (AI visual check)."],["2026-03","- Looks right: runway/taxiway strip and terminal apron appear red (built/paved); large green vegetated blocks match fields inside the footprint; blue patches align with visible water bodies.\n- Looks wrong: extensive tan bare earth inside the footprint is mapped green (vegetation) in places; some green field edges are mapped red (built/paved); scattered blue specks in built areas likely false water.\n- Trust level: medium — Larper captures major infrastructure and broad land cover, but bare vs. vegetation confusion and low water precision (0.393) reduce confidence; built/paved precision is only 0.61. AI visual check."]]},"product":"NavContinuity: GPS failure -> diversion capacity -> confirmed passenger recovery. A6 output = recovery capacity + region for Track C GNSS check."};
-const feed=document.getElementById('feed');let visualCheck=null;
-const btns=()=>document.querySelectorAll('.chips button,.composer button');
-function fmtInto(el,text){el.textContent='';String(text).split(/**/).forEach((part,i)=>{if(!part)return;if(i%2){const s=document.createElement('strong');s.textContent=part;el.appendChild(s);}else el.appendChild(document.createTextNode(part));});}
-function add(cls,title,text){const d=document.createElement('div');d.className='msg '+cls;if(title){const b=document.createElement('b');b.textContent=title;d.appendChild(b);}const body=document.createElement('span');fmtInto(body,text);d.appendChild(body);feed.appendChild(d);feed.scrollTop=feed.scrollHeight;return d;}
-async function b64(url){const b=await (await fetch(url)).blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(b);});}
-async function ask(shown,question,images){
- add('me','',shown);const w=add('bot','Nemotron','Working on it…');btns().forEach(b=>b.disabled=true);
- const ctx={...CTX,current_sliders:{inspection_cost:+c.value,p_report_optimistic:+p.value,loss_if_optimistic:L,inspection_effectiveness:e},nemotron_live_visual_check:visualCheck};
- try{const res=await fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,context:ctx,images:images||[]})});const j=await res.json();
-  if(j.answer){fmtInto(w.lastChild,j.answer);return j.answer;}w.className='msg err';w.lastChild.textContent='The analyst could not answer: '+(j.error||('HTTP '+res.status))+'. The panels on the left are unaffected.';return null;}
- catch(err){w.className='msg err';w.lastChild.textContent='The analyst is unreachable ('+err.message+'). The panels on the left are unaffected.';return null;}
- finally{btns().forEach(b=>b.disabled=false);feed.scrollTop=feed.scrollHeight;}}
-document.querySelectorAll('.chips button').forEach(b=>b.onclick=async()=>{const q=b.dataset.q;
- if(q==='memo')return ask('Write lender memo','Write a short lender memo: release the next tranche on the contractor report, or commission an inspection first, using the current slider values. Headings: Evidence / Decision / Caveats.');
- if(q==='verify'){const m=MAPS.includes(sb.value)?sb.value:MAPS[MAPS.length-1],row=(CTX.derived_larper_all||[]).find(x=>x[0]===m);
-  const imgs=[{label:'Sentinel-2 true colour '+m+' (yellow = airport boundary)',mime:'image/png',data:await b64('quicklook_'+m+'.png')},{label:'Larper class map '+m,mime:'image/png',data:await b64('classmap_'+m+'.png')}];
-  const a=await ask('Check Larper\'s map for '+m,'Cross-check the Larper class map for '+m+' against the satellite photo. Larper says '+(row?('built/paved '+Math.round(row[1]*100)+'%, bare '+Math.round(row[2]*100)+'%, vegetation '+Math.round(row[3]*100)+'%'):'(see context)')+'. Where does the map look right, where does it look wrong, and how far should we trust these numbers?',imgs);
-  if(a)visualCheck={month:m,finding:a.slice(0,1500)};return;}
- ask(b.textContent,q);});
-document.getElementById('composer').onsubmit=ev=>{ev.preventDefault();const i=document.getElementById('q'),t=i.value.trim();if(!t){i.focus();return;}i.value='';ask(t,t);};
-})();
-</script></body></html>
+<h2>The three tracks</h2>
+<div class="tracks">
+ <section class="track A" aria-labelledby="tA">
+  <div class="id">TRACK A6 · INFRASTRUCTURE · COMPULSORY</div>
+  <h3 id="tA">Jewar airport, watched from orbit</h3>
+  <p>Can the new Noida International Airport (70 km from Delhi) actually take diverted flights? We measured its construction from space.</p>
+  <ul>
+   <li>79 monthly Sentinel-2 scenes, 2020–2026, plus sharp 2019 vs 2026 photos</li>
+   <li><b>80%</b> "complete" reported in Jan 2025 vs <b>41–51%</b> of land converted seen from orbit</li>
+   <li>Larper AI labels every 10 m pixel; 71% agreement with ESA WorldCover</li>
+   <li>Decision: release the next funding tranche, or inspect first</li>
+  </ul>
+  <a class="go" href="a6.html">Open Jewar airport →</a>
+ </section>
+ <section class="track B" aria-labelledby="tB">
+  <div class="id">TRACK B3 · POSITIONING &amp; SENSING</div>
+  <h3 id="tB">Harder-to-jam GPS from low orbit</h3>
+  <p>The long-term fix: navigation signals from 1,000 km instead of 20,200 km, cross-checked by AI.</p>
+  <ul>
+   <li><b>19 dB</b> stronger signal, so a jammer's reach covers <b>80×</b> less area <span class="ev">physics</span></li>
+   <li>Spoofed position error <b>50 m → 8 m</b>; spoofing detected <b>1.2% → 92%</b> <span class="ev">simulation</span></li>
+   <li><b>114</b> satellites, about <b>$445M</b> <span class="ev">assumed costs</span></li>
+  </ul>
+  <a class="go" href="b3.html">Open harder-to-jam GPS →</a>
+ </section>
+ <section class="track C" aria-labelledby="tC">
+  <div class="id">TRACK C · GNSS RESILIENCE</div>
+  <h3 id="tC">Where GPS is malfunctioning right now</h3>
+  <p>Aircraft broadcast how much they trust their own GPS. We map those reports to find failing zones. Protective monitoring only.</p>
+  <ul>
+   <li><b>24,579</b> real aircraft reports in one day (ADS-B Exchange sample)</li>
+   <li><b>37</b> high-interference zones on the India–Pakistan border and Myanmar</li>
+   <li>Jewar region: <b>normal</b>, so it is a usable diversion airport</li>
+  </ul>
+  <a class="go" href="c.html">Open GPS malfunction →</a>
+ </section>
+</div>
+
+<h2>What passengers go through</h2>
+<p class="lead">Every GPS-driven delay or diversion lands on people in a terminal: repeated "15 more minutes", missed connections, bad automatic rebooking, hotel vouchers in the wrong city and bags on a different route.</p>
+<a class="cta" href="passengers.html">See the passenger impact →</a>
+
+<p class="note" style="margin-top:36px">Mach-A-Thon Aeromania '26 · Orbit to Economy: AI in Space · with Boeing. Labels: <b>reported</b> = published source, <b>derived</b> = computed from our data, <b>simulation / assumed</b> = modelled, not measured. Sources: research/ in the repository.</p>
+</main></body></html>
