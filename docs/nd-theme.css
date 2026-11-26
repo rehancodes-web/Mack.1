@@ -1,0 +1,27 @@
+/* NavContinuity navigation-display theme, loaded AFTER each page's own styles.
+   Re-maps the shared design tokens of a6.html, c.html, globe.html and earth.html to the site palette:
+   magenta = our model/route, amber = caution/claims, cyan = data, green = normal. Type: B612 + Source Sans 3. */
+@import url('https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+:root{
+  --bg:#0d1a24 !important; --panel:#132634 !important; --rail:#0b1620 !important; --railfg:#93a8b8 !important;
+  --ink:#e8eef3 !important; --mut:#93a8b8 !important; --rule:#2b475a !important;
+  --larper:#e05fd0 !important; --acc:#e05fd0 !important; --focus:#f2a93b !important;
+  --claim:#f2a93b !important; --claimbg:rgba(242,169,59,.12) !important; --warn:#f2a93b !important; --warnbg:rgba(242,169,59,.12) !important;
+  --ok:#5fd38d !important; --veg:#5fd38d !important;
+  --sea:#0b1620 !important; --land:#1a3344 !important; --landin:#21405a !important; --border:#3d5a6d !important;
+  --low:#5fd38d !important; --med:#f2a93b !important; --high:#ef5a5a !important;
+}
+html,body{background:#0d1a24 !important;color:#e8eef3;font-family:'Source Sans 3',system-ui,sans-serif !important}
+h1,h2,h3,.brand,.mods a,.tile .v,.v,.big,.H{font-family:'B612',system-ui,sans-serif !important}
+input,select,button,textarea{font-family:inherit}
+select{background:#132634;color:#e8eef3;border:1px solid #2b475a}
+table th{color:#93a8b8}
+/* top bar shared by all pages */
+header.top,.top{background:rgba(13,26,36,.94) !important;border-bottom:1px solid #2b475a !important}
+.mods a{color:#93a8b8 !important;white-space:nowrap}
+@media (max-width:1500px){.top .src{display:none !important}}
+.mods a small{color:#93a8b8 !important;border-color:#2b475a !important}
+.mods a[aria-current=page]{color:#e8eef3 !important;background:transparent !important;box-shadow:inset 0 -2px 0 #e05fd0 !important}
+.mods a:hover{color:#e8eef3 !important;background:#132634 !important}
+a{color:#4fd1e0}
+:focus-visible{outline:2px solid #f2a93b !important;outline-offset:2px}

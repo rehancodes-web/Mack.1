@@ -74,7 +74,7 @@ svg{width:100%;height:auto;display:block;border-radius:6px}
 .r{font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;color:#fff}.r.high{background:var(--high)}.r.medium{background:var(--med);color:#1d1d1d}.r.low{background:var(--low)}
 .note{color:var(--mut);font-size:12.5px;margin:8px 0 0}ul.note{padding-left:18px}
 @media (max-width:900px){.top{flex-wrap:wrap;height:auto;padding:10px 14px}.mods{flex-wrap:wrap}.mods a{padding:6px 8px}.grid{grid-template-columns:1fr}}
-</style></head><body>
+</style><link rel="stylesheet" href="nd-theme.css"></head><body>
 <header class="top">
  <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>NavContinuity</div>
  <nav class="mods" aria-label="Modules">
