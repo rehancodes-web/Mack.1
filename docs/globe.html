@@ -83,7 +83,7 @@ input[type=text]{flex:1;min-width:0}button{cursor:pointer;font-weight:650}
  <label class="layer"><input type="checkbox" data-l="LEO" checked><i style="background:var(--leo)"></i><span><b>LEO navigation</b> (real)<small>Iridium NEXT, ~780 km, runs Iridium STL positioning and timing; white: Xona PULSAR-0 demonstrator. Track B3 proposes a layer like this over India</small></span><em id="nLEO"></em></label>
  <label class="layer"><input type="checkbox" data-l="orbits" checked><i style="background:linear-gradient(90deg,var(--gps),var(--leo))"></i><span><b>Orbits</b><small>each satellite's real orbit; the Earth turns inside them</small></span></label>
  <label class="layer"><input type="checkbox" data-l="gnss" checked><i style="background:var(--high)"></i><span><b>GPS interference</b> (Track C)<small>aircraft reports, 1 Nov 2026; red high, amber medium</small></span><em id="nGnss"></em></label>
- <label class="layer"><input type="checkbox" data-l="airports" checked><i style="background:var(--ap)"></i><span><b>Airports</b><small>every airport with scheduled flights, India in green</small></span><em id="nAp"></em></label>
+ <label class="layer"><input type="checkbox" data-l="airports" checked><i style="background:var(--ap)"></i><span><b>Airports</b><small>every airport with scheduled flights, India in green, <b style="color:#EF4444">new since 2018 in red</b></small></span><em id="nAp"></em></label>
  <form class="search" id="sf"><input type="text" id="sq" placeholder="Find an airport (name or code)" aria-label="Find an airport" autocomplete="off"><button type="submit">Find</button></form>
  <ul id="hits" aria-live="polite"></ul>
  <button type="button" id="tourbtn" class="tourbtn">▶ Tour every airport, before and after</button>
@@ -120,7 +120,9 @@ function ring(s,t0,gm0){const pts=[],N=s.sys==='LEO'?48:96;for(let i=0;i<=N;i++)
  const g=satellite.eciToGeodetic(pv.position,gm0);pts.push([satellite.degreesLat(g.latitude),satellite.degreesLong(g.longitude),g.height/RE]);}return {sys:s.sys,orbit:true,pul:s.pul,pts};}
 
 // ---- airports and interference cells ----
-const aps=D.airports.map(([name,code,lat,lng,cc,large])=>({name,code,lat,lng,cc,large,jewar:code==='DXN'||/Noida International/i.test(name)}));
+// Newly built airports (opened 2018 onward, reported): drawn in red, year shown on hover
+const NEWAP={DXN:2026,NMI:2025,KTI:2025,AYJ:2023,HSR:2023,GOX:2023,TQO:2023,DGH:2022,HGI:2022,NLU:2022,SDW:2021,TFU:2021,BER:2020,YIA:2020,GBI:2019,PKX:2019,CNN:2018,IST:2018,ISB:2018,KJT:2018};
+const aps=D.airports.map(([name,code,lat,lng,cc,large])=>({name,code,lat,lng,cc,large,opened:NEWAP[code]||0,jewar:code==='DXN'||/Noida International/i.test(name)}));
 // clockwise ring: on a sphere a counter-clockwise ring means "everything except this square" and paints the whole globe
 const cell=(la,lo)=>({type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[lo,la],[lo,la+1],[lo+1,la+1],[lo+1,la],[lo,la]]]}});
 const gnss=D.gnss.map(([la,lo,lvl,share,n])=>({...cell(la,lo),lvl,share,n,la,lo}));
@@ -133,9 +135,9 @@ const el=document.getElementById('globe');let hovAp=null;
 // preserveDrawingBuffer: lets screenshots and recordings capture the globe
 const G=Globe({rendererConfig:{antialias:true,preserveDrawingBuffer:true}})(el).globeImageUrl(IMG+'earth-blue-marble.jpg').bumpImageUrl(IMG+'earth-topology.png').backgroundImageUrl(IMG+'night-sky.png')
  .atmosphereColor('#86A3FF').atmosphereAltitude(.18)
- .pointsData(aps).pointLat('lat').pointLng('lng').pointAltitude(d=>d.jewar?.06:.006).pointRadius(d=>d.jewar?.45:d.cc==='IN'?.22:.16)
+ .pointsData(aps).pointLat('lat').pointLng('lng').pointAltitude(d=>d.jewar?.06:.006).pointRadius(d=>d.jewar?.45:d.opened?.32:d.cc==='IN'?.22:.16)
  // all airports merged into ONE mesh (4,000+ separate meshes made the globe stutter); clicks find the nearest airport instead
- .pointColor(d=>d.jewar?'#FFD24A':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(true).pointResolution(5)
+ .pointColor(d=>d.opened?'#EF4444':d.cc==='IN'?'#7CE38B':'#E8EEF0').pointsMerge(true).pointResolution(5)
  .onGlobeClick(c=>pickAirport(c)).onPointClick((p,e,c)=>pickAirport(c)).onPolygonClick((p,e,c)=>pickAirport(c))
  .onLabelClick((p,e,c)=>pickAirport(c)).onPathClick((p,e,c)=>pickAirport(c)) // the Jewar label and orbit lines sit in front of airports
  .polygonsData(gnss).polygonCapColor(d=>d.lvl===2?'rgba(224,90,67,.75)':'rgba(232,179,58,.55)').polygonSideColor(()=>'rgba(0,0,0,0)').polygonStrokeColor(()=>false).polygonAltitude(.004)
@@ -152,7 +154,7 @@ el.addEventListener('mousemove',e=>{hovAp=null;
    for(const a of aps){const d=Math.acos(Math.min(1,Math.sin(c.lat*k)*Math.sin(a.lat*k)+Math.cos(c.lat*k)*Math.cos(a.lat*k)*Math.cos((c.lng-a.lng)*k)))/k;if(d<bd){bd=d;best=a;}}
    if(best&&bd<=thr)hovAp=best;}}
  document.body.classList.toggle('aphov',!!hovAp);
- if(hovAp){atip.innerHTML='<b>'+esc(hovAp.name)+'</b>'+(hovAp.code?' · '+esc(hovAp.code):'')+'<br><span style="opacity:.75">click for 1990 vs 2025 imagery</span>';atip.style.left=(e.clientX+14)+'px';atip.style.top=(e.clientY+14)+'px';atip.style.display='block';el.style.cursor='pointer';}
+ if(hovAp){atip.innerHTML='<b>'+esc(hovAp.name)+'</b>'+(hovAp.code?' · '+esc(hovAp.code):'')+(hovAp.opened?'<br><b style="color:#EF4444">New airport · opened '+hovAp.opened+'</b>':'')+'<br><span style="opacity:.75">click for 1990 vs 2025 imagery</span>';atip.style.left=(e.clientX+14)+'px';atip.style.top=(e.clientY+14)+'px';atip.style.display='block';el.style.cursor='pointer';}
  else{atip.style.display='none';el.style.cursor='';}});
 el.addEventListener('mouseleave',()=>{atip.style.display='none';hovAp=null;document.body.classList.remove('aphov');});
 // globe.gl 2.46 drops the image URLs set during start-up; set them again once it has initialised
