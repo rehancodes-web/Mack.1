@@ -63,7 +63,7 @@ const tag = (s, x, y, label, color) => { s.addShape(pres.shapes.ROUNDED_RECTANGL
 // ---------- 1. Title ----------
 pres.addSection({ title: 'Opening' });
 let s = pres.addSlide({ masterName: 'DARK', sectionTitle: 'Opening' });
-s.addImage({ path: img('quicklook_2026-03.png'), x: 5.4, y: 0, w: 4.6, h: 5.625, sizing: { type: 'cover', w: 4.6, h: 5.625 }, transparency: 15, altText: 'Sentinel-2 view of Noida International Airport, March 2026' });
+s.addImage({ path: img('hires_2026-05-28.jpg'), x: 5.4, y: 0, w: 4.6, h: 5.625, sizing: { type: 'cover', w: 4.6, h: 5.625 }, altText: 'High-resolution satellite view of Noida International Airport, 2026 (Esri World Imagery Wayback)' });
 s.addText('NavContinuity', { placeholder: 'title', x: 0.5, y: 1.2, w: 4.8, h: 1.0 });
 T(s, 'When GPS fails around an airport, know which airports can take the diversions, then get every passenger to a confirmed outcome.', { x: 0.5, y: 2.3, w: 4.6, h: 1.0, fontSize: 15, color: HEX.lt2 });
 card(s, 0.5, 3.55, 4.6, 0.95, HEX.dk2, 'Track card');
@@ -96,11 +96,12 @@ s.addNotes('0:20-0:50. Three reported numbers, then Delhi 2025. Land on the ques
 pres.addSection({ title: 'Track A6' });
 s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Track A6' });
 s.addText('Track A6: watching Jewar airport get built from orbit', { placeholder: 'title' });
-s.addImage({ path: img('quicklook_2020-03.png'), x: 0.5, y: 1.2, w: 3.2, h: 1.86, altText: 'Jewar site March 2020: farmland' });
-s.addImage({ path: img('quicklook_2026-03.png'), x: 3.85, y: 1.2, w: 3.2, h: 1.86, altText: 'Jewar site March 2026: runway and terminal' });
-T(s, 'March 2020: farmland and villages', { x: 0.5, y: 3.12, w: 3.2, h: 0.3, fontSize: 11, color: HEX.accent5 });
-T(s, 'March 2026: runway and terminal', { x: 3.85, y: 3.12, w: 3.2, h: 0.3, fontSize: 11, color: HEX.accent5 });
-card(s, 7.3, 1.2, 2.2, 2.22, HEX.dk1, 'Data facts');
+s.addImage({ path: img('hires_2019-10-09.jpg'), x: 0.5, y: 1.15, w: 3.2, h: 2.06, altText: 'Jewar site 2019: farmland and villages (Esri World Imagery Wayback)' });
+s.addImage({ path: img('hires_2026-05-28.jpg'), x: 3.85, y: 1.15, w: 3.2, h: 2.06, altText: 'Jewar site 2026: runway, taxiways and terminal (Esri World Imagery Wayback)' });
+T(s, '2019: farmland and villages', { x: 0.5, y: 3.24, w: 3.2, h: 0.22, fontSize: 11, color: HEX.accent5 });
+T(s, '2026: runway, taxiways, terminal', { x: 3.85, y: 3.24, w: 3.2, h: 0.22, fontSize: 11, color: HEX.accent5 });
+T(s, 'Photos: Esri World Imagery Wayback (Maxar, Earthstar), releases Oct 2019 and May 2026. Measurements: Sentinel-2.', { x: 0.5, y: 3.45, w: 6.55, h: 0.2, fontSize: 9, color: HEX.accent5 });
+card(s, 7.3, 1.15, 2.2, 2.3, HEX.dk1, 'Data facts');
 T(s, [
   { text: '79', options: { bold: true, fontSize: 28, color: HEX.accent1, breakLine: true } },
   { text: 'monthly Sentinel-2 scenes, 2020-2026', options: { fontSize: 12, color: HEX.lt1, breakLine: true } },
@@ -110,10 +111,10 @@ T(s, [
 const steps = [['Real data', 'Free Sentinel-2 L2A, cloud-masked, no account needed'], ['Larper (AI)', 'Random Forest labels every pixel: built, bare, vegetation, water'], ['Decision', 'Lender: release the next tranche, or inspect first?']];
 steps.forEach(([h, d], i) => {
   const x = 0.5 + i * 3.05;
-  s.addShape(pres.shapes.OVAL, { x, y: 3.7, w: 0.42, h: 0.42, fill: { color: HEX.accent1 }, line: { color: HEX.accent1 } });
-  T(s, String(i + 1), { x, y: 3.7, w: 0.42, h: 0.42, fontSize: 15, bold: true, color: HEX.dk1, align: 'center', valign: 'middle' });
-  T(s, h, { x: x + 0.55, y: 3.68, w: 2.3, h: 0.32, fontSize: 15, bold: true, color: HEX.dk1 });
-  T(s, d, { x: x + 0.55, y: 4.0, w: 2.35, h: 0.75, fontSize: 12, color: HEX.dk2 });
+  s.addShape(pres.shapes.OVAL, { x, y: 3.75, w: 0.42, h: 0.42, fill: { color: HEX.accent1 }, line: { color: HEX.accent1 } });
+  T(s, String(i + 1), { x, y: 3.75, w: 0.42, h: 0.42, fontSize: 15, bold: true, color: HEX.dk1, align: 'center', valign: 'middle' });
+  T(s, h, { x: x + 0.55, y: 3.73, w: 2.3, h: 0.32, fontSize: 15, bold: true, color: HEX.dk1 });
+  T(s, d, { x: x + 0.55, y: 4.05, w: 2.35, h: 0.75, fontSize: 12, color: HEX.dk2 });
 });
 s.addNotes('0:50-1:30. Show the before/after (or switch to the live Site Monitor). 79 real scenes, every one traceable to a Sentinel-2 file. Larper is our pixel classifier. The output feeds a money decision.');
 

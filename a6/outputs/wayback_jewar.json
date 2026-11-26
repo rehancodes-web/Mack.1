@@ -1,0 +1,79 @@
+{
+ "point": {
+  "lon": 77.6082,
+  "lat": 28.1709
+ },
+ "zoom": 15,
+ "tile": {
+  "x": 23448,
+  "y": 13709
+ },
+ "note": "First release in which the imagery over this tile changed; actual capture date is on or before the release date",
+ "distinct": [
+  {
+   "release": "2014-02-20",
+   "release_id": 10,
+   "tile_bytes": 21834
+  },
+  {
+   "release": "2016-09-14",
+   "release_id": 6984,
+   "tile_bytes": 19490
+  },
+  {
+   "release": "2018-09-06",
+   "release_id": 2168,
+   "tile_bytes": 25129
+  },
+  {
+   "release": "2019-10-09",
+   "release_id": 11351,
+   "tile_bytes": 22741
+  },
+  {
+   "release": "2020-11-18",
+   "release_id": 20753,
+   "tile_bytes": 11041
+  },
+  {
+   "release": "2021-07-21",
+   "release_id": 8432,
+   "tile_bytes": 11478
+  },
+  {
+   "release": "2021-10-13",
+   "release_id": 16749,
+   "tile_bytes": 11511
+  },
+  {
+   "release": "2022-09-21",
+   "release_id": 47471,
+   "tile_bytes": 14969
+  },
+  {
+   "release": "2023-08-31",
+   "release_id": 64776,
+   "tile_bytes": 16743
+  },
+  {
+   "release": "2024-09-19",
+   "release_id": 20337,
+   "tile_bytes": 16741
+  },
+  {
+   "release": "2025-09-04",
+   "release_id": 52304,
+   "tile_bytes": 17119
+  },
+  {
+   "release": "2026-02-26",
+   "release_id": 64001,
+   "tile_bytes": 15135
+  },
+  {
+   "release": "2026-05-28",
+   "release_id": 10842,
+   "tile_bytes": 15113
+  }
+ ]
+}
