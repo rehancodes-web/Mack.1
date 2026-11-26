@@ -520,7 +520,7 @@ add({ notes: '4:40–5:00. Roadmap and close. Now a working prototype; three mon
 // Rows of the judges' scheme -> slides (original insertion numbers, mapped to final positions by pos()).
 const RUBRIC = [
   ['Track A', 'var(--a6)', 'Problem understanding & economic impact', 20, [44, 2, 24, 25, 26, 27, 4, 16]],
-  ['Track A', 'var(--a6)', 'Technical depth, AI & satellite data', 20, [5, 7, 32, 39, 8, 35, 18, 33]],
+  ['Track A', 'var(--a6)', 'Technical depth, AI & satellite data', 20, [5, 45, 46, 7, 32, 39, 8, 35, 18, 33]],
   ['Track A', 'var(--a6)', 'Feasibility, accuracy & applicability', 15, [9, 10, 11, 36, 29, 43]],
   ['Track A', 'var(--a6)', 'Working demo & objective completion', 10, [28, 6, 12]],
   ['Track C', 'var(--c)', 'Innovation & strategic impact', 10, [30, 20, 26, 31]],
@@ -939,22 +939,59 @@ add({ so: "One problem, split into five questions. Each question is answered by 
    <div style="position:absolute;left:72px;right:72px;top:270px;display:flex;font-family:var(--B);font-weight:600;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)"><span style="width:306px">The question</span><span style="width:214px">Track that answers it</span><span style="width:438px">What we built</span><span>See it live</span></div>
    ${rows}`); } });
 
+// 45 SATELLITES + DATA SOURCES
+add({ so: "All imagery is from public satellites (ESA Sentinel-2 and NASA/USGS Landsat), all aircraft data is from public ADS-B broadcasts, and every source is free.", notes: 'Tech reference: which satellites and which data we use, who runs them, what we take from each and how we access it.', html: n => S(n, 'top', `${run('Technology · satellites + data', 'Track A · Technical depth, AI & satellite data · 20', n)}
+ <h2>Which satellites, which data, from where.</h2>
+ <div style="margin-top:14px">${T([['Satellite / source', '19%'], ['Operator', '13%'], ['What we use', '30%'], ['Resolution / volume', '15%'], ['Accessed via']], [
+   ['Sentinel-2A / 2B / 2C (MSI)', 'ESA Copernicus', 'Level-2A surface reflectance: bands B2, B3, B4, B8, B11, B12 + scene classification (clouds)', '10–20 m · 79 monthly scenes, Jan 2020 – Nov 2026', 'Element 84 Earth Search STAC API → cloud-optimised GeoTIFFs on AWS; Microsoft Planetary Computer to fill a gap'],
+   ['ESA WorldCover 2021', 'ESA', 'Land-cover labels to train Larper', `10 m · ${fmt(met.n_train + met.n_test)} labelled pixels`, 'Public AWS S3 bucket (tile N27E075)'],
+   ['Landsat 5 / 7 (GLS)', 'NASA / USGS', '"Before" images for every airport on the globe, 1975–2010', '30 m', 'Esri Landsat ImageServer (export API)'],
+   ['Sentinel-2 cloudless mosaics', 'EOX (ESA data)', 'Yearly "after" images, 2016–2025, on the globe viewer', '10 m', 'EOX WMTS tiles'],
+   ['Maxar / Earthstar photos', 'via Esri Wayback', 'Human-readable before/after of Jewar', '~0.5–2 m · 13 dated versions', 'Esri World Imagery Wayback tiles'],
+   ['ADS-B aircraft broadcasts', 'ADS-B Exchange', 'NIC (position-trust) per aircraft for Track C', `${fmt(gsum.reports)} reports, 72 snapshots, 1 Nov 2026`, 'samples.adsbexchange.com (readsb-hist)'],
+   ['GPS, Galileo, NavIC, Iridium NEXT, Xona', 'US, EU, ISRO, Iridium, Xona', 'Live orbits on the globe; geometry for Track B3', 'per satellite', 'CelesTrak GP orbital elements'],
+   ['Airports, boundaries, places', 'OurAirports, OSM', '4,155 airports; 1,333 ha Jewar boundary; place search', 'vector', 'OurAirports CSV, OpenStreetMap, Nominatim'],
+ ], 12.5)}</div>`) });
+
+// 46 APIS, LIBRARIES, BUILD
+add({ so: "No servers to buy: Node.js scripts turn the data into JSON files, a static site shows them, and one small serverless function talks to NVIDIA Nemotron.", notes: 'Tech reference: the APIs we call, the libraries, and how the project is built and deployed, end to end.', html: n => S(n, 'top', `${run('Technology · APIs + build', 'Track A · Technical depth, AI & satellite data · 20', n)}
+ <h2>APIs, libraries and how it is built.</h2>
+ <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:18px;margin-top:14px;align-items:start">
+  <div>${T([['API', '34%'], ['Used for']], [
+    ['NVIDIA NIM API (integrate.api.nvidia.com)', `Nemotron: ${NB.model.replace('nvidia/', '')} (briefs, fact-check, decisions) and super-vl-120b (vision audit)`],
+    ['Element 84 Earth Search (STAC)', 'Find every Sentinel-2 scene over Jewar; direct band URLs'],
+    ['Microsoft Planetary Computer (STAC)', 'Second Sentinel-2 catalogue for an 8-month gap'],
+    ['AWS S3 (HTTP range reads)', 'Read only the airport window from each GeoTIFF'],
+    ['ADS-B Exchange samples', 'Aircraft NIC reports for Track C'],
+    ['CelesTrak GP', 'Orbital elements for the live globe'],
+    ['Esri Wayback · Landsat ImageServer · EOX WMTS', 'Imagery tiles in the site viewers'],
+    ['Nominatim (OpenStreetMap)', 'Place search in the viewer'],
+  ], 12.5)}</div>
+  <div class="grid" style="gap:10px">
+   <div class="card" style="padding:12px 16px"><h3 style="font-size:16px">Libraries</h3><p style="font-size:13.5px;margin-top:4px;line-height:1.45"><b>Pipeline (Node.js):</b> geotiff.js (read COGs), proj4 (map projections), ml-random-forest (Larper), pngjs, jpeg-js<br><b>Site:</b> globe.gl + three.js (3D globe), satellite.js (orbits from TLEs), Leaflet (maps)<br><b>Deck:</b> pptxgenjs, headless Edge</p></div>
+   <div class="card" style="padding:12px 16px"><h3 style="font-size:16px">Build and deploy</h3>${li(['<b>1 · Fetch + process:</b> node scripts in data/, a6/, c/, b3/, decisions/ write JSON and CSV outputs', '<b>2 · Pages:</b> generators write static HTML into docs/', '<b>3 · Host:</b> GitHub Pages serves docs/ on every push to main', '<b>4 · AI:</b> one Vercel serverless function (/api/analyst) holds the NVIDIA key and calls Nemotron', '<b>5 · Deck:</b> build.mjs reads the same outputs → HTML → PNG → pptx'])}</div>
+   <div class="black" style="padding:10px 16px;font-size:13.5px;color:#DCE3E8"><b style="color:var(--mint)">Cost:</b> ₹0 data, free hosting, a few NVIDIA API calls per decision. No Python, no GPU, one laptop.</div>
+  </div>
+ </div>`) });
+
 // ---------- order slides by the marking scheme ----------
 // Numbers are insertion order above; the deck is reordered so Track A (65 marks) comes first.
-const TITLES = ['FlyWithEase', 'The problem', 'The basics', 'Who it serves', 'How it works', 'Track A6 objective', 'Data', 'Larper AI', 'Track A6 result', 'Accuracy', 'Case 1: Jewar lender', 'Working demo', 'Track C', 'Case 2: Delhi IGI spoofing', 'Case 3: Border jamming', 'Case 4: One passenger', 'Case 5: Tartu', 'Nemotron', 'Track B3', 'Originality', 'Feasibility', 'Roadmap', 'Marking map', 'Research findings', 'Boeing: the manufacturer view', 'Boeing fleet cases', 'Economic impact', 'Track A explained', 'Case 6: Boeing 787 diversion', 'Track C explained', 'Track B3 explained', 'Under the hood', 'Nemotron in full', 'Scorecard', 'Larper in detail', 'Progress + decision maths', 'Track C method', 'B3 physics + simulation', 'Architecture', 'Feasibility: cost', 'Feasibility: pilot', 'Feasibility: risks', 'Feasibility: sensitivity', 'Problem statement'];
-const ORDER = SHORT ? [1, 44, 2, 26, 5, 6, 8, 9, 11, 13, 14, 19, 21, 22] : [1, 44, 23, 3, 2, 24, 25, 26, 27, 4, 16, 28, 6, 5, 7, 32, 39, 8, 35, 18, 33, 9, 10, 11, 36, 29, 12, 30, 13, 37, 14, 15, 17, 31, 19, 38, 20, 21, 40, 41, 42, 43, 34, 22];
+const TITLES = ['FlyWithEase', 'The problem', 'The basics', 'Who it serves', 'How it works', 'Track A6 objective', 'Data', 'Larper AI', 'Track A6 result', 'Accuracy', 'Case 1: Jewar lender', 'Working demo', 'Track C', 'Case 2: Delhi IGI spoofing', 'Case 3: Border jamming', 'Case 4: One passenger', 'Case 5: Tartu', 'Nemotron', 'Track B3', 'Originality', 'Feasibility', 'Roadmap', 'Marking map', 'Research findings', 'Boeing: the manufacturer view', 'Boeing fleet cases', 'Economic impact', 'Track A explained', 'Case 6: Boeing 787 diversion', 'Track C explained', 'Track B3 explained', 'Under the hood', 'Nemotron in full', 'Scorecard', 'Larper in detail', 'Progress + decision maths', 'Track C method', 'B3 physics + simulation', 'Architecture', 'Feasibility: cost', 'Feasibility: pilot', 'Feasibility: risks', 'Feasibility: sensitivity', 'Problem statement', 'Satellites + data', 'APIs + build'];
+const ORDER = SHORT ? [1, 44, 2, 26, 5, 45, 46, 6, 8, 9, 11, 13, 14, 19, 21, 22] : [1, 44, 23, 3, 2, 24, 25, 26, 27, 4, 16, 28, 6, 5, 45, 46, 7, 32, 39, 8, 35, 18, 33, 9, 10, 11, 36, 29, 12, 30, 13, 37, 14, 15, 17, 31, 19, 38, 20, 21, 40, 41, 42, 43, 34, 22];
 const pos = o => ORDER.indexOf(o) + 1;
 if (!SHORT && (ORDER.length !== slides.length || new Set(ORDER).size !== slides.length)) throw new Error('ORDER does not cover every slide');
 const NOTES5 = {
+ 45: '1:25–1:35. The data: ESA Sentinel-2 satellites at 10 m for the airport, ESA WorldCover to train the AI, NASA/USGS Landsat for history, and real ADS-B broadcasts from aircraft for the GPS map. All free and public.',
+ 46: '1:35–1:45. The build: Node.js scripts pull the data through STAC APIs and AWS, write JSON, a static site on GitHub Pages shows it, and one Vercel function calls NVIDIA Nemotron through the NIM API. One laptop, no servers.',
  44: '0:15–0:40. Our problem statement: when GPS is jammed or spoofed near a busy Indian airport, flights hold or divert, but nobody can tell in time where GPS is failing, whether the diversion airport is really ready, or what to do for the passengers. We split that into five questions. Track C answers where GPS is failing. Track A6, our compulsory track, answers whether the diversion airport is built and who pays. Nemotron turns both into a passenger plan. Track B3 is the long-term fix. Each one is a page on the live site.',
  1: '0:00–0:15. Good morning. GPS jamming and spoofing now hit Indian airspace every day. When GPS fails near Delhi, flights divert. FlyWithEase makes sure there is somewhere ready to go and no passenger is stranded. Primary Track A6, additional Track C, with B3 as the long-term layer.',
  2: '0:40–0:55. 2,354 incidents reported to Parliament in two years, 623 more in just two months of 2026. 71% meant total loss of GPS on board. Delhi IGI approaches were spoofed in 2025. Today the warning, the diversion and the passenger are handled separately, after the fact.',
  26: '0:55–1:10. For Boeing: this is your fleet. A 777 spoofed 80 nautical miles off track, a United 777 from Delhi spoofed over the Black Sea, a Ryanair 737 that went around and diverted to another country, a 787 that lost a GPS receiver. Each one is a gap we fill.',
  5: '1:10–1:25. How it works in four steps: detect where GPS is failing from aircraft data, confirm from orbit which airport can absorb the diversions, harden positioning long term, and start passenger recovery before landing.',
- 6: '1:25–1:40. Track A objective 6, infrastructure from orbit. We watched Jewar, 70 km from Delhi, the airport Delhi would divert to. Its opening was promised three times, so we must know it is really built.',
- 8: '1:40–2:00. Larper, our AI: a Random Forest that labels every 10 m pixel across 79 Sentinel-2 scenes from 2020 to 2026. Trained on ESA WorldCover west of the airport and tested on land it never saw: 71% agreement, 88% of built land found.',
- 9: '2:00–2:20. The result: in January 2025 the builder claimed 80% complete. Orbit saw 41 to 51% of the land converted. Two independent methods agree on the timeline. That 29-point gap is the signal.',
- 11: '2:20–2:40. The economic decision: should a lender release the next tranche? With the satellite gap, inspecting first costs $26k in expectation versus $112k for releasing: about $86k of expected loss avoided, with assumed inputs, on free data.',
+ 6: '1:45–1:55. Track A objective 6, infrastructure from orbit. We watched Jewar, 70 km from Delhi, the airport Delhi would divert to. Its opening was promised three times, so we must know it is really built.',
+ 8: '1:55–2:10. Larper, our AI: a Random Forest that labels every 10 m pixel across 79 Sentinel-2 scenes from 2020 to 2026. Trained on ESA WorldCover west of the airport and tested on land it never saw: 71% agreement, 88% of built land found.',
+ 9: '2:10–2:25. The result: in January 2025 the builder claimed 80% complete. Orbit saw 41 to 51% of the land converted. Two independent methods agree on the timeline. That 29-point gap is the signal.',
+ 11: '2:25–2:40. The economic decision: should a lender release the next tranche? With the satellite gap, inspecting first costs $26k in expectation versus $112k for releasing: about $86k of expected loss avoided, with assumed inputs, on free data.',
  13: '2:40–3:05. Track C: a live map of where GPS is failing, from 24,579 real aircraft reports. Each aircraft broadcasts how much it trusts its own position; we count low-trust aircraft per 1 degree square. 37 high zones, on the border and over Myanmar. Jewar: normal. Protective only, no tracking.',
  14: '3:05–3:35. Putting it together on the Delhi spoofing case: Track C shows degraded cells north of Delhi, A6 confirms Jewar is built, NVIDIA Nemotron drafts the decision, a second Nemotron pass fact-checks it, and a person decides. Here the human corrected the AI: stay at Delhi on ILS runways, Jewar as confirmed fallback.',
  19: '3:35–3:55. Track B3, the long-term fix: navigation satellites at 1,000 km instead of 20,200 km give a 19 dB stronger signal, shrink a jammer’s reach 80 times, and with NavIC catch 92% of spoofing in simulation. Boeing already builds GPS and low-orbit satellites.',
