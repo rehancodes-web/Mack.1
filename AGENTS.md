@@ -13,7 +13,7 @@ Read [README.md](README.md) first. It holds the idea: **GPS failure around an ai
 | Track B3: Nav Integrity | **The one optional track we present. Done (architecture + simulation).** LEO link budget (19 dB, jammer area 80× smaller), 114-sat constellation ~$445M, spoofing simulation (50 m → 8 m after correction) | `b3/`, [b3.html](https://mackathon-three.vercel.app/b3.html) |
 | Track choice | **Decided: A6 (compulsory) + B3 (optional).** Organisers said choose one of B or C, so C appears only as a one-line "next step" on the final slide. Don't add Track C to the demo flow or the PPT body | [RULES.md](RULES.md) |
 | Passenger recovery flow | Spec only | [PRODUCT_SPEC.md](PRODUCT_SPEC.md) |
-| PPT (compulsory, 5 min, slide 1 names "Track A6 Infrastructure · Track B3") | In progress | `pitch/` |
+| PPT (compulsory, 5 min) | **Draft done: 7 slides with speaker notes and timings.** Slide 1 names "Primary: Track A6 Infrastructure / Optional: Track B3". Numbers are read from repo outputs. **Not visually checked** (PowerPoint automation unavailable here): open it and fix any overflow. Rebuild: `cd pitch && npm install && node build_deck.js` | `pitch/NavContinuity_MachAThon.pptx` |
 
 ## Next tasks, in order
 
