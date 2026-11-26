@@ -1,4 +1,4 @@
-// Builds pitch/NavContinuity_MachAThon.pptx (8 slides, ~5 min). Usage: cd pitch && node gnss_map.js && node build_deck.js
+// Builds pitch/NavContinuity_MachAThon.pptx (9 slides, ~5 min). Usage: cd pitch && node gnss_map.js && node build_deck.js
 const fs = require('fs');
 const path = require('path');
 const pptxgen = require('pptxgenjs');
@@ -110,6 +110,32 @@ ev.forEach(([n, l], i) => {
 T(s, `Source: ADS-B Exchange sample data, ${gsum.days.join(', ')} (${gsum.snapshots} snapshots), aircraft-reported navigation integrity. Derived; one day only. Protective monitoring, no individual tracking.`, { x: 0.5, y: 5.0, w: 9, h: 0.22, fontSize: 9, color: HEX.accent5 });
 s.addNotes('0:50-1:10. This is real data, not a model: aircraft broadcast how much they trust their own GPS. One day of reports already shows the interference band along the border. Jewar, 70 km from Delhi, sits in clean cells, which is why it matters as a diversion airport. This is Track C: protective monitoring of GPS malfunction. It feeds the chain: C says where GPS is failing, A6 says which airport can take the diversions, B3 is the long-term fix.');
 
+// ---------- 2c. Passenger impact ----------
+s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Problem' });
+s.addText('What GPS failure does to passengers at the airport', { placeholder: 'title' });
+const flow = ['GPS jammed or spoofed', 'Backup procedures, holding', 'Delay or diversion', 'Stranded passengers'];
+flow.forEach((t, i) => {
+  const x = 0.5 + i * 2.3;
+  card(s, x, 1.15, 2.05, 0.65, i === 3 ? HEX.accent4 : HEX.dk1, `Flow ${i + 1}`);
+  T(s, t, { x: x + 0.1, y: 1.15, w: 1.85, h: 0.65, fontSize: 13, bold: true, color: HEX.lt1, align: 'center', valign: 'middle' });
+});
+const pax = [['Endless "15 more minutes"', 'then a cancellation'], ['Missed connections', 'the onward flight leaves first'], ['Bad auto-rebooking', 'wrong city or worse option'], ['Hotel in the wrong city', 'voucher for where they are not'], ['Bags on another route', 'rebooked, the bag is not']];
+pax.forEach(([h, d], i) => {
+  const y = 2.05 + i * 0.52;
+  s.addShape(pres.shapes.OVAL, { x: 0.5, y: y + 0.08, w: 0.3, h: 0.3, fill: { color: HEX.accent4 }, line: { color: HEX.accent4 } });
+  T(s, [{ text: h + '  ', options: { bold: true, color: HEX.dk1 } }, { text: d, options: { color: HEX.dk2 } }], { x: 0.95, y, w: 4.6, h: 0.46, fontSize: 14, valign: 'middle' });
+});
+tag(s, 4.55, 4.75, 'SELF-REPORTED', HEX.accent5);
+const cost = [['€1,000-77,200', 'per diverted flight (EUROCONTROL)'], ['$98 / minute', 'aircraft operating cost (A4A 2025)'], ['≈ $4,430', 'direct cost of a 45-minute delay, before hotels and rebooking']];
+cost.forEach(([n, l], i) => {
+  const y = 2.05 + i * 0.95;
+  card(s, 5.85, y, 3.65, 0.82, HEX.lt2, `Cost ${i + 1}`);
+  T(s, n, { x: 6.0, y: y + 0.04, w: 3.4, h: 0.42, fontSize: 20, bold: true, color: HEX.dk1, fontFace: THEME.headFontFace });
+  T(s, l, { x: 6.0, y: y + 0.44, w: 3.4, h: 0.34, fontSize: 11, color: HEX.dk2 });
+});
+T(s, 'Airlines pay for every diversion and stranded passenger, so they are the buyer for faster, confirmed recovery.', { x: 0.5, y: 4.75, w: 3.95, h: 0.45, fontSize: 11, color: HEX.accent5 });
+s.addNotes('Passenger impact, about 25 seconds. GPS failure rarely makes the news as a crash; it shows up as holding, delays and diversions, and those land on people in the terminal. Name two of the five problems. Costs are published industry figures, not costs proven to come from GPS failures. Airlines pay for all of this, so they are the customer.');
+
 // ---------- 3. A6 real data ----------
 pres.addSection({ title: 'Track A6' });
 s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Track A6' });
@@ -200,7 +226,7 @@ b3.forEach(([n, d, lab], i) => {
   T(s, d, { x: x + 0.2, y: 2.35, w: 2.45, h: 1.4, fontSize: 12, color: i === 1 ? HEX.lt1 : HEX.dk2 });
 });
 card(s, 0.5, 4.05, 9, 0.95, HEX.lt2, 'B3 flow');
-T(s, [{ text: 'Link to A6: ', options: { bold: true, color: HEX.dk1 } }, { text: 'A6 tells you which airports can absorb diversions when GPS degrades; B3 makes positioning around them harder to deny in the first place. Live 3D simulation: mackathon-three.vercel.app/b3.html', options: { color: HEX.dk2 } }], { x: 0.7, y: 4.1, w: 8.6, h: 0.85, fontSize: 13, valign: 'middle' });
+T(s, [{ text: 'Link to A6: ', options: { bold: true, color: HEX.dk1 } }, { text: 'A6 tells you which airports can absorb diversions when GPS degrades; B3 makes positioning around them harder to deny in the first place. Live 3D simulation: rehancodes-web.github.io/Mack.1/b3.html', options: { color: HEX.dk2 } }], { x: 0.7, y: 4.1, w: 8.6, h: 0.85, fontSize: 13, valign: 'middle' });
 s.addNotes('3:15-4:15. Physics first: inverse-square law gives LEO a 19 dB edge, which shrinks a 10 W jammer\'s reach 80x in area. Simulation: GPS alone barely detects spoofing; adding NavIC and LEO with a learned cross-check catches 92% and pulls the spoofed error from 50 m to 8 m. Cost is a back-of-envelope with assumed inputs. Optionally open the 3D globe.');
 
 // ---------- 7. Close ----------
@@ -216,7 +242,7 @@ done.forEach(([h, d], i) => {
   T(s, d, { x: 1.2, y: y + 0.35, w: 8.2, h: 0.5, fontSize: 13, color: HEX.accent6 });
 });
 T(s, 'Limits: land conversion is not completion · Larper is trained on WorldCover weak labels · all economics assumed · B3 is simulation, not hardware', { x: 0.5, y: 4.65, w: 9, h: 0.35, fontSize: 11, color: HEX.accent6 });
-T(s, 'mackathon-three.vercel.app', { x: 0.5, y: 5.05, w: 9, h: 0.3, fontSize: 12, bold: true, color: HEX.accent2 });
+T(s, 'rehancodes-web.github.io/Mack.1', { x: 0.5, y: 5.05, w: 9, h: 0.3, fontSize: 12, bold: true, color: HEX.accent2 });
 s.addNotes('4:15-5:00. Say exactly what was built and what was not. Recap the chain: C finds where GPS fails, A6 finds where diversions can go, B3 hardens positioning. End on the live site URL and thank the judges.');
 
 (async () => {
