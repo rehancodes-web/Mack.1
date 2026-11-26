@@ -212,10 +212,6 @@ input[type=range]{width:100%;accent-color:var(--larper)}
   <a href="c.html">GPS map <small>C</small></a>
   <a href="globe.html">Globe <small>B3</small></a>
   <a href="passengers.html">Passengers</a>
-  <a href="tech.html">Tech</a>
-  <a href="ai.html">AI</a>
-  <a href="feasibility.html">Feasibility</a>
-  <a href="scorecard.html">Scorecard</a>
   <a href="deck.html">Deck</a>
  </nav>
  <div class="src">Sentinel-2 · ${base.length} monthly scenes · latest ${monthName(base[base.length - 1].month)}</div>
