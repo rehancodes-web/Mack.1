@@ -37,6 +37,8 @@ const P0 = DEFAULTS;
 const SHOTS = ['2020-03', '2022-05', '2024-03', '2025-01', '2026-03'].filter(m => has(`quicklook_${m}.png`));
 const MAPS = ['2020-03', '2022-05', '2024-03', '2026-03'].filter(m => has(`classmap_${m}.png`));
 const monthName = m => new Date(`${m}-15T00:00:00Z`).toLocaleString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+// High-resolution photos from Esri World Imagery Wayback (built by wayback_mosaic.mjs + to_jpeg.mjs): [month label, release date]
+const HIRES = [['2019-10', '2019-10-09'], ['2023-08', '2023-08-31'], ['2026-05', '2026-05-28']].filter(([, d]) => has(`hires_${d}.jpg`));
 const aiAt = m => ai.find(r => r.month === m);
 const jan25 = aiAt('2025-01');
 const lastBuilt = [...ai].reverse().find(r => r.built_12m != null) || null; // latest persistent built/paved share, for the map legend
@@ -236,7 +238,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
  </section>
 
  <section class="panel" aria-labelledby="h-view">
-  <h2 id="h-view">Site imagery<span class="tools"><span class="seg" role="group" aria-label="Layer"><button id="lyPhoto" aria-pressed="true">Satellite photo</button><button id="lyLarper" aria-pressed="false"${MAPS.length ? '' : ' disabled title="Available when Larper finishes"'}>Larper layer</button></span></span></h2>
+  <h2 id="h-view">Site imagery<span class="tools"><span class="seg" role="group" aria-label="Layer">${HIRES.length ? '<button id="lyHi" aria-pressed="false">High-res photo</button>' : ''}<button id="lyPhoto" aria-pressed="true">Sentinel-2</button><button id="lyLarper" aria-pressed="false"${MAPS.length ? '' : ' disabled title="Available when Larper finishes"'}>Larper layer</button></span></span></h2>
   <div class="viewer" id="viewer" style="--pos:50%">
    <img id="imgB" src="quicklook_${lastShot}.png" alt="Site, ${monthName(lastShot)}">
    <div class="clip"><img id="imgA" src="quicklook_${firstShot}.png" alt="Site, ${monthName(firstShot)}"></div>
@@ -248,6 +250,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
    <label>Left <select id="selA">${SHOTS.map(m => `<option value="${m}"${m === firstShot ? ' selected' : ''}>${monthName(m)}</option>`).join('')}</select></label>
    <label>Right <select id="selB">${SHOTS.map(m => `<option value="${m}"${m === lastShot ? ' selected' : ''}>${monthName(m)}</option>`).join('')}</select></label>
    <span>Yellow: airport boundary (OSM)</span>
+   <span id="credit" hidden>Photos: Esri World Imagery Wayback (Maxar, Earthstar Geographics); capture on or before the release date</span>
    <span class="legend" id="legend" hidden><span><i class="b"></i>built / paved</span><span><i class="a"></i>bare</span><span><i class="g"></i>vegetation</span><span><i class="w"></i>water</span></span>
   </div>
   <div class="lcard" id="lcard" hidden aria-live="polite">
@@ -329,10 +332,13 @@ input[type=range]{width:100%;accent-color:var(--larper)}
 const MAPS=${JSON.stringify(MAPS)};
 const v=document.getElementById('viewer'),r=document.getElementById('swipeR'),A=document.getElementById('imgA'),B=document.getElementById('imgB'),sa=document.getElementById('selA'),sb=document.getElementById('selB'),ta=document.getElementById('tagA'),tb=document.getElementById('tagB');
 let layer='quicklook';
+const HI=${JSON.stringify(HIRES.map(([m, d]) => [m, d, monthName(m)]))},SH=${JSON.stringify(SHOTS.map(m => [m, monthName(m)]))};
+const hiFile=m=>{const h=HI.find(x=>x[0]===m);return h?'hires_'+h[1]+'.jpg':null;};
+function setOpts(list,first,last){for(const [s,val] of [[sa,first],[sb,last]]){s.innerHTML=list.map(o=>'<option value="'+o[0]+'">'+o[o.length-1]+'</option>').join('');s.value=val;}}
 const pos=x=>v.style.setProperty('--pos',x+'%');
 r.addEventListener('input',()=>{v.classList.remove('intro');pos(r.value);});
 const lbl=s=>s.options[s.selectedIndex].text;
-function src(m){return (layer==='classmap'&&MAPS.includes(m)?'classmap_':'quicklook_')+m+'.png';}
+function src(m){if(layer==='hires')return hiFile(m);return (layer==='classmap'&&MAPS.includes(m)?'classmap_':'quicklook_')+m+'.png';}
 function paint(){A.src=src(sa.value);B.src=src(sb.value);A.alt='Site, '+lbl(sa)+(layer==='classmap'?' (Larper layer)':'');B.alt='Site, '+lbl(sb)+(layer==='classmap'?' (Larper layer)':'');ta.textContent=lbl(sa);tb.textContent=lbl(sb);}
 sa.onchange=sb.onchange=()=>{paint();if(typeof fillLegend==='function')fillLegend();};
 const bP=document.getElementById('lyPhoto'),bL=document.getElementById('lyLarper'),lg=document.getElementById('legend'),lc=document.getElementById('lcard');
@@ -340,10 +346,14 @@ const SHARE=${JSON.stringify(LG.share)};
 function fillLegend(){const pc=v=>v==null?'–':Math.round(v*100)+'%';const a=SHARE[sa.value],b=SHARE[sb.value];
  document.getElementById('lhA').textContent=lbl(sa);document.getElementById('lhB').textContent=lbl(sb);
  for(let k=0;k<4;k++){document.getElementById('lA'+k).textContent=a?pc(a[k]):'–';document.getElementById('lB'+k).textContent=b?pc(b[k]):'–';}}
-function setLayer(l){layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');lg.hidden=l!=='classmap';lc.hidden=l!=='classmap';
+const bH=document.getElementById('lyHi'),cr=document.getElementById('credit');
+function setLayer(l){const was=layer;layer=l;bP.setAttribute('aria-pressed',l==='quicklook');bL.setAttribute('aria-pressed',l==='classmap');if(bH)bH.setAttribute('aria-pressed',l==='hires');lg.hidden=l!=='classmap';lc.hidden=l!=='classmap';cr.hidden=l!=='hires';
+ if(l==='hires'){setOpts(HI,HI[0][0],HI[HI.length-1][0]);paint();return;}
+ if(was==='hires')setOpts(SH,SH[0][0],SH[SH.length-1][0]);
  if(l==='classmap'){for(const s of [sa,sb])for(const o of s.options)o.disabled=!MAPS.includes(o.value);if(!MAPS.includes(sa.value))sa.value=MAPS[0];if(!MAPS.includes(sb.value))sb.value=MAPS[MAPS.length-1];}
  else for(const s of [sa,sb])for(const o of s.options)o.disabled=false;paint();}
 bP.onclick=()=>setLayer('quicklook');bL.addEventListener('click',()=>fillLegend());bL.onclick=()=>{if(MAPS.length)setLayer('classmap');};
+if(bH){bH.onclick=()=>setLayer('hires');setLayer('hires');}
 v.classList.add('intro');pos(86);setTimeout(()=>{pos(50);r.value=50;},400);
 
 const L=${P0.loss_if_optimistic.value},e=${P0.inspection_effectiveness.value};
