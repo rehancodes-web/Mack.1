@@ -5,9 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const pptxgen = require(path.join(__dirname, '..', 'node_modules', 'pptxgenjs'));
 
-const PNG = path.join(__dirname, 'png');
-const notes = JSON.parse(fs.readFileSync(path.join(__dirname, 'html', 'notes.json'), 'utf8'));
-const meta = JSON.parse(fs.readFileSync(path.join(__dirname, 'html', 'meta.json'), 'utf8'));
+const SHORT = process.argv.includes('--short'); // 5-minute cut
+const PNG = path.join(__dirname, SHORT ? 'png5' : 'png');
+const notes = JSON.parse(fs.readFileSync(path.join(__dirname, SHORT ? 'html5' : 'html', 'notes.json'), 'utf8'));
+const meta = JSON.parse(fs.readFileSync(path.join(__dirname, SHORT ? 'html5' : 'html', 'meta.json'), 'utf8'));
 // 1x1 fully transparent PNG used as the clickable hotspot
 const CLEAR = 'image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
 const pres = new pptxgen();
@@ -26,4 +27,4 @@ files.forEach((f, i) => {
   }
   if (notes[i]) s.addNotes(notes[i]);
 });
-pres.writeFile({ fileName: path.join(__dirname, '..', 'FlyWithEase_Pitch.pptx') }).then(f => console.log('wrote', f, files.length, 'slides'));
+pres.writeFile({ fileName: path.join(__dirname, '..', SHORT ? 'FlyWithEase_5min.pptx' : 'FlyWithEase_Pitch.pptx') }).then(f => console.log('wrote', f, files.length, 'slides'));

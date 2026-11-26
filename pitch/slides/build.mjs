@@ -1,4 +1,4 @@
-// FlyWithEase hackathon deck, structured on the judges' marking scheme.
+﻿// FlyWithEase hackathon deck, structured on the judges' marking scheme.
 // Style follows the team's earlier decks (SAP HigherUp.AI, CropTwin): off-white slides, dark cover/close,
 // running header with section + slide count, stat cards with sources, dark callouts, numbered columns.
 // Outputs: pitch/slides/html/NN.html (for PNG render -> pptx) and docs/deck.html (interactive, keyboard/touch).
@@ -8,7 +8,8 @@ import { pathToFileURL } from 'node:url';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, '$1');
 const ROOT = path.join(HERE, '..', '..');
-const OUT = path.join(HERE, 'html'); fs.mkdirSync(OUT, { recursive: true });
+const SHORT = process.argv.includes('--short'); // 5-minute cut: 13 slides, own timed notes, pitch/slides/html5 -> FlyWithEase_5min.pptx
+const OUT = path.join(HERE, SHORT ? 'html5' : 'html'); fs.mkdirSync(OUT, { recursive: true });
 const rd = f => JSON.parse(fs.readFileSync(path.join(ROOT, f), 'utf8'));
 const met = rd('a6/outputs/classifier_metrics.json'), dec = rd('a6/outputs/decision.json'), rdy = rd('a6/outputs/readiness.json');
 const phys = rd('b3/outputs/b3_physics.json'), sim = rd('b3/outputs/b3_sim.json').results;
@@ -82,7 +83,7 @@ const slides = [];
 const add = (o) => slides.push(o);
 // HOT: clickable areas per slide (1280x720 px), turned into pptx hyperlinks by pack.cjs and real links in the web deck
 const HOT = {};
-const hot = (n, o) => { (HOT[n] ||= []).push(o); };
+const hot = (n, o) => { if (o.slide === 0) return; (HOT[n] ||= []).push(o); };
 const MAPN = () => pos(23); // slide number of the marking map
 const run = (sec, rub, n, k = '') => { hot(n, { x: 440, y: 22, w: 400, h: 32, slide: MAPN(), tip: 'Back to the marking map' }); return `<div class="run ${k}"><span class="sec">${sec}</span><a class="rub" href="#${MAPN()}" data-go="${MAPN()}" title="Back to the marking map" style="text-decoration:none">${rub}</a><span>FlyWithEase&nbsp;&nbsp;${String(n).padStart(2, '0')} / %TOTAL%</span></div>`; };
 const PAGE = 'https://' + 'rehancodes-web.github.io/Mack.1/';
@@ -625,7 +626,7 @@ add({ so: "Every minute of holding costs about $98 and a single diversion up to 
 
 // ---------- TRACK EXPLAINERS, BOEING CASE, UNDER THE HOOD, NEMOTRON IN FULL, SCORECARD (28-34) ----------
 // jump chips: absolute row under the running header, turned into slide links in pptx and web
-const jumps = (n, list) => list.map(([o, label], j) => { const x = 72 + j * 172, t = pos(o); hot(n, { x, y: 54, w: 164, h: 26, slide: t, tip: label }); return `<a href="#${t}" data-go="${t}" style="position:absolute;left:${x}px;top:54px;width:164px;height:26px;display:flex;align-items:center;gap:6px;padding:0 10px;border-radius:20px;background:var(--acc);color:#fff;font-family:var(--H);font-weight:600;font-size:12px;text-decoration:none;white-space:nowrap;overflow:hidden"><span style="font-family:var(--N)">${String(t).padStart(2, '0')}</span>${label}</a>`; }).join('');
+const jumps = (n, list) => list.filter(([o]) => pos(o) > 0).map(([o, label], j) => { const x = 72 + j * 172, t = pos(o); hot(n, { x, y: 54, w: 164, h: 26, slide: t, tip: label }); return `<a href="#${t}" data-go="${t}" style="position:absolute;left:${x}px;top:54px;width:164px;height:26px;display:flex;align-items:center;gap:6px;padding:0 10px;border-radius:20px;background:var(--acc);color:#fff;font-family:var(--H);font-weight:600;font-size:12px;text-decoration:none;white-space:nowrap;overflow:hidden"><span style="font-family:var(--N)">${String(t).padStart(2, '0')}</span>${label}</a>`; }).join('');
 const col = (h, c, body) => `<div class="card" style="padding:14px 16px;border-top:4px solid ${c}"><div style="font-family:var(--H);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:${c};font-weight:800">${h}</div>${body}</div>`;
 const boeing = (title, items, foot = '') => `<div class="black" style="padding:16px 18px"><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--H);font-weight:800;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;background:#8EE9D9;color:#0F1117;border-radius:5px;padding:2px 7px">Boeing angle</span></div><h3 style="color:#fff;margin-top:8px;font-size:18px">${title}</h3><ul style="list-style:none;display:grid;gap:7px;margin-top:8px">${items.map(t => `<li style="font-size:14px;line-height:1.36;color:#DCE3E8"><span class="dot" style="background:#8EE9D9"></span>${t}</li>`).join('')}</ul>${foot ? `<p style="font-size:12.5px;color:#8E9BA6;margin-top:8px">${foot}</p>` : ''}</div>`;
 const li = a => `<ul style="margin:8px 0 0 18px;display:grid;gap:5px">${a.map(t => `<li style="font-size:14.5px;line-height:1.36">${t}</li>`).join('')}</ul>`;
@@ -917,10 +918,24 @@ add({ so: "The 'inspect' answer is not fragile: with orbit showing a 29-point ga
 // ---------- order slides by the marking scheme ----------
 // Numbers are insertion order above; the deck is reordered so Track A (65 marks) comes first.
 const TITLES = ['FlyWithEase', 'The problem', 'The basics', 'Who it serves', 'How it works', 'Track A6 objective', 'Data', 'Larper AI', 'Track A6 result', 'Accuracy', 'Case 1: Jewar lender', 'Working demo', 'Track C', 'Case 2: Delhi IGI spoofing', 'Case 3: Border jamming', 'Case 4: One passenger', 'Case 5: Tartu', 'Nemotron', 'Track B3', 'Originality', 'Feasibility', 'Roadmap', 'Marking map', 'Research findings', 'Boeing: the manufacturer view', 'Boeing fleet cases', 'Economic impact', 'Track A explained', 'Case 6: Boeing 787 diversion', 'Track C explained', 'Track B3 explained', 'Under the hood', 'Nemotron in full', 'Scorecard', 'Larper in detail', 'Progress + decision maths', 'Track C method', 'B3 physics + simulation', 'Architecture', 'Feasibility: cost', 'Feasibility: pilot', 'Feasibility: risks', 'Feasibility: sensitivity'];
-const ORDER = [1, 23, 3, 2, 24, 25, 26, 27, 4, 16, 28, 6, 5, 7, 32, 39, 8, 35, 18, 33, 9, 10, 11, 36, 29, 12, 30, 13, 37, 14, 15, 17, 31, 19, 38, 20, 21, 40, 41, 42, 43, 34, 22];
+const ORDER = SHORT ? [1, 2, 26, 5, 6, 8, 9, 11, 13, 14, 19, 21, 22] : [1, 23, 3, 2, 24, 25, 26, 27, 4, 16, 28, 6, 5, 7, 32, 39, 8, 35, 18, 33, 9, 10, 11, 36, 29, 12, 30, 13, 37, 14, 15, 17, 31, 19, 38, 20, 21, 40, 41, 42, 43, 34, 22];
 const pos = o => ORDER.indexOf(o) + 1;
-if (ORDER.length !== slides.length || new Set(ORDER).size !== slides.length) throw new Error('ORDER does not cover every slide');
-const orig = slides.slice(); slides.length = 0; ORDER.forEach(o => slides.push({ ...orig[o - 1], title: TITLES[o - 1] }));
+if (!SHORT && (ORDER.length !== slides.length || new Set(ORDER).size !== slides.length)) throw new Error('ORDER does not cover every slide');
+const NOTES5 = {
+ 1: '0:00–0:20. Good morning. GPS jamming and spoofing now hit Indian airspace every day. When GPS fails near Delhi, flights divert. FlyWithEase makes sure there is somewhere ready to go and no passenger is stranded. Primary Track A6, additional Track C, with B3 as the long-term layer.',
+ 2: '0:20–0:45. 2,354 incidents reported to Parliament in two years, 623 more in just two months of 2026. 71% meant total loss of GPS on board. Delhi IGI approaches were spoofed in 2025. Today the warning, the diversion and the passenger are handled separately, after the fact.',
+ 26: '0:45–1:05. For Boeing: this is your fleet. A 777 spoofed 80 nautical miles off track, a United 777 from Delhi spoofed over the Black Sea, a Ryanair 737 that went around and diverted to another country, a 787 that lost a GPS receiver. Each one is a gap we fill.',
+ 5: '1:05–1:25. How it works in four steps: detect where GPS is failing from aircraft data, confirm from orbit which airport can absorb the diversions, harden positioning long term, and start passenger recovery before landing.',
+ 6: '1:25–1:40. Track A objective 6, infrastructure from orbit. We watched Jewar, 70 km from Delhi, the airport Delhi would divert to. Its opening was promised three times, so we must know it is really built.',
+ 8: '1:40–2:05. Larper, our AI: a Random Forest that labels every 10 m pixel across 79 Sentinel-2 scenes from 2020 to 2026. Trained on ESA WorldCover west of the airport and tested on land it never saw: 71% agreement, 88% of built land found.',
+ 9: '2:05–2:30. The result: in January 2025 the builder claimed 80% complete. Orbit saw 41 to 51% of the land converted. Two independent methods agree on the timeline. That 29-point gap is the signal.',
+ 11: '2:30–2:50. The economic decision: should a lender release the next tranche? With the satellite gap, inspecting first costs $26k in expectation versus $112k for releasing: about $86k of expected loss avoided, with assumed inputs, on free data.',
+ 13: '2:50–3:15. Track C: a live map of where GPS is failing, from 24,579 real aircraft reports. Each aircraft broadcasts how much it trusts its own position; we count low-trust aircraft per 1 degree square. 37 high zones, on the border and over Myanmar. Jewar: normal. Protective only, no tracking.',
+ 14: '3:15–3:45. Putting it together on the Delhi spoofing case: Track C shows degraded cells north of Delhi, A6 confirms Jewar is built, NVIDIA Nemotron drafts the decision, a second Nemotron pass fact-checks it, and a person decides. Here the human corrected the AI: stay at Delhi on ILS runways, Jewar as confirmed fallback.',
+ 19: '3:45–4:05. Track B3, the long-term fix: navigation satellites at 1,000 km instead of 20,200 km give a 19 dB stronger signal, shrink a jammer’s reach 80 times, and with NavIC catch 92% of spoofing in simulation. Boeing already builds GPS and low-orbit satellites.',
+ 21: '4:05–4:30. Feasibility: everything shown runs today on free data on one laptop. Assumptions and constraints are stated, every number is labelled. The next step is a 12-week read-only shadow pilot with one airline at Delhi, no new satellites needed.',
+ 22: '4:30–5:00. GPS will keep failing; passengers should not pay for it. Now a working prototype, in three months a shadow pilot, then more hubs and a regulator view. Everything is live at rehancodes-web.github.io/Mack.1. Thank you.' };
+const orig = slides.slice(); slides.length = 0; ORDER.forEach(o => slides.push({ ...orig[o - 1], title: TITLES[o - 1], notes: SHORT ? NOTES5[o] : orig[o - 1].notes }));
 
 // ---------- write ----------
 const TOTAL = slides.length;
@@ -999,5 +1014,5 @@ input[type=range]{accent-color:#4338CA;width:100%}
 </script></body></html>`;
 fs.mkdirSync(path.join(ROOT, 'docs', 'shots'), { recursive: true });
 for (const k of ['shotA6', 'shotC', 'shotHome']) fs.copyFileSync(path.join(ROOT, IMG[k][0]), path.join(ROOT, 'docs', IMG[k][1]));
-fs.writeFileSync(path.join(ROOT, 'docs', 'deck.html'), deck);
+if (!SHORT) fs.writeFileSync(path.join(ROOT, 'docs', 'deck.html'), deck);
 console.log(`wrote ${TOTAL} slides (pitch/slides/html) + docs/deck.html`);

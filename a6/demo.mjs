@@ -205,7 +205,7 @@ input[type=range]{width:100%;accent-color:var(--larper)}
 </style><link rel="stylesheet" href="nd-theme.css"></head><body>
 <div class="app">
 <header class="top">
- <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#86A3FF" stroke-width="2"/><path d="M4 15 L20 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#E6A84A"/></svg>FlyWithEase</div>
+ <a class="brand" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#e05fd0" stroke-width="2.4"/><circle cx="12" cy="12" r="3" fill="#f2a93b"/></svg>FlyWithEase</a>
  <nav class="mods" aria-label="Modules">
   <a href="index.html">Overview</a>
   <a href="a6.html" aria-current="page">Jewar <small>A6</small></a>

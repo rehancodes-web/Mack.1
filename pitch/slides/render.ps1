@@ -1,7 +1,7 @@
 # Screenshots each pitch/slides/html/NN.html to pitch/slides/png/NN.png at 2x (2560x1440) with headless Edge.
-param([string]$Only = "")
+param([string]$Only = "", [string]$Dir = "html", [string]$Out = "png")
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$html = Join-Path $here "html"; $png = Join-Path $here "png"
+$html = Join-Path $here $Dir; $png = Join-Path $here $Out
 New-Item -ItemType Directory -Force $png | Out-Null
 $edge = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 $prof = Join-Path $env:TEMP "navc-edge-render"
